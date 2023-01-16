@@ -1,0 +1,40 @@
+Consumer Offset Behaviour
+-------------------------------------
+
+- A consumer is expected to read from a log continusly
+- A consumer can be down in case of a bug
+- By default. Kaka has a retention of 7 days , and if your consumer is down for more than 7 days, teh offsets are invlid
+- The behaviour for the cosumer ids then to then use:
+	- auto.offset.rest=latest 
+			- will read 	from the end of the log 
+	- auto.offset.reset=earliest
+			- will read from teh start of the log
+	- auto.offset.reset=none
+			- will throw exception if no offset is found
+
+- Additionally, consumer offsets can be lost:
+	- If a consumer hasn't read new data in 1 day( KAfka < 2.0)  - default
+	- If a consumer hasn't read new data in 7 days( KAfka >= 2.0) - default
+
+- This can be controlled by the broker setting offset.retention.minutes 
+
+
+
+
+
+
+Replaying data for Consumers
+-------------------------------
+- To replay data for a consumer group:
+ 	- Take all consumers from a specific group down 
+	- Use kafka-consumer-groups command to set offset to what you want 
+	 
+
+Bottom Line
+-------------
+	- Set proper data retention period & offset retention period
+	- Ensure the auto reset bahavious is the oe you expect/want
+	- Use replay capability in case of unexpected behaviour
+
+
+

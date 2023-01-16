@@ -1,0 +1,31 @@
+Kafka Cluster Setup - High Level Architecture Overview
+-----------------------------------------------------
+
+- You want multiple brokers in diffeent Data Centres( racks) to distribute your load.You also want a cluster of atleast 3 Zookeeper( if you are using Zookeeper)
+
+
+Notes:
+	- Its not easy to setup a cluster
+	- You want to isolate each Zookeeper & Broker on seprate servers
+	- You also need to implment monitoring
+	- Operations must be mastered
+	- You need an excellent Kafka admin 
+ 
+	- Alternative:
+		- managed "Kafka as a Service" offerings from various companies
+			- Amazon MSK< Cnflunetn Cloud, Aiven, CloudKarafka, Instaclustr, Upstash, etc.
+			- No operational burdens(updates, monitoring, setup etc.)
+
+
+ 	- How many brokers:
+		- Compute your throughput, data retention and replication factor
+		- Then test for your use case
+
+
+	- Other components that you need to setup:
+		- Kafka Connect clusters
+		- Kafka Schema Registtry: make sure to run two for high availbility
+		- UI tools for ease of administration 
+		- Admin tools for automated workflows
+		- Automate as much as you can your infrastructure when you have understood how processes work
+ 

@@ -1,0 +1,262 @@
+
+Java Consumer- Consumer Groups and Partion Rebalancing
+---------------------------------------------------------
+
+
+
+
+- Project : kafka-beginners-course\kafka-basics
+
+- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-basics
+
+Refer: D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-beginners-course-part2\kafka-basics\src\main\java\io\conduktor\demos\kafka
+
+
+
+
+Objectives:
+	- Learn how to write a basic consumer to receive data from Kafka
+	- View basic configuration parameters
+	- Confirm we recieve the data from the Kafka Producer written in Java
+	- Ensure we have code in place to respond to termination signals
+	- Make your consumer in Java consume data as part of consumer group
+	- Observe rebalance mechanisms
+	- Moving parttions between consumers is called a rebalance
+	- Reassignment happen when a consumer leves or joins a group
+	- It can also happen if an admin adds new parttions into a topic
+
+
+Eager Rebalance:
+----------------
+- Is a default behaviour 
+- All consumers stop give up their mebership of partitiions
+- They rejoin the consumer group and get a new parttion assignment 
+- During a short period of time, the entire consumer group stops processings 
+- Consumers don't necessarily "get back" the same parttions as they used to 
+
+
+Cooperative Rebalance(Incremental Rebalance)
+----------------------------------------------
+- Reassigning a small subset of the partitions from one consumer to another 
+- Other consumers that dont' have reassigned partitions can still process uniterrupted
+- Can go through several iterations to find a "stable" assignment ( hence "incremental")
+- Avoids "stop-the-world" events where all consumers stop preocssing data
+
+
+Different types of rebalacing strategies
+-------------------------------------------
+- How to use:
+	- Kafka Consumer: parttion.assignment.strategy:
+		(1) RangeAssignor: Eager Rebalancing. Assign partitions on a per topic basis ( can lead to imbalance)
+		(2) RoundRobin: Eager Rebalancing. Assign partitions across all topics in round-robin fashion, optimal balance
+		(3) StickyAssignor: Eager Rebalancing. Balanced  like RoundRobin, and then minimises parttion movements when consumer join/leave the group in order to minimize movements
+		(4) CooperativeStickyAssignor: Cooperative Rebalancing(Incremental Rebalancing)
+			- Rebalance strategy is identical to StickyAssignor but supports cooperative rebalances and therefore consumers can keep on consuming from topic
+
+
+Default assignor
+-----------------
+ - The default assignor is [RangeAssignor, CooperativeStickyAssignor], which will use the RangeAssignor by default, but allows upgrading to the CooperativeStickyAssignor with just a single rolling bounce that removes the RangeAssignor from the list.
+
+
+Kafka Connect
+-------------
+- already implemented by default 
+
+
+Kafka Streams
+--------------
+- turned on by default using StreamsParttionAssignor	
+
+
+
+Static Group Membership
+-------------------------	 	 
+- By default , when a consumer leaves a group, it's partiions are revoked and reassigned
+- If it joins back, it will have a new "meeebr ID" and new parttions assigned
+- If you specify group.instance.id it makes the consumer a static member
+- Upon leaving, the consumer has to upto session.timout.ms to join back it's parttions( else they will eb reassigned) , without trigerrign a rebalance
+- This is helpful when consumers maintain local state and cache( to avoid re-building the cache)
+
+
+
+
+Class 'ConsumerDemoCooperative.java':
+			- Refer code for documentation
+			
+
+
+
+Before running the code
+-----------------------
+
+
+
+(1) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+(2)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window open
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+
+
+
+
+
+
+(3) Create Kafka topic named 'demo_java' with 3 partitions & replication factor 1 :
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic demo_java --create --partitions 3 --replication-factor 1
+
+
+WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Created topic demo_java.	
+
+
+(4)List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+
+__consumer_offsets
+demo_java
+first_topic
+new_topic
+thrid_topic
+
+
+
+
+(5) List consumer groups;
+
+	- Creating consumer groups:
+		- Refer '5e.Kafka Consumer in Groups  CLI .txt'
+
+	- Open WSL console:
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+
+my-first-consumer-group
+console-consumer-88257
+my-second-consumer-group
+
+
+
+
+Run the code
+-------------
+
+
+
+- - Project : kafka-beginners-course\kafka-basics
+
+- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-basics
+
+
+- ConsumerDemoWithShutdown.java:
+		- Right click -> Run ConsumerDemoCooperative.main()
+		
+
+				- Code will keep on running
+				- Data consumed will be shown from beginning across all partitions
+				- You can produce more data by running 'ProducerDemoWithKeys.java'
+				-  If the below line is commented, and you start the application, in the logs you can see partition.assignment.strategy is a list of RangeAssignor & CooperativeStickyAssignor
+					- //consumerProperties.setProperty(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, CooperativeStickyAssignor.class.getName());
+
+				- Force assignor to run only in cooperative sticky mode 
+        				umerProperties.setProperty(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, CooperativeStickyAssignor.class.getName());
+
+
+
+				 
+				- Start multiple instances of 'ConsumerDemoCooperative.java' parallely to the first instance:
+					- Go to the drop down box on teh top RHS corner bedide the hammer icon( Build Project icon) :
+						- Select 'Edit COnfigurations'
+						- Select 'ConsumerDemoCooperative':
+								- Click on 'Modify Options' link in right pane 
+									- Select ' Allow MUltiple Instances' 
+				-  ConsumerDemoCooperative.java:
+					- Right click -> Run ConsumerDemoCooperative.main() 
+					= second instance will start
+
+
+				- Run a single instance of the app ConsumerDemoCooperative.main() :
+						- Logs: 
+
+     - partition.assignment.strategy = [org.apache.kafka.clients.consumer.CooperativeStickyAssignor]
+	
+	Assigned partitions:                       [demo_java-0, demo_java-1, demo_java-2]
+	Current owned partitions:                  []
+	Added partitions (assigned - owned):       [demo_java-0, demo_java-1, demo_java-2]
+	Revoked partitions (owned - assigned):     []
+				
+	
+
+
+			- Produce data by running 'ProducerDemoWithKeys.java'
+				 - Data il lbe wriiten to parttion 0,1 & 2
+			
+
+
+	
+	 		- Run second instance of the app ConsumerDemoCooperative.main() :
+			- Logs of second instance : 
+	
+	Assigned partitions:                       [demo_java-2]
+	Current owned partitions:                  []
+	Added partitions (assigned - owned):       [demo_java-2]
+	Revoked partitions (owned - assigned):     []
+
+
+
+		   - Logs of First Instance:
+				
+	Assigned partitions:                       [demo_java-0, demo_java-1]
+	Current owned partitions:                  [demo_java-0, demo_java-1]
+	Added partitions (assigned - owned):       []
+	Revoked partitions (owned - assigned):     []
+
+
+
+		- As you can observe, teh third parttion '[demo_java-2]' was reassigned gfrom instance 1 to instance 2 without the first two parttions being sut down for instance 1 
+
+
+
+		- Start a third instnace of the app : 
+			- Logs for the third instance: 
+	Assigned partitions:                       [demo_java-1]
+	Current owned partitions:                  []
+	Added partitions (assigned - owned):       [demo_java-1]
+	Revoked partitions (owned - assigned):     [] 
+
+
+
+		- All instances will now have one parttion each 
+
+		-  Produce data by running 'ProducerDemoWithKeys.java'
+				 - Data will be wriiten to the 3 instances based on which parttion they now own
+			
+
+
+********************
+
+Tips:
+	- Import: Alt + Enter
+	- Auto complete = tabs

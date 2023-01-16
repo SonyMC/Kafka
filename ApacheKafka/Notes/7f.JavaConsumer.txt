@@ -1,0 +1,133 @@
+
+Java Consumer
+-----------------------------
+
+
+- Project : kafka-beginners-course\kafka-basics
+
+- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-basics
+
+Refer: D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-beginners-course-part2\kafka-basics\src\main\java\io\conduktor\demos\kafka
+
+
+
+
+Objectives:
+	- Learn how to write a basic consumer to receive data from Kafka
+	- View basic configuration parameters
+	- Confirm we recieve teh data from the Kafka Producer written in Java
+
+
+
+
+
+Class 'ConsumerDemo.java':
+			- Refer code for documentation
+			
+
+
+
+Before running the code
+-----------------------
+
+
+
+(1) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+(2)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window open
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+
+
+
+
+
+
+(3) Create Kafka topic named 'demo_java' with 3 partitions & replication factor 1 :
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic demo_java --create --partitions 3 --replication-factor 1
+
+
+WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Created topic demo_java.	
+
+
+(4)List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+
+__consumer_offsets
+demo_java
+first_topic
+new_topic
+thrid_topic
+
+
+
+
+(5) List consumer groups;
+
+	- Creating consumer groups:
+		- Refer '5e.Kafka Consumer in Groups  CLI .txt'
+
+	- Open WSL console:
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+
+my-first-consumer-group
+console-consumer-88257
+my-second-consumer-group
+
+
+
+
+Run the code
+-------------
+
+
+
+- - Project : kafka-beginners-course\kafka-basics
+
+- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-basics
+
+
+- ConsumerDemo.java:
+		- Right click -> Run ConsumerDemo.main()
+		
+
+				- Code will keep on running
+				- Data consumed will be shown form beginning across all partitions
+				- You can produce more data by running 'ProducerDemoWithKeys.java'
+				- If you restart the applicaiton, data wile bconsumed from the latest committed offset and not from the beginning 
+				- To stop the applcation, you have to manually stop the server and you wil get a exit code of 130.
+					- This is not a clean shutdown and in next demo we will see how to do a clean shutdown of a consumer.	
+
+
+
+
+
+
+********************
+
+Tips:
+	- Import: Alt + Enter
+	- Auto complete = tabs

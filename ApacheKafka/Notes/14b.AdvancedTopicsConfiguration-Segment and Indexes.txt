@@ -1,0 +1,41 @@
+Advanced Topics Configuration - PArttions and Segments
+-------------------------------------------------------
+
+- Topics are made of parttions
+- Partitions are made of segments(files)
+- Each segment contains a range of Offsets
+- Active Segment : 
+	- Is the last segment in a partition which is being written to
+	- A prttion can have only one active segment
+- 2 important segment settings:
+	- log.segment.bytes:
+		- is the maximum size of a single segment in bytes( default is 1 GB)
+			- This means that is teh segment sze exceeds 1 GB, teh current segment will eb closed and a new one will be created.
+
+		- smaller log.segment.bytes means: 
+			- More segments per parttions
+			- Log compaction happens more often
+			- But Kafka must keep more files opened( Error: To omany open files)
+		
+	- log.segment.ms:
+			
+			- The time Kafka will wait before committing the segment if not full( 1 week)
+
+			- This denotes teh time that KAfka will wait before closing the segment( regardless of the size)
+
+			- smaller log.segment.ms maeans
+				- You set a max frequency for log compaction(more often triggers)
+				- Maybe you require a daily compaction instead of weekly
+
+
+- Indexes:
+	- Segments come along with 2 indexes(files):
+		- An offset to position index: helps Kafka find where to read from and to find a message
+		- A timestamp to offset index: helps Kafka find messages with a specific timestamp
+
+
+
+
+ 
+
+

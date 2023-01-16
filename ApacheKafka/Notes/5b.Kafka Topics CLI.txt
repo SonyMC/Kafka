@@ -1,0 +1,133 @@
+Kafka CLI: Topics
+----------------------------
+
+Objectives:
+	- Create KAfka Topics
+	- List Kafka Topics
+	- Describe Kafka Topics
+	- Increase PArttions in a Kafka Topic
+	- Deelte a Kafka Topic 
+
+
+
+
+Start Kafka broker:
+---------------------
+
+		-  Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the windo wopen
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+
+			Note: keep both windows open 
+
+
+Create Kafka Topics:
+-------------------------
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-for-beginners-code-part1\1-kafka-cli
+	- Refer '0-kafka-topics.sh'
+	- Open WSL:
+		- Show all commands associated with topics :
+			- cmd: kafka-topics.sh 
+
+
+
+
+
+
+
+
+
+
+
+
+	- Open new WSL terminal
+
+	- List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+			- Response: Does not return anything as we have not created any topics
+
+
+	- Create Kafka topic named 'first_topic':
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --create
+			- Response: Missing required argument "[partitions]"
+			- Note: In newer versions of Kafka, will creatre topic with default values
+
+ 
+
+	- Create Kafka topic named 'first_topic' with 3 partitions:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --create --partitions 3
+			- Response: Missing required argument "[replication-factor]"
+			- Note: In newer versions of Kafka, will creatre topic with default values
+
+	- Create Kafka topic named 'first_topic' with 3 partitions & replication factor 2 :
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --create --partitions 3 --replication-factor 2
+			-	- Response: Error while executing topic command : Replication factor: 2 larger than available brokers: 1.
+
+				- Note: In newer versions of Kafka, will creatre topic with default values
+				- Note : We have only configured 1 broker to be up and running
+
+
+
+	- Create Kafka topic named 'first_topic' with 3 partitions & replication factor 1 :
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --create --partitions 3 --replication-factor 1
+
+		- Response: 
+WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Created topic first_topic.
+
+
+
+
+ 	- Create Kafka topic named 'first.topic' with 3 partitions & replication factor 1 :
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first.topic --create --partitions 3 --replication-factor 1	 
+
+Response: WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Error while executing topic command : Topic 'first.topic' collides with existing topics: first_topic
+[2022-10-13 13:17:22,937] ERROR org.apache.kafka.common.errors.InvalidTopicException: Topic 'first.topic' collides with existing topics: first_topic
+ (kafka.admin.TopicCommand$)
+
+
+	- Create Kafka topic named 'second_topic' with 3 partitions & replication factor 1 :
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic second_topic --create --partitions 3 --replication-factor 1
+
+
+	- List topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+		- Response: 
+first_topic
+second_topic
+
+
+	- Describe a topic
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --describe	
+
+Topic: first_topic      TopicId: XebTCW8aQq2a6Qz0YiAKXg PartitionCount: 3       ReplicationFactor: 1    Configs: segment.bytes=1073741824
+        Topic: first_topic      Partition: 0    Leader: 0       Replicas: 0     Isr: 0
+        Topic: first_topic      Partition: 1    Leader: 0       Replicas: 0     Isr: 0
+        Topic: first_topic      Partition: 2    Leader: 0       Replicas: 0     Isr: 0
+
+	- Describe all topics:
+		- cmd:kafka-topics.sh --bootstrap-server localhost:9092 --describe
+
+
+	- Delete a topic 
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --delete
+			- Wil delete first_topic
+
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic second_topic --delete
+			- Wil delete second_topic
+
+		- Note: # (only works if delete.topic.enable=true)
+
+
+ 	 

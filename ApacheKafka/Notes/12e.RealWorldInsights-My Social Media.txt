@@ -1,0 +1,59 @@
+My Social Media 
+------------------
+
+- Is a company that allows people topost images and others to react by using "likes" and "comments". The business want the following capabilites:
+	- Users should be able to post, like and comment 
+	- Users should be able to see total no. of likes and coments per post in real time 
+	- High volume of data is expected on the first day of launch
+	- Users should be able be able to see trending posts
+
+
+
+
+How to implement
+---------------
+
+
+- New Topic : 
+	-Posts 
+	-Likes 
+	-Comments
+	- Posts_With_Counts
+	- Trending Posts
+	
+		
+	
+	 
+
+
+- Producer:
+	- Posting Service  :  which sends posts to the topic ' posts' 
+	- Like/Comment Service : 	sends likes and comments to topics 'Likes' & topic 'Comments'
+						- is a producer tat writes to 2 different topics	
+
+
+-Kafka Stream:
+	- Total Likes/Comments Computation: 	
+		- takes data from topics 'Posts', 'Likes', and 'Comments' and computes aggregations and writes to topic  'Posts_With_Counts'	
+	- Trending Posts in the past hour:
+		- takes data from topics 'Posts', 'Likes', and 'Comments' and computes aggregations and writes to topic  'Trending Posts'
+
+- Consumer: 
+	- Refresh_Feed_Consumer :
+		- takes data from topic 'posts_with_counts' and publish to a website
+
+- Kafka Connect:
+	- Trending Feed Service:
+		-  takes data from topic 'posts_with_counts' and publish to a website
+
+
+CQRS model:
+	- The above architectural model is called CQRS( Command, Query REsponsibilty Segregations) as it decouples all Commands, Queries and Reads which would enable scalability
+	- REsponsibilites are segregated
+
+Events:
+	- The data in Kafka should be formatted as events:
+		- E.g. 
+			- User_123 created a post_id 456 at 2 pm 
+			- User_234 liked post_id 456 at 3 pm 
+			- USer_123 deleted a post_id 456 at 6 pm 

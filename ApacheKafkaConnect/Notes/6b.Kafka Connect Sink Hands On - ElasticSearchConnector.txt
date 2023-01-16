@@ -1,0 +1,211 @@
+Kafka Connect Sink JHHands on : Elastic Search Connector
+------------------------------------------------------------
+
+Note : Does not work. However good for learning
+
+
+Objective:
+----------
+- We are going to start n ElasticSearch Instance to Sink the data to 
+- We will use Docker to start our ElasticSearch instance  
+- This will serve as our Sink for our first Sink Connector
+
+
+ElasticSearch:
+---------------
+	- ElasticSearch is an easy way to store JSON data and search across it 
+	- Used by many companies around the world to power search engines and advanced analystics capabilities 
+	- No knowledge of ElasticSearch is required for this demo
+
+
+Goal:
+--------
+	- Start an ElasticSearch instance using Docker
+	- Sink a topic with multiple partittions to ElasticSearch
+	- Run in distributed mode with multiple tasks
+	- Flow:
+		- Refer '5c.Kafka Connect Source Hands On -File Stream Source Connector Distributed Mode.txt'
+		- File Stream Source COnnector Topic : 'demo-2-distributed' -> ElasticCSearchSink Connector= ElasticSearch
+
+
+Learning:
+------------
+	- Learn abput tasks.max parameter
+	- Understand how Sink COnnectors work
+
+
+docker-compose.yml:
+-------------------
+
+	-D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	-Line 18 onwards contains the configuration for elasticsearch  
+	- Start Docker Desktop
+
+
+
+
+
+
+Commands use:
+--------------
+
+
+- ElasticSearch Container needs more memory.To set this:
+	- Open powershell in admin mode:
+		- cmd: wsl -d docker-desktop
+		- cmd: sysctl -w vm.max_map_count=262144
+		- cmd: exit
+
+			OR ( to set permenantly)
+	-  Open powershell in admin mode:
+		- cmd: wsl -d docker-desktop
+		- cmd: vi /etc/wsl.conf
+		- add these lines at the end:
+			[boot]
+			kernelCommandLine = "sysctl.vm.max_map_count=262144"
+		- quit VI : esc + type ':wq'
+		- Restart Docker Desktop
+
+
+
+- kafka-connect-tutorial-sinks.sh
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+
+
+- Start our kafka cluster , elasticsearch and postgres containers
+	- cmd: docker-compose up
+
+
+Update Landoop container :
+------------------------------------------
+	- Start Docker desktop
+	- cmd: docker pull landoop/fast-data-dev
+
+
+
+- ElasticSearch Sink
+------------------
+- Info here: http://docs.confluent.io/3.2.0/connect/connect-elasticsearch/docs/elasticsearch_connector.html
+-  We make sure elasticsearch is working. 
+	-  url: http://127.0.0.1:9200/
+	-  Response:
+
+{
+"name": "Soulfire",
+"cluster_name": "elasticsearch",
+"cluster_uuid": "jIYwVyOPTlCRGL8RyGZtVg",
+"version": {
+"number": "2.4.3",
+"build_hash": "d38a34e7b75af4e17ead16f156feffa432b22be3",
+"build_timestamp": "2016-12-07T16:28:56Z",
+"build_snapshot": false,
+"lucene_version": "5.5.2"
+},
+"tagline": "You Know, for Search"
+}
+
+
+
+
+
+- Go to the connect UI and apply the configuration at :
+	
+	-Sink Connector for Twitter:
+		- sink-elastic-twitter-distributed.properties
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\sink\demo-elasticsearch	
+			- sink/demo-elastic/sink-elastic-twitter-distributed.properties
+
+
+
+	-Sink Connector for Distributed File:
+		- sink-elastic-file-distributed.properties
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\sink\demo-elasticsearch	
+			- sink/demo-elastic/sink-elastic-file-distributed.properties
+
+	- Configuration option:
+		-  Refer : http://docs.confluent.io/3.1.1/connect/connect-elasticsearch/docs/configuration_options.html
+
+
+	- Open Kafka COnnect CLuster UI:
+		- http://127.0.0.1:3030/
+			- Connectors-> Enter-> New-> Sinks:
+
+				- ElasticSearch:
+					- copy-paste configuration from:
+						-  sink-elastic-twitter-distributed.properties 
+					
+
+		- Note: The connector 'create' buttonis greyed out and seems Lamdoop/Lens.io is ye tto update the connectors
+			- So for the time being open POSMAN and execute following POST request:
+					- Collections = Kafka -> ElasticSearchConnectTwitter 
+ 					- Collections = Kafka -> ElasticSearchConnectFile
+			- Error: The connectors wil lfail to get created and a 400 resposne wil eb shown as follows:
+
+    "error_code": 400,
+    "message": "Connector configuration is invalid and contains the following 2 error(s):\nCould not connect to Elasticsearch. Error message: Failed to parse info response. Check logs for detailed information - [11:3] [org.elasticsearch.client.core.MainResponse] failed to parse field [version]\nFailed to create client to verify connection. Failed to parse info response. Check logs for detailed information - [11:3] [org.elasticsearch.client.core.MainResponse] failed to parse field [version]\nYou can also find the above list of errors at the endpoint `/connector-plugins/{connectorType}/config/validate`"
+										
+
+
+-  Visualize the data using the Dejavu plugin we installed in teh ElasticSearch container:
+	- url: http://127.0.0.1:9200/_plugin/dejavu
+		- Note: appname will be teh topic name( i.e. demo-3-twitter or demo-2-distributed)
+		- If this works, it will show you the tweets or input file entries based on which topic you chose
+
+	- Query for retweets:
+			-> Queries -> Add Query :
+				- Name= any name 
+				- Query body:
+{
+  "query":{
+    "term" : {
+      "is_retweet" : true
+		}
+  }
+}
+
+
+
+
+	- Query for users with GT 500 friends:
+			-> Queries -> Add Query :
+				- Name= any name 
+				- Query body:
+
+
+  "query":{
+    "range" : {
+      "user.friends_count" : {
+          "gt" : 500
+      }
+		}
+  }
+}
+
+
+
+	- Note: Since we were not able to create the connector, we will lnot be able to see the above
+
+
+# Counting the number of tweets:
+http://127.0.0.1:9200/demo-3-twitter/_count
+# You can download the data from the UI to see what it looks like
+# We can query elasticsearch for users who have a lot of friends, see query-high-friends.json
+
+
+
+
+###############
+# B) REST API Demo
+# Examples are covered from here: http://docs.confluent.io/3.2.0/connect/managing.html#common-rest-examples
+# See File sink/demo-rest-api/demo-rest-api.sh
+###############
+
+###############
+# B) JDBC Sink demo
+# Examples are covered from here: http://docs.confluent.io/3.2.0/connect/managing.html#common-rest-examples
+# See File sink/demo-rest-api/demo-rest-api.sh
+###############
+
+###############
+# C) PostgresSQL demo
+# Examples are taken from here: http://docs.confluent.io/3.2.0/connect/connect-jdbc/docs/sink_connector.html#quickstart

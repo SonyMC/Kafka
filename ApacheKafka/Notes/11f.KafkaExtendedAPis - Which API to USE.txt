@@ -1,0 +1,26 @@
+
+Which API to use
+---------------------
+
+Kafka Connect Source:
+	- If you have a Sorce DB or data is laready somewhere and you want to put it into Kafka
+
+
+Kafka Producer:
+	- If you want to produce the data direnclty into Kafka 
+
+
+Kafka Streams :
+	- If you want to do KAfka to Kafka transformations
+
+KSQL: 
+	- is a DB whih allows you to do SQL queries on top of KAfka by also leveraging internally Kafka Streams
+
+Kafka Connect Sink:
+	- if you want to send data into a target for storage and analysis later on.
+
+KAfka Consumer:
+	- If you just want to consume data without storage 
+
+Schema Registry:
+	- use to ensure data and data types are correct

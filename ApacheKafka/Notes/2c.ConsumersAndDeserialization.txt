@@ -1,0 +1,28 @@
+Consumers and Deserialization
+--------------------------------
+
+- Consumers read data from a topic(identified by name) - pull model
+- A Consumer can read from one topic and can use multiple topic partitions
+- One Topic can have multiple consumers
+- Consumers automatically know which broker to read from 
+- In case of broker failures, consumers know how to recover
+- Data is read in order from low to high offset within each parttionss
+
+Consumer Deserializer
+----------------------
+- Deserialize indicates how to transform bytes into objects/data
+- They are used on the value and the key of the message
+- E.g. 
+	- Key = binary
+		- Apply Key Deserializer = Integer Deserializer to get Key Object 
+	- Value = binary 
+		- Apply Value Deserializer = String Deserializer to get Value Object
+
+- Common Deserializers:
+	- String, Int. Float, Avro, Protobuf etc.
+
+- The serialization/deserialization type must not change during topic lifecycle( create a new topic instead)
+
+ 
+     
+ 

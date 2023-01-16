@@ -1,0 +1,212 @@
+Running your first Apache Streams Application
+---------------------------------------------
+
+
+
+Objectives:
+	(1) Download Kafka binaries
+	(2) Start Zookeeper and Kafka
+	(3) Create input and Output Topics using 'kafka-topics'
+	(4) Publish data to the input topic
+	(5) Run the 'WordCount' example
+	(6) Stream the output topic using 'kafka-console-consumer'
+
+
+(1) Download Kafka binaries : 
+		- https://kafka.apache.org/downloads
+		- Download binary ( anything greater than 0.11.0.0)
+		- Extract using WinRar :
+			- D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+
+		- For Windows, use the binaries( appended with .bat) in :
+			- D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1\bin\windows
+
+		- Config Library:
+			- D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1\config
+			- Contains propoertis files
+							
+		- Jar files:	
+			- D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1\libs
+
+		- Create folder 'connectors'
+
+(2) Start Zookeeper and Kafka
+		- cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+
+	- Change permissions of folder to allow acess to all users( Note: only for DEV ):
+		- Right click on folder -> properties-> Security-> Users/Athelas -> Edit -> Allo = Full COntrol
+	
+	- Refer coomads:
+			- Windows:
+				- course-intro-windows.bat
+					- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project\code\1-course-intro\
+			- MAC/Linux:
+				- course-intro-mac-linux.sh
+					- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project\code\1-course-intro\
+
+			- We will be following Windows commands for this demo
+
+	- Open cmd
+		- cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+	
+	-Start zookeeper 
+		- cmd: bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+			-  Error : 'The input line is too long. The syntax of the command is incorrect'
+
+
+	 - Open file 'kafka-run-class.bat' in editor
+			- Refer : https://narayanatutorial.com/jms/apache-kafka/the-input-line-is-too-long-the-syntax-of-the-command-is-incorrect
+			- Replace: 
+for %%i in ("%BASE_DIR%\libs\*") do (
+	call :concat "%%i"
+)	
+
+
+			- With:
+	call :concat "%BASE_DIR%\libs\*;"
+
+
+	- Closecm console and try command again
+
+	- Start Zookeeper:
+		- - zookeeper is at localhost:2181		
+		- cmd: cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+		- cmd: bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+	
+	- You should be seeing the following msg towards teh en din your powershell console:
+		- INFO binding to port 0.0.0.0/0.0.0.0:2181 (org.apache.zookeeper.server.NIOServerCnxnFactory)
+
+	- Start Kafka:
+		- open another cmd console  shell 
+			-  kafka is at localhost:9092		
+			- cmd: bin\windows\kafka-server-start.bat config\server.properties	
+
+		- You should see something like teh following:
+[2023-01-16 14:23:05,887] INFO [KafkaServer id=0] started (kafka.server.KafkaServer)
+
+
+	- Leave the two consoles for Zookeepr and KAfka running 
+
+
+			
+(3) Create input and Output Topics using 'kafka-topics'
+
+	- Note: For Streams, we have to create teh topics ahead ( instead of tryign the application to auto-generate it)
+	- Open another cmd console
+	- cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+	- create input topic 'streams-plaintext-input'
+		- Older versions of Kafka using Zookeeper
+		cmd: bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic streams-plaintext-input		
+		- Newer versions of Kafka not having Zookeeper
+		cmd: bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic streams-plaintext-input	
+
+		- Note: We are following the newer version cmd( without zookeeper)
+
+
+	- Create output topic 'streams-wordcount-output'
+	 -  Older versions of Kafka using Zookeeper
+		cmd: bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic streams-wordcount-output
+	- Newer Version of Kafka that does not have Zookeeper
+		cmd: bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic streams-wordcount-output
+		- Note: We are following the newer version cmd( without zookeeper)
+
+	- List topics:
+		cmd: bin\windows\kafka-topics.bat --zookeeper localhost:2181 --list
+	- Newer Version of Kafka that does not have Zookeeper
+		cmd: bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --list
+		- Note: We are following the newer version cmd( without zookeeper)
+		- Response:
+streams-plaintext-input
+streams-wordcount-output
+
+
+
+(4a) Publish data to the input topic:
+
+	- start a kafka producer
+		- Open new cmd prompt
+		- cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+		- cmd: bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic streams-plaintext-input
+			- Response:
+				- Will show a '>' symbol meaning data can be input
+			- Enter any data you want and press enter to go to next line
+		- Once you have entered data , do ctrl + C to exit
+>keep roaring
+>roaing
+>roaring
+>soaring
+>fly high
+			
+
+	
+(4b) verify the data has been written
+	- Start a kafka consumer in the console wghich will read teh input topic from the beginning
+		- Open new cmd prompt
+		- cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+		- cmd: bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 --topic streams-plaintext-input --from-beginning
+			- Response:
+				- You will see all teh data you have entered in the produer above appear in the consumer console
+
+		- Once you have verfifed the , do ctrl + C to exit
+
+
+(4c) Start a consumer on the output topic using a formatter 
+	
+		- Open new cmd prompt
+		- cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+		- cmd: 
+bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 ^
+    --topic streams-wordcount-output ^
+    --from-beginning ^
+    --formatter kafka.tools.DefaultMessageFormatter ^
+    --property print.key=true ^
+    --property print.value=true ^
+    --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer ^
+    --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
+
+
+		- Response:
+			- You will see a blinking arrow after the following indicatign the consumer is ready to accept data 
+
+bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 ^
+    --topic streams-wordcount-output ^
+    --from-beginning ^
+    --formatter kafka.tools.DefaultMessageFormatter ^
+    --property print.key=true ^
+    --property print.value=true ^
+    --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer ^
+    --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
+
+		- Leave teh console running
+
+(5/6) Run the 'WordCount' example
+	- Start the streams application
+		- Open new cmd prompt
+		- cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+		- cmd: 
+bin\windows\kafka-run-class.bat org.apache.kafka.streams.examples.wordcount.WordCountDemo
+		- Though you will see a couple a permission errora and null pointer warning , ignore 
+		
+
+		- Go back to the formatted consumer window( teh step above) and you will see the following:
+keep    1
+roaring 1
+roaing  1
+roaring 2
+soaring 1
+fly     1
+high    1
+
+
+	- So esentially for each line we entered in teh producer, it increments the count of teh repeated words
+
+
+
+- List topics:
+		- cmd: bin\windows\kafka-topics.bat --zookeeper localhost:2181 --list
+		- You will notice 3 internal topics have been added than teh ones we created for offsets, changelog and repartition:
+__consumer_offsets
+streams-plaintext-input
+streams-wordcount-KSTREAM-AGGREGATE-STATE-STORE-0000000003-changelog
+streams-wordcount-KSTREAM-AGGREGATE-STATE-STORE-0000000003-repartition
+streams-wordcount-output

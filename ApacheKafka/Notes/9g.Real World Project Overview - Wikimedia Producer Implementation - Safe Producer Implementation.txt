@@ -1,0 +1,138 @@
+Wikimedia Producer - Safe Producer Implmentation
+--------------------------------------------------
+
+
+
+
+- Wikimedia Recent change stream :
+		
+	-url: https://stream.wikimedia.org/v2/stream/recentchange
+	- page keeps on gettign updates very fast
+	- Is realtime and shown all changes happening in Wikimedia
+	-  What is Wikimedia used for?
+		- The nonprofit Wikimedia Foundation provides the essential infrastructure for free knowledge
+	- What's the difference between Wikipedia and Wikimedia?
+		- Based in San Francisco, the Wikimedia Foundation (WMF) is the organization that owns the domain wikipedia.org
+
+	- We will use thsi streeam to send data into Apache Kafka 
+
+- Wikimedia Recent Change Stats:
+		- https://codepen.io/Krinkle/pen/BwEKgW?editors=1010
+- Wikimedia Event Stream Demo:
+		- https://esjewett.github.io/wm-eventsource-demo/s
+
+
+
+
+
+- Classes:
+	- WikiMediaChangesProducerSafeImplementation.java
+	- WikimediaChangeHandler.java( implments EventHandler)
+
+
+
+Before running the code
+-----------------------
+
+
+
+(1) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+(2)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window open
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+(3) Create Kafka topic named 'wikimedia.recentchange' with 3 partitions & replication factor 1 :
+
+NOte: Only execute this step if you have not already created teh topic 
+
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic wikimedia.recentchange --create --partitions 3 --replication-factor 1
+
+
+WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Created topic demo_java.	
+
+
+(4)List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+__consumer_offsets
+demo_java
+first_topic
+java_demo
+new_topic
+thrid_topic
+wikimedia.recentchange
+
+
+(5)build.gradel:
+	 -  We are using clintet version >2.8 , so we aere safe by default 
+			- implementation 'org.apache.kafka:kafka-clients:3.3.1'
+	 - If we were using a client version <= 2.8, we would need to setup configuration of the producer 
+	 - The producer properties can be viewed in the logs at startuo 
+
+
+- View 'min.insync.replicas':
+	- Open Conduktor and connect to existign cluster 
+	- Go to Brokers tab in LHS:
+		- Click on 'localhost:9092':
+			- search for 'min.insync.replicas'
+			- 'min.insync.replicas' value will be 1 as we have only 1 broker
+
+- Start Producer ( refer below) to see changed configuration
+
+
+Wikimedia Producer Run
+------------------------
+
+- New WSL console for a consumer from topic 'wikimedia.recentchange' to read from latest msg in topc wikimedia.recentchange and display the key as a string and value as a json
+	- cmd: 
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic wikimedia.recentchange --formatter kafka.tools.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property format.key=string --property print.value=true  --property format.value=json
+		
+		- The command by default reads from the earliest 
+		- Formats key as Strign and Values as JSON
+
+- New WSL console for a consumer from topic 'wikimedia.recentchange' to read from earliest msg in topc wikimedia.recentchange and display the key as a string and value as a json
+	- cmd: 
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic wikimedia.recentchange --formatter kafka.tools.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property format.key=string --property print.value=true  --property format.value=json --from-beginning		
+
+
+
+- We will  read from the latest ( as there will be lots of data)
+- Nothing will ebs hown as we have not started our producer  
+
+- Start producer: 
+	- Run WikiMediaChangesProducerSafeImplementation.main()
+		- Startup log:
+			- [main] INFO com.launchdarkly.eventsource.EventSource - Starting EventSource client using URI: https://stream.wikimedia.org/v2/stream/recentchange
+			
+
+
+- Go to WSL consumer console:
+	- You can see data being consumed from the topic to which we have produced using the java code
+		 
+
+- Start Conduktor:
+	- Connect to teh runnign local KAfka CLuster
+	- Start a consumer to teh topic 'wikimedia.recentchange'
+	- You will see losts of msgs coming through. You can see the details of teh msg ( after stoppignteh consumer) by clicking on the msg and seelcting the 'details' button 

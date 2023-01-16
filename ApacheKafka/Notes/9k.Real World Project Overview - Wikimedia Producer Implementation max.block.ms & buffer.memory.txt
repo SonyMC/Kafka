@@ -1,0 +1,20 @@
+Wikimedia Producer -max.block.ms & buffer.memory
+------------------------------------------------
+
+
+
+- If te eproducer produces faster than the broker can take, the records will be buffered in memory
+- buffer.memory=33554432(32MB): the size of teh send buffer
+- The buffer will fill up over time and empty back down when the throughput to the broker increases
+- If the buffer is full(al of 32MB), then the .send() method will start to block(won't eturn right away)
+- max.block.ms=60000; i.e 60 second. This is the time the .send() willblock until throwing an exception.
+	- Exceptions are thrown when:
+		- The producer has filled up it's buffer
+		- The broker is not accpeting any new data
+		- 60s has elapsed
+
+- If you hit an exception it usually menas that your brokers are down or overloadedas they can't respind to requests
+
+
+
+

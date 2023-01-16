@@ -1,0 +1,65 @@
+Kafka Extended APIs - Overview
+------------------------------
+
+- Kafka Consumers and Producers ahve existed for a long time and the are consudered low level
+- Kafka & eosystem have evolved and has introduced some new API that are higher level that solves specific problems
+- Kafka Connect:
+	- Solves External Source => Kafka and KAfka => External Sink
+
+- Kafka Streams:
+	- Solves the transformations from one KAfka topic to another topic (alternative to chaining Kafka Producers and Consumers)
+	
+
+- Schema Registry:
+	- Helps using Schema in Kafka
+
+
+Objective
+---------
+- Kafka Connect : 
+	- Send Wikimedia data to Kafka using a Source Connector( Kafka SSE Source Connector)
+	- Send data from KAfka to OpenSearch using a Sink Connector( Kafka Connect ElastiSearch Sink)
+- Kafka Streams : USe streams to do a counter applicaiton to do some statistics on top of a dataset 
+
+
+
+Resources:
+------------
+- Refer : 
+	- https://www.confluent.io/product/connectors/
+	- https://www.confluent.io/hub/
+
+- Source code: https://github.com/conduktor/kafka-connect-wikimedia
+- Code Directory: D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-connect-wikimedia	
+
+
+
+Sample Ueecases
+---------------
+- Get data out of Twitter 
+- Send data fromKafka to PostGreasSQL/ElasticSearch/MongoDB
+
+
+
+Kafka Connect
+-------------------
+- Kafka COnnect is all about re-using coden & connectors
+
+- Why use Kafka Connect:
+	- Programmers always want to import data from teh same source:
+		- DBs, JDBC, Couchbase, GoldenGate, SAP HANA, Blockchain, Cassandra, DynamoDB, FP, IOT, MongoDB, MQTT< RethinkDB, Salesforce, Soir, SQS, Twitter, ...
+	- Programmers always want to store data in the same sinks:
+		- S3, ElasticSearch, HDFS, SAP HANA< Document DB, Cassandra, DynamoDB, HBase, MongoDB, Redis, Solr, Splunk, Twitter
+
+- Connect Cluster consists of Worker nodes which takes data from the Source and passes it onto the Kafka CLuster( consistign of brokers)
+- The Same Connect Cluster Worker nodes can be used to send data to the Sinks from the  Kafka CLuster( consistign of brokers)
+
+- Source Connectors: 
+	- to get data from Common Data Sources
+- Sink COnnectors:
+	- to publish that data in Common Data Stores
+- Make it easy for non-experienced dev to quickly get their data reliably inot Kafka
+- Part of your ETL( Extract.Transform/Load) Pipeline
+- Scaling made easy from small pipelines to company-wide pipelines
+- Other programmers may already have doen a very good job: re-us eteh code!!
+- Connectors achieve fault tolerance, idempotence, distribution , ordering  

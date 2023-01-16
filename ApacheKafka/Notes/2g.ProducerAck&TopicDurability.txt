@@ -1,0 +1,20 @@
+Producer Acknowledgment and Topic Durability
+---------------------------------------------
+
+
+Producer Acknowledgement
+------------------------
+- Producers can choose to recieve acknowledgments of data writes 
+	(1) acks=0:
+		- Producer won't wait for acknowledgement(possible data loss)
+	(2) acks=1
+		- Producer will wait for leader acknowledgement(limited data loss) 
+	(3) acks=all
+		- Producer will wait for leader+replicas acknowledgement( no data loss)
+
+
+
+Kafka Topic Durability
+-------------------------
+- For a topic replication factor of 3, topic data durability can withstand 2 brokers loss
+- As a rule, for a Replication Factor of N, you can permanently lose upto N-1 brokers and still recover your data 

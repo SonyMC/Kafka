@@ -1,0 +1,175 @@
+Starting Kafka with Conduktor
+------------------------------
+
+- Download Conductor- Refer 'https://www.conduktor.io/download/'
+- Free for all platforms
+- Compatible with all versions
+- Can add separate components such as Schema REgistry
+
+
+- Dowloand msi file for Windows:
+	- https://www.conduktor.io/download/
+- Install 
+- Start Conduktor:
+	- Click on 'Start Local Kafka CLuster'
+	- Conduktor login:
+		- Use GitHub for login
+	- Cluster name= Kafka Course
+	- Cluster version -> choose highest -> Click on DOwnload
+	- Scheme Registry = do not enable	
+	- Color: Choose any
+	- Click on 'Start Cluster'
+		- You will see Zookeeper starting 
+		- Note: If it does not start the frst time, try again
+		- Once successfully started:
+			- Click on OVerview:
+				- Cluster local url: http://127.0.0.1:9092 OR http://localhost:9092 
+
+
+MACOS
+-------
+- Downloads: https://kafka.apache.org/downloads
+- Install Kafka on MAC: https://www.conduktor.io/kafka/how-to-install-apache-kafka-on-mac
+- Start Zookeer: https://www.udemy.com/course/apache-kafka/learn/lecture/11566924#overview
+- Install usinging Brew: https://www.udemy.com/course/apache-kafka/learn/lecture/11566922#overview
+		- Refer: https://www.conduktor.io/kafka/how-to-install-apache-kafka-on-mac-with-homebrew
+
+
+
+Linux
+------
+- Downloads: https://kafka.apache.org/downloads
+- Install Kafka on Linux: https://www.conduktor.io/kafka/how-to-install-apache-kafka-on-linux
+- Refer : https://www.udemy.com/course/apache-kafka/learn/lecture/11566910#overview
+- Start Zookeeper: https://www.udemy.com/course/apache-kafka/learn/lecture/11566914#overview
+
+
+
+Windows
+-------
+- Install Windows WSL2: Install Kafka Binaries
+	- Necessary step whther you use Conduktor or not to start Kafka
+- Downloads: https://kafka.apache.org/downloads
+- How to Install Apache Kafka on Windows : 
+	- https://kafka.apache.org/downloads
+- Steps:
+	- Windows 10 or above 
+	- Install WSL2
+		- Refer https://www.conduktor.io/kafka/how-to-install-apache-kafka-on-windows
+		- OPtional:Disable IPv6 on WSL2
+			- Skip thsi for now and use only if you have any issues
+
+			- WSL2 currently has a networking issue that prevents outside programs to connect to Kafka running on WSL2 				(for example your Java programs, Conduktor, etc...);
+
+			- To fix this, we recommend disabling IPv6 on WSL2. Your Windows password will be prompted on the first 				command
+			- admin mode cmd:
+				- sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+				- sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+	- Install Java JDK version 11 on WSL2:
+		- Open WSL as admin
+		 - cmds;
+			wget -O- https://apt.corretto.aws/corretto.key | sudo apt-key add - 
+			sudo add-apt-repository 'deb https://apt.corretto.aws stable main'
+			sudo apt-get update; sudo apt-get install -y java-11-amazon-corretto-jdk
+		- Refer https://www.conduktor.io/kafka/how-to-install-apache-kafka-on-windows
+	
+
+	- Download Apache Kafka 
+		- Extract contents on WSL2:
+		- Open WSL as admin:
+			- cmd: wget https://archive.apache.org/dist/kafka/3.0.0/kafka_2.13-3.0.0.tgz
+			- Download and extract the contents to a directory of your choice, for example ~/kafka_2.13-3.0.0
+				- cmds: 
+
+				cmd:tar xzf kafka_2.13-3.0.0.tgz
+				cmd: mv kafka_2.13-3.0.0 ~
+
+			- Check installation:
+				- cmd: cd /home/cd mailsonymathew/
+				- cmd: ls
+						-Will show:  kafka_2.13-3.0.0
+				- cmd: pwd
+						- Will show: 
+							- /home/mailsonymathew
+			- Launching Kafka commands:
+				- cmd: cd kafka_2.13-3.0.0/bin
+				- cmd: ls
+					- Will list all Kafka commands avaialble
+				
+			
+	- Setup the $PATH environment variables for easy access to the Kafka binaries
+		- Open WSL as admin:
+			- cmd: cd kafka_2.13-3.0.0/bin
+			- cmd: pwd
+				- Response: /home/mailsonymathew/kafka_2.13-3.0.0/bin
+			- Go up two levels:
+			  cmd:cd ../../	
+			- cmd:pwd
+				- REsponse: /home/mailsonymathew
+			- cmd: nano .bashrc
+				- Go to the bottom:
+				- paste : 
+				PATH="$PATH:/home/mailsonymathew/kafka_2.13-3.0.0/bin"
+			- Exit: 
+				ctrl+ s
+				ctrl + x
+
+	- Check Installation:
+		- Close WSL and Open again:
+			- cmd: echo $PATH
+				- you should see Kafka bin path
+		- cmd: kafka-topics.sh
+			- Will list all topic cmds
+
+
+	- Start Zookeeper and Kafka
+
+		- Refer: https://www.conduktor.io/kafka/how-to-install-apache-kafka-on-windows
+		(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Go to Kafka directory: 
+					- cmd: cd /home/mailsonymathew
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+			
+
+
+		(2) Start Kafka using binaries in another process in WSL2:
+			-  Open WSL in a new terminal:
+			- Open WSL:
+				- Go to Kafka directory: 
+					- cmd: cd /home/mailsonymathew
+				- Start Kafka:
+					- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+
+	
+	- Note: we need to have both these WSL windows open to have Kafka running
+
+
+
+
+WSL N/W bug
+--------------
+
+Execute steps mentioned in Refer '3c.Wsl2NetworkBug.txt'
+
+
+
+
+
+
+
+
+Connect Conduktor to existing Kafka Cluster which we started above
+------------------------------------------------------------------
+
+- Start Conduktor:
+	- Click on 'Connect on Existign Cluster' -> New Kafka Cluster:		
+			- Cluster name = Kafka-Cluster
+			- Bootstrap servers = localhost:9092
+			- Zookeper= localhost:2181
+			- Test Kafka connectivity
+				- If you get msg ok -> Save
+	- Doube clik on 'Kafka-Cluster' on right pane for Conduktor to connect to existing Kafka culster
+
+	- Note: If you run into any problems , redo teh steos detailed in '3c.Wsl2NetworkBug.txt'

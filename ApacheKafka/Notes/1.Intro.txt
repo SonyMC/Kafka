@@ -1,0 +1,49 @@
+Course reference repo : https://github.com/simplesteph
+
+Conduktor:
+----------
+	- Desktop GUI for Apache Kafka
+	- Perform all Kafka operations from one tool 
+	- Supports Kafka clusters and all securoty mechanisms
+	- Supports Kafka community projects(Connect, Streams, Schema REgistroy, kSqlDB, etc.)
+
+Apache Kafka
+-------------
+Problem: 
+	- No. of Integrationsd: if you have 4 source systems & 6 target systems , you need to write 24 integrations
+	- Protocol:each inegration will have a different protocol ( E.g. TCP, HTTP, REST, FTP, JDMC..)
+	- Data format: How data is parsed( binary, csv, JSON, Avro, Protbuf...)
+	- Load on source system: Each source system will have an increased load from the connection)
+
+Solution:
+	- Decouple : uing Apache Kafka
+	- Producer: Source systems are responsibel for producing data into Apacha Kafka
+		- E.g: Website Events, Pricing Data, Finacial TRansactions, User Interactions
+	- Consumer: Target system will consume data from Kafka
+		= E.g: DB, Analytics, Email System
+
+	
+Kafka:
+	- Was created by Linkedln, now OpenSource Project maintained by Confluent, IBM,Cloudera
+	- Distributed, resilient architecture, fault tolerant
+	- Horizontal Scalability:
+		 - Can slace to 100s of brokers
+		 - Can scale to millions of messages per second (E.g. Twitter)
+	- High Performance ( latency of less than 10ms) - real time
+	- Used by 2000+ firms, 80% of teh Fortun 100
+		= E.g: Linkedln, Netflix, Uber, Walmart, airbnb
+			- Netflix: uses Kafka to apply recommnedations in real time while you are watching TV shpws
+			- Uber: uses Kafka to gather user, taxi and trip data in real time to compute and forecast demand, and compute surge pricing in real time
+			- Linkednln: uses Kafka to prevent spam, collect user interactions to make better connection recommnedations in real times
+	- Use cases:
+		- Messaging system
+		- Activity Tracking
+		- Gather metrics from many different locations
+		- Application Logs gathering
+		- Stream processing( with the Kafka Stream API for E.g)
+		- De-coupling of system dependencis
+		- Integration with Spark, Flink, Storm, Hadoop, and many other Big Data technologies
+			- Microservice spub/sub   
+
+	- *** Remember:Kafka is used only as a transport mechanism!!!
+ 

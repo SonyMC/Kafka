@@ -1,0 +1,50 @@
+Starting Kafka Without ZooKeeper using Kraft
+-----------------------------------------------
+
+Note: 
+Starting Kafka without Zookeeper (KRaft mode)
+
+
+These has been included as a demo if you are curious about trying out this mode, to see the future of Apache Kafka. Note: the KRaft mode is not ready for production yet.
+
+If you have successfully completed the previous section, you can skip these lectures and go straight into the next section.
+
+MACOS
+----
+https://www.udemy.com/course/apache-kafka/learn/lecture/31409192#overview
+
+
+LINUX
+--------
+https://www.udemy.com/course/apache-kafka/learn/lecture/31409230#overview
+
+
+
+Windows
+--------
+Start Kafka in Kraft Mode:
+	- Refer : https://www.conduktor.io/kafka/how-to-install-apache-kafka-on-windows-without-zookeeper-kraft-mode
+
+- Open WSL2:
+
+	(1) Generate a cluster ID and format the storage using kafka-storage.sh
+		- cmd: cd /home/mailsonymathew
+		- cmd: kafka-storage.sh random-uuid
+			- REsponse: hPLOxdchSYadG8tYtJ-I6A
+
+	(2) Format your storage directory (replace <uuid> by your UUID obtained above)
+	
+		- cmd: kafka-storage.sh format -t hPLOxdchSYadG8tYtJ-I6A -c ~/kafka_2.13-3.0.0/config/kraft/server.properties
+			- Response : Formatting /tmp/kraft-combined-logs
+	
+	(2) Start Kafka using Kraft binaries(you can use same wsl2 window): 
+
+				- Start Kafka:
+					- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/kraft/server.properties
+
+
+
+
+
+
+

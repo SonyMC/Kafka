@@ -1,0 +1,88 @@
+Building and Running Connector in Standalone Mode
+--------------------------------------------------
+
+
+Gut Hub Source Connector configuration files
+-----------------------------------------------
+D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1\config
+	- (1)GitHubSourceConnectorExample.properties
+			- Update Github creds but do not dforget to deelte when uploading to a public repo
+	- (2)worker.properties
+			- COntainer teh KAfka Worker node configs
+
+
+Build:
+	- CLean , Test and Build
+	- cd: D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+	- cmd:mvn clean package
+			OR
+	- In Eclipe IDE:
+		- Right click project -> Run as -> Mavan Build -> Goals = clean install
+
+		- Application jar file will be geenrated in tarhget folder:
+			- kafka-connect-github-source-1.1.jar
+			
+		- Alljar files needed for this connector(including the applicatio njar generated above will be auto-geernated in:
+			- \target\kafka-connect-github-source-1.1-package\share\java\kafka-connect-github-source
+			
+
+
+
+Running: 
+	- Start Docker Desktop
+
+
+	- Dockerfile:
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+	- MAC/Linux - Refer shell script file 'run.sh' in D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+
+	- Windows:
+		- cd D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+		
+- Build image:
+			- cmd: docker build -t mailsonymathew/kafka-connect-source-github:1.0 .
+
+		- Push image to Docker repo:
+			- cmd: docker push  mailsonymathew/kafka-connect-source-github:1.0
+
+
+		- Run the container:
+			- cmd: docker run --net=host --rm -t -v /offsets:/kafka-connect-source-github/offsets mailsonymathew/kafka-connect-source-github:1.0
+
+				- Note: The LHS path to the ':"  denotes the Windows directory whil ethe RHS denotes the container directory
+	
+
+				- This will start the GitHub Source Coonector
+
+
+
+
+- Bash into the container:
+	- List containers
+		- cmd: docker ps
+			- Note down contianer id 
+	- Bash:
+		 - cmd:  docker exec -it <container-id> bash	
+			- Bash terminal:
+				- cmd: pwd
+					- /kafka-connect-github-source-1.1
+				- cmd: cd ..
+				- cmd: ls
+
+
+Note:
+In Docker console you will see teh following info:
+      
+[2023-01-11 10:55:27,478] INFO Source task WorkerSourceTask{id=GitHubSourceConnectorDemo-0} finished initialization and start (org.apache.kafka.connect.runtime.WorkerSourceTask:142)
+[2023-01-11 10:55:29,800] INFO Fetched 100 record(s) (com.mailsonymathew.kafka.GitHubSourceTask:147)
+[2023-01-11 10:55:36,838] INFO Reflections took 10807 ms to scan 576 urls, producing 13662 keys and 89524 values  (org.reflections.Reflections:229)
+
+There are also errors shown such as:
+[2023-01-11 10:55:36,838] INFO Reflections took 10807 ms to scan 576 urls, producing 13662 keys and 89524 values  (org.reflections.Reflections:229)
+[2023-01-11 10:55:42,416] ERROR Failed to flush WorkerSourceTask{id=GitHubSourceConnectorDemo-0}, timed out while waiting for producer to flush outstanding 1 messages (org.apache.kafka.connect.runtime.WorkerSourceTask:304)
+[2023-01-11 10:55:42,417] ERROR Failed to commit offsets for WorkerSourceTask{id=GitHubSourceConnectorDemo-0} (org.apache.kafka.connect.runtime.SourceTaskOffsetCommitter:112)
+	
+
+

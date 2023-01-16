@@ -1,0 +1,60 @@
+Consumer Internal Threads
+-------------------------------------
+
+Controlling Consumer Liveliness:
+	- Consumers in a Group talk to a Consumer Groups Co-ordinator(acting Broker)
+	- To detect which consumers are down, ther eis a "heartbeat" and "poll" mechanism
+	- Heartbeat Mechanism
+		- Consumers send msg to Consumer Groups Co-ordinator Broker once in while statign that they are still alive
+		- heartbeat.interval.ms(default 3 secs):
+			- how often to send heartbeats
+			- Usually set to 1/3 of sesion.timeout.ms
+		- session.timeout.ms(default 45 secs for Kafka 3.0 +, before 10 secs):
+			- Hearbeata are sent periodically to the broker
+			- If no heartbeat is sent during that period, teh consumer is considered dead
+			- Set even lower to faster consume rrebalances
+		- Takeaway: This mechanism is used to detect a consumer application being down		
+			
+
+	- Polling Mechanism
+		- Other Brokers thinking our consumer is still alive as they are consuming data from Kafka
+		- consumer.poll.thread:
+			- max.poll.interval.ms(default 5 minutes):
+				- maximum amount of time between two .poll(0 calls before declaring consumer as dead
+				- hsi is relevant for Big Data frameworks like Spark in case the processing takes time
+		- Takwaway: Thid mechanism is used to detect a data processign issue with teh consumer( i.e consumer is "stuck")
+		- max.poll.records( default 500):
+			- controls how many recs to receive per poll equest
+			- increase is your messages are very small and have a lot of RAM 
+			- lower if it takes you too much time to process recs
+		- fetch.min.bytes(default 1):
+			- controls how much data you want to pull atleast on each request
+			- helps improving throughput and decreasing request number
+			- at the cost of latency	
+		- fetch.max.wait.ms( default 500):
+			- The max. amount of time the Kafka broker wil block before answering the fetch request if there isn't sufficient  data to immediately satisfy the requirement givn by fetch.min.bytes
+			- This means that until the requirement of fetch.min.bytes to be satisfied, you will have upto 500 ms of latency before the fetch returns datga to the consumer( E.g. introducing a potential delaty to be more efficient in requests)
+		- max.partition.fetch.bytes( default 1 mB):
+			- The max. amount of data per partition teh server will return
+			- If you read from 100 parttions, you will need  a lot of memory( RAM)
+		- fetch.max.bytes( default 55 MB)
+			- max. amount of data returned for each fetch request
+			- if you have available memory, try increasing  fetch.max.bytes to allow consumer to read more data in each 				request
+
+
+		 -Note: Change these settings only if your consumer maxes out on throughput already		
+
+				
+	
+
+
+- To avoid issues. consumers are encouraged to process data fast and poll often
+
+
+	 
+	 
+
+
+
+
+

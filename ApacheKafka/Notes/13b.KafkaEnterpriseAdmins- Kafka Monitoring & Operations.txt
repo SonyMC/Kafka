@@ -1,0 +1,35 @@
+Kafka Monitoring & Operations
+-----------------------------
+
+
+Reference: 
+- https://kafka.apache.org/documentation/#monitoring
+- https://docs.confluent.io/platform/current/kafka/monitoring.html
+- https://www.datadoghq.com/blog/monitoring-kafka-performance-metrics/
+
+
+
+- Kafka exposes metrics through JMX( an interface to get hese metrics)
+- These metrics are highly important for monitoring Kafka, and ensuring the systems are behaving correctly under load 
+- Common places to host the Kafka metrics:
+	- ELK( ELasticSearch + Kibana)
+	- Datadog
+	- Confluent Control Center
+	- Prometheus
+
+- Some important metrics:
+	- Under Replicated partitions: No of partittions that are in problem with ISR( in sync replicas) . May indicate a high load on the system
+	- Request Handlers: utilzation of threads for IO, NW, etc. Overall utilization of an Apache Kafka broker
+	- Request Timing: how long it takes to reply to requests. Lower is better, as latency will eb improved
+
+
+
+Kafka Operations:
+	- Kafka Operations team must be able to perform teh following tasks:
+		- Rolling REstart of Brokers
+		- Updating Configurations
+		- REbalancing parttions
+		- Increasing replication factor
+		- Adding a Broker
+		- Replacing a Broker
+		- Upgrading a Kafka CLuster with zero downtime

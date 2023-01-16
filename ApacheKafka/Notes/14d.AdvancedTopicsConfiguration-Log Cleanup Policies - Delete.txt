@@ -1,0 +1,26 @@
+Advanced Topics Configuration - Log Cleanup Policies - Delete
+-------------------------------------------------------------
+
+- log.retention.hours:
+	- no. of hours to okeep data for( default is 168 = 1 week)
+	- higher no. means more disk space
+	- lower no. means that less data is retained( if your consumers are down for too lon, they can miss data)
+- Other parameters allowed:
+	- log.retention.ms
+	- log.retention.minutes
+	- smaller unit has preceedence
+
+- log.retention.bytes:
+	- Max. size in Bytes for each partittion( default is -1 - infinite)
+	- Useful to keep the size of a log under a threshhold
+
+
+USe cases - two common pair of options:
+	- 1 week of retention:
+		- log.retention.hours=168 and log.retention.bytes=-1
+
+	- Infinite time retention bounded by 500 MB:
+		- log.retention.ms=-1 and log.retention.bytes=524288000
+	 
+
+

@@ -1,0 +1,13 @@
+Architecture:
+
+- Refer diagram in 'Connect&StreamsArchitecture.png'
+
+
+Objective:
+- Get Data from KAfka Cluster -> Into the Connect Cluster -> and finally into outr Sink
+- Sinks we are using for this demo:
+	- Elastsearch 
+	- PostGreSQL
+
+
+- Note : We are going to use the same COnnect Cluster for both Source & Sink

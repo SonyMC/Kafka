@@ -1,0 +1,126 @@
+
+Java Consumer- Auto Offset Commit Behaviour
+-------------------------------------------
+
+
+
+
+- Project : kafka-beginners-course\kafka-basics
+
+- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-basics
+
+Refer: D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-beginners-course-part2\kafka-basics\src\main\java\io\conduktor\demos\kafka
+
+
+
+- In the Java Consumer API, offsets are regularly committed
+- Enable at-least once reading scenario by default( undr conditions)
+- Offests are committed when you call .poll() and auto.commit.interval.ms has elapsed
+- E.g.: auto.commit.interval.ms=5000 and enable.auto.commit=true will commit every 5 seconds
+- Make sure messages are all successfully processed before you cal lpoll() again
+	- If you don;t, you will not be in at-least-once 	reading scenario
+	- In that(rare) case,you must disable enable.auto.commit, and most likely most process to a separate thread, and then from time to time call .commitSync() or .commitAsync() with teh correct offsets manually( advanced) 
+	  
+
+
+
+			
+
+
+
+Before running the code
+-----------------------
+
+
+
+(1) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+(2)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window open
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+
+
+
+
+
+
+(3) Create Kafka topic named 'demo_java' with 3 partitions & replication factor 1 :
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic demo_java --create --partitions 3 --replication-factor 1
+
+
+WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Created topic demo_java.	
+
+
+(4)List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+
+__consumer_offsets
+demo_java
+first_topic
+new_topic
+thrid_topic
+
+
+
+
+(5) List consumer groups;
+
+	- Creating consumer groups:
+		- Refer '5e.Kafka Consumer in Groups  CLI .txt'
+
+	- Open WSL console:
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+
+my-first-consumer-group
+console-consumer-88257
+my-second-consumer-group
+
+
+
+
+Run the code
+-------------
+
+
+
+- - Project : kafka-beginners-course\kafka-basics
+
+- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-basics
+
+
+- ConsumerDemoWithShutdown.java:
+		- Right click -> Run ConsumerDemoCooperative.main()
+		
+
+				- From logs you can see 
+					- auto.commit.interval.ms=5000
+					- enable.auto.commit=true
+
+********************
+
+Tips:
+	- Import: Alt + Enter
+	- Auto complete = tabs

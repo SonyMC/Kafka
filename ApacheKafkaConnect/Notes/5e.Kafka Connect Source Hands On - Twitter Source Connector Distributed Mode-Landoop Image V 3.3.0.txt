@@ -1,0 +1,182 @@
+Kafka Connect Source - Twitter Source COnnector - Distributed Mode
+------------------------------------------------------------------
+
+
+Note 
+	- The following demo fails to pull data from Twitter as unfortunately the Landoop connectors are not updated. 
+	- However good to folow from a learning perspective
+	- For sinks demo ( further in the course) we will be suing distributed file connector instead 
+
+
+- Goal:
+	- Gather data from Twitter in Kafka Connect Distributed Mode 
+	- Run a connector in distributed mode on our already setup Kafka Connect Cluster
+	- Flow:
+		Twiiter -> Kafka Connect -> Twitter TOpic
+
+Learning:
+	- Gather real data using the connector :
+		- Connector used :
+			- https://www.confluent.io/hub/jcustenborder/kafka-connect-twitter
+
+			
+
+
+
+Twitter Developer APP Setup:
+	_ Refer 'Setup' section of https://github.com/jcustenborder/kafka-connect-twitter
+	- Creating a Twitter application:
+		- To obtain the required keys, visit https://apps.twitter.com/ 
+		- Login using your Twitter Account
+		- Create a New App:
+			- In the form:
+				- use case = select 'Building tools for Twitter users'
+				- Will you make Twitter content or derived information available to a government entity or a government affiliated entity = no
+				- Click on 'Let's do this':
+					- Accept Developer agreement & policy
+				- Submit
+				- Verify 	your email
+					- click on the 'Confirm your email' button in the verification emai
+					- You will be redirected to a new page 'Welcome to the Twitter Developer Platform':
+						- App name = Kafka _ bobu.mathew
+						- Get keys :
+							API key = gmrZBxEAyL41KKP3e4aJoapE5
+							API secret key = SWlkiKkr9SJWvUeBKZDKYseIQKYhnZaW5pTCXRrRLoCriYUBvm
+							Bearer Token = AAAAAAAAAAAAAAAAAAAAABrvkQEAAAAAj9iGiqLAfXL59bDUWBH33Z5z4So%3DtZucskc97PKxgLdRMG9ka6VektPBl4iExGNrApOSZ7tVxQRWm7
+
+						- Once you have created the app:
+								- Developer pOrtal -> Project & Apps -> Project 1 -> Kafka_bobu.mathew
+								- Click on 'Keys and Tokens' tab:
+									- Access Token and Secret -> geenrate -> scrol ldown in the pop window:
+										- Access Token = 1489794384732196867-8J3Mljjm73q4pwF3aiYIlpTm1pn0vx
+										- Access Token Secret = b509ehXdujy6h9woN8ZYaxeMiYckJAIJkYCUhj6qFfylS
+							
+
+					- Note: If application description or purpose is asked, type in something similar:
+
+I intend to use this Twitter feed to get real time data streams into an application that will put data into Kafka.This data will end up in ElasticSearch at the end and thsi is just for POC purposes. No commercial application will result out of this and I won't have any users besides just myself.Twiiter data will not be displayed, and we will only extract tweets on low volume terms.
+
+
+
+
+
+
+
+
+
+
+
+Starting Kafka Connect Cluster using Docker Compose
+----------------------------------------------------
+
+- Ensure that Docker has atleast 4 GB of memory allocated :
+settings.json
+C:\Users\DELL\AppData\Roaming\Docker
+
+You can also set the memory used by docker by editing the json file C:\Users\Personal\AppData\Roaming\Docker\settings.json . Look for a property called MemoryMiB and update its value to be the number of megabytes you want your docker installation to use
+
+
+
+	- docker-compose.yml :
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	- Start Docker Desktop
+	- Commands used:
+		- Refer 'kafka-connect-tutorial-sources.sh' in D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	- C:\Windows\System32\cmd.exe
+	- Start our kafka cluster
+		- cmd: docker-compose up kafka-cluster
+	- Wait 2 minutes for the kafka cluster to be started	
+
+	- Kafka cluster url: 
+		- http://127.0.0.1:3030/
+			- Will land you onto Kafka Development Environment UI
+			- Ensure atealst 1 connector is running
+
+
+Update Landoop container for viewing logs:
+------------------------------------------
+	- Start Docker desktop
+	- cmd: docker pull landoop/fast-data-dev
+
+
+
+
+Source files
+-------------
+Parent folder : D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\
+
+- Demo 3: 
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\source\demo-3
+	
+		(1) source-twitter-distributed.properties
+			- Contains setup/configuration of the twtiier connector 
+			- The file is commented and self explanatory
+
+	
+
+
+
+
+Commands executed:
+----------------
+
+Note: Use PowerShell to execute the followign :
+
+-  kafka-connect-tutorial-sources.sh:
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	
+		
+		
+
+	- Open Powershell
+		-  Bash into the container:
+			- cmd: docker run --rm -it --net=host landoop/fast-data-dev:cp3.3.0 bash
+			
+			 
+			- List folder:
+	- Create the topic we're going to write to 'demo-3-twitter'
+				- cmd: kafka-topics --create --topic demo-3-twitter --partitions 3 --replication-factor 1 --zookeeper 127.0.0.1:2181
+
+
+			- Go to the Kafka CLuster UI : http://127.0.0.1:3030/
+				-Topics :
+					- You should be able to see teh newly created topic 'demo-3-twitter'
+						- Click on the topic:
+							- Data = Topic is empty
+
+
+
+Create new connector usign the KAfka cluster UI:
+--------------------------------------------------
+
+- URL : http://127.0.0.1:3030/
+- Connectors:
+	- Create a New File Source Connector:
+						- Click on 'New' :
+							- Will list out all available connectors :
+								- Select 'Twitter' connector:
+											- Will openup a configurable UI for New Connector with class : org.apache.kafka.connect.file.FileStreamSourceConnector
+
+										- Enable Optional Fields:
+												- Fill in the UI form referencing the following :
+													- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\source\demo-3
+														- source-twitter-distributed.properties
+														  - Delete 'transform' field in teh form				
+													- Click on 'Create'
+										- You can see the new connector 
+											
+
+
+Alternate method of creating a Connector using a REST call
+-------------------------------------------------------------
+- Postman -> Collections = Kafka
+- Execute POST REquest:	
+	- Twitter Connect
+
+
+Start a console consumer on that topic
+-------------------------------------------
+Use the bash console odf the container:
+cmd: kafka-console-consumer --topic demo-3-twitter --bootstrap-server 127.0.0.1:9092
+
+	- If your connection works, you will see data in the consumer

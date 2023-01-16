@@ -1,0 +1,44 @@
+Refer : https://kafka.apache.org/0110/documentation/streams/
+
+
+Kafka Streams:
+--------------
+	- Easy data processing and transformation library within Kafka
+	- Examples of KAfka Stream Applications:
+			- Data Transformations, Data Enrichment, Fraud Detection, Monitoring and Alerting	
+	- Standard Java Application
+	- No need to create a separate cluster
+	- Highly scalable, elastic and fault tolerant
+	- Exactly Once Capabilities
+	- One record at a time processing( i.e.no baatching)
+	- Works for any application size
+	
+
+Kafka Streams Architecture:
+	- Refer 'KafkaStreamsArchitecture.png'
+
+History:
+	- This API/Library was introduced as part of Kafka 0.10(XX 2016) and is fully mature as part of Kafka 0.11.0.0(June 2017)
+	- It is the only library at thsi time of writing that can leverage the new excatly once capabilitiesfrom KAfka 0.11
+	- It is a serious contender to other stream processing frameworks such as Apache Spark, Flink or Nifi
+
+Objectives:
+	- Write and package Kafka Streams Apps( Hands-On & End-to-End)
+		- 'WordCount' to get familiar with the concepts
+		- 'FavouriteClour' to practice more Kafka Stream transformations API( & Scala version)   
+		- 'BankBalance' to use aggregations and the power of Exactly Once Semantics
+		- 'StreamEnrich' to join and enrich a KStream using a GLoablKTable
+
+	- Learn Kafka Streams Fundamentals
+		  - Difference vs other libraries( Spark Streaming, Flink, NiFI...)
+		  - Underlying concepts( topolgies, processors...)	
+		  - Basic and Advanced transformations API - Stateless and Stateful			
+		  - Grouping Once Semantics and Capabilities
+		  - Production Settings and COnfigurations
+
+Pre-requisites:
+	- Knowledge of Kafka
+	- Strong Knowledge of KJava 8( or Scala)
+	- Understanding of Lamba expressions is better
+	- Previous experience with data processing libraries is helpfule(Spark, Flink, MapREduce, Scalding, Akka Streatms , etc..._
+	-

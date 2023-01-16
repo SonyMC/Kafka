@@ -1,0 +1,148 @@
+
+
+Open Search Querying API
+------------------------
+
+
+Obejective : Practice using OpenSearch( which is used same as ElastiSearch) 
+
+
+
+
+
+
+
+If using Docker
+------------------
+(1) Start Docker Desktop
+
+
+(2) Start OpenSearch:
+	- Run docker-compose.yml
+	- Follow instruaction in '10b- OpenSearchConsumerProjectOverview - Setting Up OpenSearch On Docker.txt'
+
+(3) 
+- Access the Open-Search DB url:
+	- http://localhost:9200/
+	- Response: 
+{
+  "name": "8de8548944fa",
+  "cluster_name": "docker-cluster",
+  "cluster_uuid": "aCFm5wy_RnKkMNGh2wxHBQ",
+  "version": {
+    "number": "7.10.2",
+    "build_type": "tar",
+    "build_hash": "6f6e84ebc54af31a976f53af36a5c69d474a5140",
+    "build_date": "2022-09-09T00:07:12.137133581Z",
+    "build_snapshot": false,
+    "lucene_version": "9.3.0",
+    "minimum_wire_compatibility_version": "7.10.0",
+    "minimum_index_compatibility_version": "7.0.0"
+  },
+  "tagline": "The OpenSearch Project: https://opensearch.org/"
+}
+
+
+
+
+(4) Access teh OpeNSearch dashborad:
+	- url: http://localhost:5601/
+
+
+(5)Browse to dev-tools console: http://localhost:5601/app/dev_tools#/console
+		- Allows us to run REST APIs queries againt ElastSearch
+
+
+(6) Use the REST API to see how Open Search works
+	- Refer : https://opensearch.org/docs/latest/#docker-quickstart
+
+
+If using Bonsai
+----------------------
+
+(1) Logon to Bonsai & navigate to console:
+	https://app.bonsai.io/clusters/mailsonymathew-kafka-3660389779/console
+
+
+
+
+Runnign Queries
+-----------------------
+
+(1)In Console type the following and press the play button to see response:
+
+
+(2) Get OpenSearch info :
+ 
+	- cmd : Get /
+
+	- Response: 
+		
+{
+  "name" : "00f6f313f36a",
+  "cluster_name" : "docker-cluster",
+  "cluster_uuid" : "Ib5GyTb9TtG9EjytDDAYQg",
+  "version" : {
+    "number" : "7.10.2",
+    "build_type" : "tar",
+    "build_hash" : "6f6e84ebc54af31a976f53af36a5c69d474a5140",
+    "build_date" : "2022-09-09T00:07:12.137133581Z",
+    "build_snapshot" : false,
+    "lucene_version" : "9.3.0",
+    "minimum_wire_compatibility_version" : "7.10.0",
+    "minimum_index_compatibility_version" : "7.0.0"
+  },
+  "tagline" : "The OpenSearch Project: https://opensearch.org/"
+}
+		
+
+
+(3) Create first index: 
+	- Index is where data is going to be stored in OpenSearch
+
+	- cmd: PUT /my-first-index
+
+	- Response: 
+{
+  "acknowledged" : true,
+  "shards_acknowledged" : true,
+  "index" : "my-first-index"
+}
+
+
+
+(4)Add some data to your newly created index
+
+	- cmd: PUT /my-first-index/_doc/1
+		 {"Description": "To be or not to be, that is the question."}
+
+
+		- Will create a document '_doc' with id '1' in index 'my-first-index'
+	
+
+
+
+
+
+(5) Retrieve the data to see that it was added properly.
+
+	- cmd: GET /my-first-index/_doc/1
+
+
+(6) After verifying that the data is correct, delete the document.
+
+	- cmd: DELETE /my-first-index/_doc/1
+
+
+(7) Delete the index.
+
+	- cmd: DELETE /my-first-index/
+
+
+
+
+
+
+
+
+

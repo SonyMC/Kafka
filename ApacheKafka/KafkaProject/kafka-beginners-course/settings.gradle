@@ -1,0 +1,11 @@
+rootProject.name = 'kafka-beginners-course'
+include 'kafka-basics'
+include 'kafka-advanced'
+include 'kafka-producer-wikimedia'
+include 'kafka-consumer-opensearch'
+include 'kafka-consumer-opensearch-v2'
+include 'kafka-consumer-opensearch'
+include 'kafka-consumer-os'
+include 'kafka-connect-wikimedia'
+include 'kafka-streams-wikimedia'
+

@@ -1,0 +1,54 @@
+Hi, since I struggled a lot to make it work, here is the solution:
+
+1) Download the latest landoop image (landoop/fast-data-dev:latest) and change the docker-compose.yml file to refer to this image:
+
+image: landoop/fast-data-dev:latest
+
+2) Download the code from https://github.com/jcustenborder/kafka-connect-twitter- as a zip file.Run maven packaging command (mvn clean install). This will give the connector jars and third party jars
+
+3) Start the docker image only for kafka cluster
+
+4) Copy the third-party directory referred by docker image at this location: /opt/landoop/kafka/share/java. Command to copy is (create frm_docker folder in your local machine)
+
+docker cp udemy-kafka-connect_kafka-cluster_1:/opt/landoop/kafka/share/java <local_directory>/frm_docker
+
+
+5) Copy the third party jars needed by twitter connector in frm_docker. The jars are available in this path<downlaoded_src_code_twitter_connector>/target/kafka-connect-target/usr/share/kafka-connect/kafka-connect-twitter.
+
+6) Modify the docker-compose.yml file to refer the new connector and supporting jars. It should be volume mapped like this now (please change the directories in volumes in the left side as per your system) :
+
+volumes:
+
+      - /home/vagrant/sws/kafka-connect-twitter-master/target/kafka-connect-twitter-0.3-SNAPSHOT.jar:/connectors/kafka-connect-twitter-0.3-SNAPSHOT.jar
+
+      - /home/vagrant/sws/kafka-connect-twitter-master/frm_docker:/opt/landoop/kafka/share/java
+
+7) Stop the docker, and restart it.
+
+8) New connector will appear as:
+
+          TwitterSourceConnector
+
+          com.github.jcustenborder.kafka.connect.twitter.TwitterSourceConnector
+
+9) Use that connector like this:
+
+connector.class=com.github.jcustenborder.kafka.connect.twitter.TwitterSourceConnector
+
+twitter.oauth.accessTokenSecret=dummy
+
+process.deletes=false
+
+filter.keywords=programming,java,kafka,scala
+
+kafka.status.topic=demo-3-twitter
+
+tasks.max=1
+
+twitter.oauth.consumerSecret=dummy
+
+twitter.oauth.accessToken=dummy
+
+twitter.oauth.consumerKey=dummy
+
+10) Thats it, it will work and get tweets as Avro objects (not json)

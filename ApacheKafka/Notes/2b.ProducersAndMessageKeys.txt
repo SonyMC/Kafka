@@ -1,0 +1,61 @@
+Producers and Message Keys
+----------------------------
+
+
+
+Producers:
+---------
+- Producers write data to topics( which are made of partitions)
+- Producers know whch partition to write to( and which Kafka broker(which is a Kafka Server) has it)
+- In case of Kafka broker failures, Producers will automatically recover 
+- The load is balanced to many brokers( servers) thanks to the no. of partitions
+
+Producers: message Keys
+---------------------------
+- Producers can choose to send a key with the message( string, number, binarty etc.) 
+- If key= null, data is sent round robin( i.e partiion 0, then 1, then 2, ...)
+		- This is how load balancing is achieved
+- If key != null, then all messages for that key will go to the same partition ( hashing)
+- A key is typically sent if you need message ordering for a specific field( E.g. truck_id)
+- ***Important: A partition can hold data for multiple keys, but a particular key will always belong to one parttion.   
+
+
+Kafka Messages Anatomy
+-------------------------
+(1) Key(binary) - Can be null
+(2) Value(binary) -Is the message content and can be null
+(3)Compression type -
+		- none,gzip, snappy, lz4, zstd
+(4)Headers(Optiona)
+	-List  Key, value pairs
+(5) Parttion + Offset
+(6)Timestamp:
+	- System or User Set)
+
+Kafka Message Serializer
+---------------------------
+- Kafka only accepts bytes as an input from producers and sends bytes out as an output to consumers
+- Message Serialization: means transforming objects.data inot bytes
+- They are used on the value and the key
+	- E.g:
+		- Key object = 123, Value Object = "Hello World"
+		- We can specify the Key Serializer as an Integer Serializer
+			- Key Serilaizer converts the Key Object( 123) to binary
+ 		- We can specify the Value Serializer as a Strign Serializer
+			- Value Serializer converts teh value( Object( Hello World) to binary
+- Common Serializers:
+	-  String, Int , Float, Avro, Protobuf etc.
+
+Kafka Message Key Hashing
+----------------------------
+- Kafka partitioner : 
+		- is  a code logic that takes a record and determines to which partition to send it inot
+- Key Hashing:
+		- is the process of determining the mapping of a key to a partition 
+
+- In the default Kafka partitioner, the keys are hashed using the murmur2 algorithm, with the formula below for the curious:
+	- targetPartition =   Maths.abs(Utils.murmur2(keyBytes)) % ( numPartiones - 1)   
+
+	 
+
+ 

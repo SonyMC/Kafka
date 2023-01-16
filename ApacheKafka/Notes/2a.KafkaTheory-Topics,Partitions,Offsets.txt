@@ -1,0 +1,45 @@
+Topic, PArttions and Offsets
+-----------------------------
+
+Topics
+-----
+	- a particular stream of data
+	- it is like a table in a DB ( without all the contraints)
+	- you can have as many topics as you want 
+	- A topic is identified by it's name
+	- Supports any kind of message format
+	- Sequence of messages in a topic is called a data stream
+	- You cannot query topics
+		- Instead use 
+			- Kafka Producers to send data
+			- Kafka Consumers to read the data
+
+Partitions and Offsets
+-----------------------
+- Topics are split into partitions( E.g. 100 partitions)
+	- Message within each partition are ordered
+	- Offset: Each message within a partition gets an incremental id, called offset
+- Topics are Immutable
+	 - Once data is written to a partition, it cannot be changed ( i.e you cannot update or delete data in a partition)
+- Topic E.g:
+	- Topic name = truck_gps:
+		- Say you have a fleet of trucks, each truck reports its GPS position to Kafka
+		- Each truck will send a message to Kafka every 20 secs, each msg will contain the truck ID and the truck position( latitude and longitude). Thsi will be done by producers.
+		- You can have a topic 'truck+gps' that conains the postion of all trucks
+		- We choose to create a topic with 10 partitions( arbitrary number)
+- Use case:
+	- We can define  a consumer which will read the data from the topic 'truck_gps'and send it to a location dashboard or to a notifcation service fro customers as to when teh delivewry will be done 
+
+- Concepts:
+	- Once the data is written to a partition, it cannot be changed( immutabilit)
+	- Data is kept only for a limited time( default is one week - configurable) 
+	- Offsets only have a meaning for a paticular partition
+		- E.g. offset 3 in partition 0 doensn't represnt the same data as offset 3 in partition 1
+		- Offsets are not re-used even if previous messages have been deleted
+	- Order is guranteed only within a partition ( not across parttions)
+	- Data is assigned randomly to a partition unless a key is provided
+	- You can have a smany parttions per topic as you want
+ 
+
+	
+	  

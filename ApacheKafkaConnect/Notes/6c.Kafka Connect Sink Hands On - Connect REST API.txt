@@ -1,0 +1,137 @@
+Kafka Connect REST API
+-----------------------
+
+Reference:
+	- demo-rest-api.sh
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\sink\demo-rest-api
+
+	- http://docs.confluent.io/3.2.0/connect/managing.html#common-rest-examples
+
+
+- All actions performed by LAndoop Kafka Connect UI are actually trigerring REST API calls to KAfka Connect
+- REST API calls we will demo:
+	1. Get Worker Information 
+	2. List Connectors available on a worker
+	3. Ask about all Active COnnectors
+	4. Get Information about a Connector Tasks and Config 
+	5. Get Connector Status
+	6. Pause/REsume a Connector
+	7. Delete our Connector
+	8. Create a new COnnector
+	9. Update COnnector Configuration 
+	10. Get Connector Configuration 
+
+
+
+
+docker-compose.yml:
+-------------------
+
+	-D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	-Line 18 onwards contains the configuration for elasticsearch  
+	- Start Docker Desktop
+
+
+
+
+
+
+Commands use:
+--------------
+
+
+- ElasticSearc COntainer needs more memory.To set this:
+	- Open powershell in admin mode:
+		- cmd: wsl -d docker-desktop
+		- cmd: sysctl -w vm.max_map_count=262144
+		- cmd: exit
+
+			OR ( to set permenantly)
+	-  Open powershell in admin mode:
+		- cmd: wsl -d docker-desktop
+		- cmd: vi /etc/wsl.conf
+		- add these lines at the end:
+			[boot]
+			kernelCommandLine = "sysctl.vm.max_map_count=262144"
+		- quit VI : esc + type ':wq'
+		- Restart Docker Desktop
+
+
+
+- kafka-connect-tutorial-sinks.sh
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+
+
+- Start our kafka cluster , elasticsearch and postgres containers
+	- cmd: docker-compose up
+
+
+
+
+	- Open Kafka COnnect CLuster UI:
+		- http://127.0.0.1:3030/
+
+	-Let's start a Powershel to all have linux commands
+	
+		- cmd: docker run --rm -it --net=host landoop/fast-data-dev:latest bash
+
+	- Install jq to pretty print json
+		- cmd: apt-get update
+ 		- cmd: apt-get install -y jq
+
+	- Optional;
+		- Install maven and gradlle
+			- cmd: apt-get install -y maven
+			- cmd: apt-get install -y gradle
+	
+	-  Get Worker information
+		cmd: curl -s 127.0.0.1:8083/ | jq
+
+	- Response:
+
+{
+  "version": "3.3.1-L0",
+  "commit": "e23c59d00e687ff5",
+  "kafka_cluster_id": "PdtLly_wTzGOYCA28OU9Ng"
+}
+
+
+	- List Connectors available on a Worker
+		- cmd: curl -s 127.0.0.1:8083/connector-plugins | jq
+
+	-  Ask about Active Connectors
+		- cmd: curl -s 127.0.0.1:8083/connectors | jq
+
+
+	-  Get information about a Connector Tasks and Config
+		- cmd: curl -s 127.0.0.1:8083/connectors/logs-broker/tasks | jq
+
+	-  Get Connector Status
+		- cmd: curl -s 127.0.0.1:8083/connectors/logs-broker/status | jq
+
+	- Pause / Resume a Connector (no response if the call is succesful)
+		- cmd: curl -s -X PUT 127.0.0.1:8083/connectors/logs-broker/pause
+		- cmd: curl -s -X PUT 127.0.0.1:8083/connectors/logs-broker/resume
+
+	- Get Connector Configuration
+		- cmd: curl -s 127.0.0.1:8083/connectors/logs-broker | jq
+
+
+	- Create a new Connector
+		- cmd:
+curl -s -X POST -H "Content-Type: application/json" --data '{"name": "file-stream-demo-distributed", "config":{"connector.class":"org.apache.kafka.connect.file.FileStreamSourceConnector","key.converter.schemas.enable":"true","file":"demo-file.txt","tasks.max":"1","value.converter.schemas.enable":"true","name":"file-stream-demo-distributed","topic":"demo-2-distributed","value.converter":"org.apache.kafka.connect.json.JsonConverter","key.converter":"org.apache.kafka.connect.json.JsonConverter"}}' http://127.0.0.1:8083/connectors | jq
+
+
+
+	- Update Connector configuration
+	- cmd: 
+
+curl -s -X PUT -H "Content-Type: application/json" --data '{"connector.class":"org.apache.kafka.connect.file.FileStreamSourceConnector","key.converter.schemas.enable":"true","file":"demo-file.txt","tasks.max":"2","value.converter.schemas.enable":"true","name":"file-stream-demo-distributed","topic":"demo-2-distributed","value.converter":"org.apache.kafka.connect.json.JsonConverter","key.converter":"org.apache.kafka.connect.json.JsonConverter"}' 127.0.0.1:8083/connectors/file-stream-demo-distributed/config | jq
+
+
+
+	-  Delete our Connector
+		- cmd: curl -s -X DELETE 127.0.0.1:8083/connectors/file-stream-demo-distributed
+
+
+

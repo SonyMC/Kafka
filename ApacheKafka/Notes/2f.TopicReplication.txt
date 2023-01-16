@@ -1,0 +1,30 @@
+Topic Replication
+----------------
+
+- Topics should have a replication factor > 1( usually between 2 & 3) 
+- That way if a broker is down, another broker can serve the data 
+- E.g.: Topic A with 2 partitions and replication factor of 2:
+	-  For 3 brokers:
+		- Topic A parttition 0 and 1 will be replicated once ( two copies) across the brokers
+
+Topic Replication Factor
+--------------------
+- Evenif one beoker is down, data willeb server from remaining brokers
+
+
+Concept of Leader for a Partition
+----------------------------------
+- At any one time one ONE broker can be a leader for a given parttion 
+- Producers can only send data to the broker that is a leader of the partition
+- Therefore each partition has one leader and multiple ISR(In-Sync Replica)
+
+
+Default producer & consumer behaviour with leaders
+---------------------------------------------------
+- Kafka producers can only write to the leader broker for a parttion
+- Kafka consumers by default will read from leader broker for a partition 
+
+
+Kafka Consumers Replica Fetching(Kafka v2.4+)
+--------------------------------------------------
+- Sicne Kafka 2.4,it is possible to configure consumers to read from closest(location wise) replica to decrease latency

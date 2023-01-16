@@ -1,0 +1,46 @@
+Setu and Launch - Kafka Connect Cluster
+--------------------------------------
+
+
+Prerequisites:
+---------------
+
+- YOUR COMPUTER MUST HAVE AT LEAST 4GB OF RAM
+
+- This course is intended for you to use Kafka Connect Cluster as soon as possible and as easy as possible and will not go over the deep setup of Kafka Connect Cluster. As it is extremely tough to get a similar configuration for everyone, I have chosen to offer a Docker image for you to use. 
+
+- Therefore you must install Docker on your machine. 
+
+. Docker allows you to run containers. Containers are basically applications that have already been configured for you and that require no additional setup. It's the only way to ensure that an application will run the same way on every computer, and that's why we use it in this course.
+
+- If for any reasons after seeing the lectures you still cannot install Docker, please look online to see if someone else had your issue, and give it another go. If you really can't install Docker, please ask for some help in the Q&A section of the course and I'll do my best to solve your problem. 
+
+-If you use Docker, then it will all go fine, and having Kafka Connect Cluster running on your machine will be very easy. 
+
+
+Starting Kafka Connect Cluster using Docker Compose
+----------------------------------------------------
+
+	- Ensure that Docker has atleast 4 GB of memory allocated :
+settings.json
+C:\Users\DELL\AppData\Roaming\Docker
+
+You can also set the memory used by docker by editing the json file C:\Users\Personal\AppData\Roaming\Docker\settings.json . Look for a property called MemoryMiB and update its value to be the number of megabytes you want your docker installation to use
+
+
+
+	- docker-compose.yml :
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	- Start Docker Desktop
+	- Commands used:
+		- Refer 'kafka-connect-tutorial-sources.sh' in D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	- C:\Windows\System32\cmd.exe
+	- Start our kafka cluster
+		- cmd: docker-compose up kafka-cluster
+	- Wait 2 minutes for the kafka cluster to be started	
+
+	- Kafka cluster url: 
+		- http://127.0.0.1:3030/
+			- Will land you onto Kafka Development Environment UI
+			- Ensure atealst 1 connector is running
+		

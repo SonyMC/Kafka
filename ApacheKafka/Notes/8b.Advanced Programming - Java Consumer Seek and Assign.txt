@@ -1,0 +1,48 @@
+JAva Consumer Reblance Listener 
+----------------------------------
+https://www.conduktor.io/kafka/java-consumer-seek-and-assign
+
+
+
+Codebase : D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-advanced
+
+
+Objectives
+---------
+- In case you are looking to read specific messages from specific partitions, the .seek() and .assign() API may help you.
+
+- These APIs are also helpful to replay data from a specific offset.
+
+To use these API, make the following changes:
+
+Remove the group.id from the consumer properties (we don't use consumer groups anymore)
+
+Remove the subscription to the topic
+
+Use consumer assign() and seek() APIs
+
+
+
+
+Code:
+-----
+ConsumerDemoAssignSeek.java
+
+
+
+
+Run the application. The console of the application will display the selected messages.
+[main] INFO Subscribed to partition(s): demo_java-0
+[main] INFO Seeking to offset 7 for partition demo_java-0
+[main] INFO Cluster ID: 8fresFx9R4Kod8UqUrixrg
+[main] INFO ConsumerDemoAssignSeek - Key: id_7, Value: hello world 7
+[main] INFO ConsumerDemoAssignSeek - Partition: 0, Offset:7
+[main] INFO ConsumerDemoAssignSeek - Key: id_8, Value: hello world 8
+[main] INFO ConsumerDemoAssignSeek - Partition: 0, Offset:8
+[main] INFO ConsumerDemoAssignSeek - Key: id_9, Value: hello world 9
+[main] INFO ConsumerDemoAssignSeek - Partition: 0, Offset:9
+[main] INFO ConsumerDemoAssignSeek - Key: id_0, Value: hello world 0
+[main] INFO ConsumerDemoAssignSeek - Partition: 0, Offset:10
+[main] INFO ConsumerDemoAssignSeek - Key: id_1, Value: hello world 1
+[main] INFO ConsumerDemoAssignSeek - Partition: 0, Offset:11
+[main] INFO ConsumerDemoAssignSeek - Exiting the application

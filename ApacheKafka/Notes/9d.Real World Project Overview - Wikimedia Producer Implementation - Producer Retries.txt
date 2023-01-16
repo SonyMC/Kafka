@@ -1,0 +1,33 @@
+Wikimedia Producer - Producer Retries 
+--------------------------------------
+
+- In case of transient failures , developers are expected to handle exceptions, otherwise data will eb lost
+- Example of transient failure:
+	- NOT_ENOUGH_REPLICAS(due to min.insync.replicas setting)
+
+- There is a "retries" setting:
+	- defaults tto 0 for Kafka <= 2.0
+	- defaults to 2147483647 for 
+
+- The retty.backoff.ms setting is by default 100ms
+	- How much time to wait before retrying
+
+Producer Timeouts
+------------------
+- If retries>0, retries are bonded by a timeout
+- Since Kafka 2.1, you ca set: delivery.timeout.ms=120000==2min
+- Records will eb failed if they can't be acknowledged within delivery.timeout.ms
+- If you are not using idempotent producer(not recommended- old Kafka) :
+	- In case of retries, there is a chance that messages will be sent outof order(if a batch has failed to besent)
+	- If you rely on key based ordering, that can be an issue
+
+- For this, you can set the setting while controls how many produce requests can be made in parallel
+	-max.in.flight.requests.per.connection
+	- Default: 5
+ 	- Set it to 1 if you need to ensure ordering( may impact throughput)
+
+- In Kafka >= 1.0.0, there's a better soltutin with idempotent producers
+ 	
+
+
+

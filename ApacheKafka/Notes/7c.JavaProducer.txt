@@ -1,0 +1,117 @@
+
+Java Producer
+-------------
+
+
+- Project : kafka-beginners-course\kafka-basics
+
+- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-basics
+
+
+Objectives:
+	- Write a basic producer to send data to Kafka
+	- View basic configuration parameters
+	- Confirm we receive the data in a Kafka Console Consumer
+
+
+To create producer:
+	- Create producer properties
+	- Create the Producer
+	- Send Data 
+	- Flush and Close the Producer
+
+
+Class 'ProducerDemo.java':
+			- Refer code for documentation
+			
+
+
+Before running the code
+-----------------------
+
+
+
+(1) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+(2)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the windo wopen
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+
+
+(3) Create Kafka topic named 'demo_java' with 3 partitions & replication factor 1 :
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic demo_java --create --partitions 3 --replication-factor 1
+
+
+WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Created topic demo_java.	
+
+
+(4)List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+
+__consumer_offsets
+demo_java
+first_topic
+new_topic
+thrid_topic
+
+
+
+
+(5) New WSL consumer console:
+	- Consume from 'demo_java' topic:
+		- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic demo_java
+
+		- Note: If leader not available message is shown, exitand run the command again
+
+
+
+
+Run the code
+-------------
+
+
+
+- - Project : kafka-beginners-course\kafka-basics
+
+- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-basics
+
+
+- ProducerDemo.java:
+		- Right click -> Run ProducerDemo.main()
+		
+
+				- Process finished with exit code 0
+
+
+- Go to consumer console:
+	_ you can see the message produced
+
+
+********************
+
+Tips:
+	- Import: Alt + Enter
+	- Auto complete = tabs

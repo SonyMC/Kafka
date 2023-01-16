@@ -1,0 +1,52 @@
+Wikimedia Produccer - Project Setup
+------------------------------------
+	
+
+- Producer will take data from Wikimedia in a Kafka Producer and finally into Kafka
+- Java libraries:
+	- Okhttp3
+	- Okhttp-eventsource
+
+
+- Wikimedia Recent change stream :
+		
+	-url: https://stream.wikimedia.org/v2/stream/recentchange
+	- page keeps on gettign updates very fast
+	- Is realtime and shown all changes happening in Wikimedia
+	-  What is Wikimedia used for?
+		- The nonprofit Wikimedia Foundation provides the essential infrastructure for free knowledge
+	- What's the difference between Wikipedia and Wikimedia?
+		- Based in San Francisco, the Wikimedia Foundation (WMF) is the organization that owns the domain wikipedia.org
+
+	- We will use thsi streeam to send data into Apache Kafka 
+
+- Wikimedia Recent Change Stats:
+		- https://codepen.io/Krinkle/pen/BwEKgW?editors=1010
+- Wikimedia Event Stream Demo:
+		- https://esjewett.github.io/wm-eventsource-demo/s
+
+
+
+- Project Setup:
+	- IntellIj-> Right click on project 'kafka-beginners-course':
+				- New module :
+					- Name = kafka-producer-wikimedia
+					- Language = JAva
+					- Build System = Gradle 
+					- JDK = choose default ( temrin 17)
+					- Gradle DSL = Groovy
+					- PArent = kafka-beginners-course
+					- Advanced settings:
+						- GroupId = com.mailsonymathew
+						- ArtifactId = kafka-producer-wikimedia
+
+	- Delete class main.java
+
+	- kafka-producer-wikimedia/build.gradle
+		- Add dependencis	
+
+	- Click on 'Load Gradle changes' icon ( yej elepahnat icon on top RHS)
+
+
+- WikiMediaChangesProducerBasic.java:
+	- New class

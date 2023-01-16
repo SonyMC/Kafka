@@ -1,0 +1,28 @@
+Large Messages
+---------------
+
+- Kafka has a default of 1 MB per message in topics, as large messages are considered inefficient andan anti-pattern
+- 2 approaches fro seding large messages:
+	(1) Use an external store: 
+		- Store messages in HDFS, Amazon S3, Google Cloud Storage, etc. and send a reference of that message to Apache Kafka 
+		- 
+
+
+	(2) Modify Kafka parameters:
+		- must change broker, producer and consumer setting
+		- topic wise , Kafak side, set max. message size to 10 MB
+		- broker side : modify message.max.bytes
+		- topic side: modify max.message.bytes
+		- Broker wise:
+			 - set max replication fetch size to 10 MB
+			 - replica.fetch.max.bytes=10485880 ( in server.properties)
+		- Consumer side: 
+			 - must increase fetch size of the consumr else it will crash 
+			 - max.partition.fetch.bytes=10485880 	
+		- Producer side: 
+			 - must increase the max request size
+			 - max.request.size=10485880
+
+ 
+
+

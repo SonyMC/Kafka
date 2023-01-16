@@ -1,0 +1,42 @@
+
+
+
+OpenSearch
+----------
+OpenSearch is a distributed, community-driven, Apache 2.0-licensed, 100% open-source search and analytics suite used for a broad set of use cases like real-time application monitoring, log analytics, and website search. OpenSearch provides a highly scalable system for providing fast access and response to large volumes of data with an integrated visualization tool, OpenSearch Dashboards, that makes it easy for users to explore their data.
+
+
+Refer : https://aws.amazon.com/what-is/opensearch/
+
+
+Objectives
+----------
+- Implement OpenSearch Consumer
+	- Kafka cluster-> KAfka COnsumer -> OPenSearch
+- Consumer COnfigurations
+- Setup an OpenSearch(Open-source fork of ElastiSearch) cluster:
+	- Option 1: Free tier/managed OpenSearch available at bonsai.io
+	- Option 2: Run locally using Docker
+
+
+- Use Java Libraries:
+	- OpenSearch REST High LevelCLient 
+
+
+
+Setup:
+-------
+- Local Code Directory : D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-consumer-opensearch
+
+- Docker file: 'docker-compose.yml' in D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-consumer-opensearch
+
+- build.gradle:
+	- setup dependencies 
+ 
+
+
+
+
+
+
+

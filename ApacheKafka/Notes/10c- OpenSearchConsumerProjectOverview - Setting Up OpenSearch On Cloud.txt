@@ -1,0 +1,31 @@
+
+
+Setting up OpenSearch on Cloud
+-------------------------------
+
+Objective: 
+	- Start OpenSearch project using bonsai.io 
+
+
+url: https://app.bonsai.io/signup#free	
+	- signup for free tier
+	- Cluster nam = mailsonymathew_kafka
+	- Seelct OpensEarch 1.xxx. instead of Elastisearch x.x.x -> Select AWS region -> Provision  Cluster
+	- Once account is setup -> navigate to console
+		: https://app.bonsai.io/clusters/mailsonymathew-kafka-3660389779/console
+		- Wait for 10 ,mins before you start running queries.
+
+
+
+Connection url: 
+Go to credentials tab:
+
+https://za78wij468:u1bhfrwlmz@mailsonymathew-kafka-3660389779.us-east-1.bonsaisearch.net:443
+
+*************
+
+
+
+
+
+

@@ -1,0 +1,51 @@
+Get Taxi 
+---------
+
+- Is a company that allows people to match with taxi drivers on demand, right away. The business wants the following capabilites:
+	-user should match with a close by driver 
+	-the pricing should surge if no.of drivers are low or no. of users are high
+	- all the position data before and durign the ride should be stored in an analytics store so that the cost can be computed accurately 
+
+
+
+How to implement
+---------------
+
+
+- New Topic : 
+	-user position 
+		- high volume of data
+		- > 30 parttions
+		- multiple producers
+		- key = user_id"
+		- data is ephemeral and does not need ot kept for long time in Kafka 
+	-taxi position 
+		- high volume of data
+		- > 30 parttions
+		- multiple producers
+		- key = "taxi id"
+		- data is ephemeral and does not need ot kept for long time in Kafka 
+	-surge pricing 
+		- high volume of data
+		- regional
+	
+	 
+
+
+- Producer:
+	- User Postion Service  :  which sends user location to the topic ' user position' 
+	- TAxi position service : 	sends taxi location to topic 'taxi posotion'	
+
+
+-Kafka Stream:
+	- Can take inputs from multiple topics and produce computation on them
+	- Surge Pricing Computational Model( Kafka Stream)
+		- takes dat from topics 'user position' & 'taxi position' and writes to topic 'surge pricing' 
+	=- Other topics such as 'weather' and 'events' can be included to increas the efficiency of the computation model
+
+- Consumer: 
+	- Taxi cost service :
+		- takes data from topic 'Surge PRicing'
+
+- KAfa Connect:
+	- take sinput from topics 'user position' & 'taxi position' and stores it day Amazon S3. 

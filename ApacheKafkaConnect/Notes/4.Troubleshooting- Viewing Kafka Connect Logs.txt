@@ -1,0 +1,61 @@
+Landoop Guthub repo : https://github.com/lensesio/fast-data-dev
+
+
+Viewing Kafka Connect Logs
+--------------------------
+
+
+
+
+- In standalone mode:
+	- They will eb directly in your terminal 
+
+
+- In distributed mode:
+	- They will be at teh url http://127.0.0.1:3030/logs/
+	- Take the file 'connect-distributed.log'
+
+- Look for "ERROR" in teh log.
+
+
+
+
+Starting Kafka Connect Cluster using Docker Compose
+----------------------------------------------------
+
+	- Ensure that Docker has atleast 4 GB of memory allocated :
+settings.json
+C:\Users\DELL\AppData\Roaming\Docker
+
+You can also set the memory used by docker by editing the json file C:\Users\Personal\AppData\Roaming\Docker\settings.json . Look for a property called MemoryMiB and update its value to be the number of megabytes you want your docker installation to use
+
+
+
+	- docker-compose.yml :
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	- Start Docker Desktop
+	- Commands used:
+		- Refer 'kafka-connect-tutorial-sources.sh' in D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	- C:\Windows\System32\cmd.exe
+	- Start our kafka cluster
+		- cmd: docker-compose up kafka-cluster
+	- Wait 2 minutes for the kafka cluster to be started	
+
+	- Kafka cluster url: 
+		- http://127.0.0.1:3030/
+			- Will land you onto Kafka Development Environment UI
+			- Ensure atealst 1 connector is running
+
+
+Update Landoop container for viewing logs:
+------------------------------------------
+	- Start Docker desktop
+	- cmd: docker pull landoop/fast-data-dev
+
+
+
+Kafka connect UI
+-----------------
+- url : http://127.0.0.1:3030/
+- At bottom of Ui -> Browse -> Click on 'running services log files' -> click on 'connect-distributed.log'
+ 

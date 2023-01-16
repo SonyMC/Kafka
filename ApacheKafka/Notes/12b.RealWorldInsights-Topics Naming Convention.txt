@@ -1,0 +1,10 @@
+Topics Naming Convention
+------------------------
+- Refer : https://cnr.sh/essays/how-paint-bike-shed-kafka-topic-naming-conventions
+- Naming a topic is " free for all"
+- It's better to enforce guidelines in your cluster to ease mgmt
+- you are free to come up with your own guidelines
+_ Recommended convention:
+	- <message type>.<dataset name>.<data name>.<data format>
+	 
+

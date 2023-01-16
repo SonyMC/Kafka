@@ -1,0 +1,167 @@
+Goals
+-----
+- Understand how connectors are made , using the GitHubSOurceConnector as an example
+	- Dependencies
+	- ConfigDef
+	- Connector
+	- Schema & Struct
+	- Source Partition & Source Offsets
+	- Task
+
+- Learn how to deploy your connectors( or any connector)
+	- Package kars
+	- Run jars in standalone mode
+	- Deployjars
+
+
+
+- Environment Setup
+--------------------
+
+Prerequisites:
+	- IntelliJ Community IDEA
+		- https://www.jetbrains.com/idea/download/#section=windows
+	- Java 11 
+		-Amazon Corretto 11
+			- https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/what-is-corretto-11.html
+
+
+Downgrade Maven to be less than 3.8.1
+---------------------------------------
+Note: From 3.8.1, maven does not allow downloads from http repos , creating a headache.
+Open powershell in admin mode:
+	- cmd: choco install --allow-downgrade maven --version=3.6.2
+
+Note: On Windows, make sure that you go to the environment vaiables and either delte the old path or move it towards teh end in the 'PATH' variable, as else the older mvn version will be kept picking up
+
+- Upgrade: You can upgrade whenever you want by :
+	- cmd: choco install maven --version=3.8.7
+		  OR
+	  cmd: choco upgrade maven
+
+
+If you still want to use the latest version of Maven without downgrading
+-----------------------------------------------------------------------
+-  Upgrade: You can upgrade whenever youwant by :
+	- cmd: choco install maven --version=3.8.7
+		  OR
+	  cmd: choco upgrade maven
+
+- Maven will be installed in:
+	C:\ProgramData\chocolatey\lib\maven\apache-maven-3.8.7
+
+
+- Make sure you have the latest version running :
+
+	- cmd: mvn -v
+		- Note: On Windows, make sure that you go to the environment vaiables and either delte the old path or move it towards the end in the 'PATH' variable, as else the older mvn version will be kept picking up
+
+- cd C:\ProgramData\chocolatey\lib\maven\apache-maven-3.8.7
+- setings.xml:
+	- Comment out miror proxy lines as follows:
+    <!--mirror>
+      <id>maven-default-http-blocker</id>
+      <mirrorOf>external:http:*</mirrorOf>
+      <name>Pseudo repository to mirror external repositories initially using HTTP.</name>
+      <url>http://0.0.0.0/</url>
+      <blocked>true</blocked>
+    </mirror>
+	-->
+
+
+- Note: IntellIj uses teh settings.xml in : C:\Users\DELL\.m2
+		- MAke the above changes in thsi file as well
+
+- Add following mirror:
+        <mirror>
+            <id>confluent-mirror</id>
+            <mirrorOf>confluent-mirror</mirrorOf> <!-- Must match repository id. -->
+            <name>Dummy mirror to unblock confluent-mirror</name>
+            <url>http://packages.confluent.io/maven/</url>
+            <!-- <blocked>false</blocked> --> <!-- This is not needed, the mirror is unblocked by default. -->
+        </mirror>
+
+
+Define plugin group in settings.xml
+------------------------------------
+- cd C:\ProgramData\chocolatey\lib\maven\apache-maven-3.8.7
+- setings.xml:
+	- Define new plugin group as follows:
+
+  <pluginGroups>
+    <!-- pluginGroup
+     | Specifies a further group identifier to use for plugin lookup.
+    <pluginGroup>com.your.plugins</pluginGroup>
+    -->
+    <pluginGroup>io.confluent</pluginGroup>			
+  </pluginGroups>
+
+
+Objective : Stream GitHub Issues API
+---------------------------------------
+- We want to create a stream of issues and pull request from the repository of our choice
+- url: https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues
+- We will use a Source connector 
+- This stream should be bale to pickup any update to any issue or pull request
+- We will use a REST Client to Query that API
+	- E.g: 
+		- Go to GitHub Repo: https://github.com/kubernetes/kubernetes 
+			-> Issues tab -> Copy the url : https://github.com/kubernetes/kubernetes/issues
+		-  Go to repository issue API urL
+			- https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues
+				- Section 'List Repository Issues' : 
+					- RHS: Code Samples -> cURL - > copy url provided in curl command: https://api.github.com/repos/OWNER/REPO/issues
+
+				- Replace potion from /OWNER... with the last part of the kubernetes issues url we had copied before
+				- The url will now be: 
+					- https://api.github.com/repos/kubernetes/kubernetes/issues	 
+					- Execute in browser
+				- Using parameters:
+					- Refer : Section 'Query Parameters' in https://docs.github.com/en/rest/issues/issues?apiVersion=2022-11-28#list-repository-issues
+					- E.g. List of closed issues:
+						- url: https://api.github.com/repos/kubernetes/kubernetes/issues?state=closed  
+					- E.g. List of open issues:
+						- url: https://api.github.com/repos/kubernetes/kubernetes/issues?state=open 
+					- E.g. List of open issues from a date & time:
+						- url: https://api.github.com/repos/kubernetes/kubernetes/issues?state=open&since=2022-01-01T12:00:00
+
+
+
+
+Create Maven ArchType Project 
+--------------------------------
+
+	- Use the archetype provided in : https://github.com/jcustenborder/kafka-connect-archtype
+	
+
+	- Open Intellij:
+		- File -> New -> Project :
+				- Click on LHS tab -> Maven Archetype
+				- Name= kafka-connect-gihub-source
+				- Location= D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+				- Create GIT Repository : leave blank
+				- Build System = Maven
+				- JDK = auto populated
+				- Catalog = Internal
+				- Archetype:
+					- Add
+						- Note: Copy the values as provide din teh archetype  https://github.com/jcustenborder/kafka-connect-archtype
+							- Group id = com.github.jcustenborder.kafka.connect
+							- Artifact id = kafka-connect-quickstart
+							- Version = 2.4.0
+							- Catalog = leave blank	
+
+				- Advanced Settings:
+					- GroupId=com.mailsonymathew.kafka
+					- ArtifactId=kafka-connect-gihub-source
+		- Create
+
+				
+
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-project\src\main\java\com\mailsonymathew
+				- Will contain auto generated files inclusing Sink and Source COneector skeleton files
+
+		
+
+
+

@@ -1,0 +1,37 @@
+Wikimedia Producer - Safe Producer Settings
+--------------------------------------------------
+
+-Kafka Producer Defaults:
+	- Since Kafka 3.0, teh producer is "safe" by default
+		-acks=all(-1)
+		- enable.idempotence=true
+
+	- With Kafka 2.8 abd lower, the producer with default comes with:
+		- acks=1
+		- enable.idempotence=false
+		
+
+- Recommended to use safe producer whenver pssible
+- Important: Always use upgraded Kafka Clients
+
+
+
+- If Kafka >= 3.0:
+	-Producer is safe by default
+	
+
+- If Kafka < 3.0:
+		-Upgrade your clients or set teh following settings:
+		- acks=all
+			-Ensures data is properly replicated before an ack is received
+		- min.insync.replicas=2
+			- broker/topic leve
+		- enable.idempotence=true
+			- duplicates are not introduced due to NW retries
+		- retries=MAX_INT
+			- Retry until delivery.timeout.ms is reached
+		- delivery.timeout.ms=120000
+			- Fail after retrying for 2 mins
+		- max.in.flight.requests.per.connection=5
+			- Ensure max. performance while keeping message ordering
+	    

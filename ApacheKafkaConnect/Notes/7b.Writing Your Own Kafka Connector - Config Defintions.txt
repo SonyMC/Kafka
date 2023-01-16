@@ -1,0 +1,36 @@
+Config Definitions:
+------------------
+
+: Note: Am switching to Eclpise, as IntellIJ seems to have problems with trying to download ceertain repos.
+
+
+Code Directory:
+D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+
+_ Open Eclipse -> Import-> Existing MAven Project -> D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+
+Config Def:
+------------
+- Config Defs are the way to communicate to the user how you want your Configuration to be
+- You can have mandatory or optional parameters(with default) , and validate the types and contraints of your parameters. You should also documetn the parameters.
+
+
+
+-GitHubSourceConnectorConfig.java
+----------------------------------
+	- \src\main\java\com\mailsonymathew\kafka
+	- Code is documented and self-explanatory
+		
+
+- Testing the Configuration
+-------------------------------
+	- GitHubSourceConnectorConfigTest.java
+			- test/java/com/mailsonymathew/kafka/GitHubSourceConnectorConfigTest.java
+			
+	- Run:
+		- Right click on file -> Run as JUnit Test
+			- Tests shouls run successfully with some warnings
+
+

@@ -1,0 +1,56 @@
+Multi Cluster and Replication
+------------------------------
+
+Refer:
+
+- https://docs.confluent.io/platform/current/multi-dc-deployments/replicator/replicator-tuning.html#improving-cpu-utilization-of-a-connect-task
+- https://community.cloudera.com/t5/Community-Articles/Kafka-Mirror-Maker-Best-Practices/ta-p/249269
+- https://www.confluent.io/kafka-summit-sf17/multitenant-multicluster-and-hieracrchical-kafka-messaging-service/
+- https://www.uber.com/blog/ureplicator
+- https://www.altoros.com/blog/multi-cluster-deployment-options-for-apache-kafka-pros-and-cons/
+- https://github.com/Comcast/MirrorTool-for-Kafka-Connect
+- https://cwiki.apache.org/confluence/display/KAFKA/KIP-382%3A+MirrorMaker+2.0
+
+
+
+- Kafka can only operate well in a single region
+- Therefore it is very common for enterproses to have Kafka clusters across the world, with some level of replication between them 
+- A relication at it's core is just a consumer+producer
+- There are different tools to perfom replication:
+	- Mirror Maker 2 - open-source Kafka connector that ships with Kafka
+	- Netflix uses Flink - they wrote their own application 
+	- Uber uses uReplicator - addresses performance and operations issues with Mirror Maker 1
+	- Comcast has their own open-source Kafka Connect Source
+	- Confluent has their own Kafka Connect Source(paid)
+	
+
+- Overall, try these and see if it works for your use case before writing your own
+
+- Replication doensn't preserve offsets, just data. Data at an offset in one cluster is not the same as data at teh same offset in another cluster.
+
+- KAfka Multi Cluster & Replication - Active/Active
+--------------------------------------------------
+	- 2 Kafka clusters with producer/consumers operatign locally
+	- Both clusters canbe read/written to
+	- A 2 way replication can be setup between teh 2 clusters
+	- Advantages:
+		- Ability to serve users from a nearby Data center, which typically has performance benefits
+		- REdundancy and Resilience: Since every data center has all teh functionality , if one data center is unavailable you can direct users to a remaining data center.
+	- Disadvantages:
+		- The main drawback of this architecture is the challenges in avoiding conflicts when data is read and updated asynchronlusly in multiple locations
+
+
+
+- KAfka Multi Cluster & Replication - Active/Passive
+--------------------------------------------------------------
+	- 2 Kafka clusters with one one having a producer/consumer operatin locally & the other having only a consumer
+	- Data is only replicated in one cluster
+	- Advantages:
+		- Simplicity in setup and that it can used in all use cases
+		- No need to worry about access to data, handling conflicts , and other architectural complexities
+		- Good for cloud migrations as well
+	- Disadvantages:
+		- Waste of a good cluster as it will be only used for reads
+		- The fact that it is currently not possible to perform cluster failover in Kafka without eithe rlosing data or having duplicate events
+	
+		

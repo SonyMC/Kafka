@@ -1,0 +1,393 @@
+Kafka Connect WikiMedia & ElastiSearch Hands ON
+-----------------------------------------------
+
+Code: D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-connect-wikimedia
+
+
+
+Objective:
+-----------
+- Kafka Connect Wikimedia Source Connector: Run 'Kafka Connect Wikimedia Source Connector' which takes data from WikiMedia and sends it to Kafka
+
+
+Dowload ElastiSearch Sink Connector
+--------------------------------
+- Refer https://www.confluent.io/hub/
+	- Overall there are mor than 200 connectors available:
+	
+		- Select Sink and search for "ElasticSearch Sink Connector'
+		- Search will take you to the page: https://www.confluent.io/hub/confluentinc/kafka-connect-elasticsearch
+			- Download Previous versions-> version = 11.0.0
+			- Click on download button which downloads a zip file
+			- Downloads 'confluentinc-kafka-connect-elasticsearch-11.0.0.zip'
+					- Avialable in D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\Notes
+
+
+		
+
+Build jar using WSL gradle 
+---------------------------
+
+- Got to D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-connect-wikimedia
+- Open WSL:
+	- cmd: cd /mnt/d/OneDrive/Study/DevOps/Kafka/ApacheKafka/KafkaProject/kafka-beginners-course/kafka-connect-wikimedia/
+	- cmd: gradle shadowJar
+		- This will build a build/libs/kafka-connect-wikimedia-1.0-SNAPSHOT-all.jar file
+
+Note: We are using WSL to build the jar as we will be executing it in WSL.
+	- If we use the gradle in windows, the execution step of the connectors ( further down below) will fail
+
+                                               
+Configuration file
+--------------------
+Use the configuration file at connector/wikimedia.properties
+
+
+
+Before running the code
+-----------------------
+
+
+
+(1) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+
+(2)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window open
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+
+
+(3)List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+__consumer_offsets
+demo_java
+first_topic
+java_demo
+new_topic
+thrid_topic
+wikimedia.recentchange
+
+
+
+(4) Create Kafka topic named 'wikimedia.recentchange.connect' with 3 partitions & replication factor 1 :
+
+Note: Create the topic ''wikimedia.recentchange.connect''  only if it is hase notbeen created before
+
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic wikimedia.recentchange.connect --create --partitions 3 --replication-factor 1
+
+
+WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Created topic demo_java.	
+
+
+(5)List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+__consumer_offsets
+demo_java
+first_topic
+java_demo
+new_topic
+thrid_topic
+wikimedia.recentchange
+wikimedia.recentchange.connect
+
+(6) Note: make sure the following topics are created and available in your Kafka cluster:
+	
+wikimedia.recentchange
+wikimedia.recentchange.connect
+
+
+(5) WSL:
+	- Go to root folder: 
+		- cmd: cd \
+	- List dir:
+		- cmd: dir
+	
+	- Go to Kafka Installation folder:
+		- cmd : cd cd kafka_2.13-3.0.0
+
+	- List folder:
+		- cmd: ls
+			or
+		- cmd: dir
+
+	- Describe folders:
+		- cmd: ll
+
+
+	- Create folder 'connectors'
+		- cmd: mkdir connectors
+
+	- Go into 'connectors' folder:
+		- cmd: cd connectors/
+
+	- Create new directory 'kafka-connect-wikimedia' within 'connectors' folder:
+		- cmd: mkdir kafka-connect-wikimedia
+
+	- Go to 'kafka-connect-wikimedia':
+		- cmd: cd kafka-connect-wikimedia/
+
+	- Copy the jar file 'kafka-connect-wikimedia-1.0-SNAPSHOT-all.jar' into directory 'kafka-connect-wikimedia':
+		 
+		- First mount & cd into the jar directory location to wsl:
+			- cmd: cd /mnt/d/OneDrive/Study/DevOps/Kafka/ApacheKafka/KafkaProject/kafka-beginners-course/kafka-connect-wikimedia/build/libs/
+			
+
+		- Now copy the jar file into /connectors/kafka-connect-wikimedia 
+			- cmd: cp kafka-connect-wikimedia-1.0-SNAPSHOT-all.jar ~/kafka_2.13-3.0.0/connectors/kafka-connect-wikimedia
+
+
+	- Verify that the jr has been copied:
+			- cmd: cd \
+ 			- cmd: cd kafka_2.13-3.0.0/connectors/kafka-connect-wikimedia/
+			- cmd: dir
+
+	- Similarly copy the downloaded Elastisearch sink connector zipped file to the 'connectors' directory:
+		- cmd: cd /mnt/d/OneDrive/Study/DevOps/Kafka/ApacheKafka/Notes
+
+		- cmd: cp confluentinc-kafka-connect-elasticsearch-11.0.0.zip ~/kafka_2.13-3.0.0/connectors/
+
+	
+	- Install zip &  unzip:
+		- cmd: sudo apt install zip
+		- cmd: sudo apt install unzip
+
+	- Unzip the elastisearch sink connector file:
+		
+		- cmd : cd kafka_2.13-3.0.0/connectors/
+		
+		- cmd : unzip confluentinc-kafka-connect-elasticsearch-11.0.0.zip
+ 
+
+	- Verify installation: 
+		- cmd: cd ~/kafka_2.13-3.0.0/connectors
+		- cmd: dir
+			confluentinc-kafka-connect-elasticsearch-11.0.0      kafka-connect-wikimedia
+confluentinc-kafka-connect-elasticsearch-14.0.2.zip
+
+	- Create and move 'confluentinc-kafka-connect-elasticsearch-11.0.0' and 'confluentinc-kafka-connect-elasticsearch-11.0.0.zip' to new folder 'kafka-connect-elasticsearch'
+
+			- cmd: mv confluentinc-kafka-connect-elasticsearch-11.0.0 kafka-connect-elasticsearch
+			- cmd: mv confluentinc-kafka-connect-elasticsearch-11.0.0.zip kafka-connect-elasticsearch
+ct-elasticsearch
+
+
+	- Verify installation:
+		- cmd: dir
+		kafka-connect-elasticsearch  kafka-connect-wikimedia
+
+	- cd kafka-connect-elasticsearch/confluentinc-kafka-connect-elasticsearch-11.0.0/lib
+		- cmd: cd kafka-connect-elasticsearch/confluentinc-kafka-connect-elasticsearch-11.0.0/lib
+			- Wil contain all the jars that are necessary to run this connector
+
+
+
+		
+	
+
+	
+
+Configuration files
+------------------------
+ - Configuration files are available in : D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-extended\config
+
+	- connect-standalone.properties
+		- Set the connector path:
+			- Open WSL and navigate to ~/kafka_2.13-3.0.0/connectors
+				- cmd: pwd
+					- /home/mailsonymathew/kafka_2.13-3.0.0/connectors
+	
+		- wikimedia.properties
+			- Change the connector class to connector.class=com.mailsonymathew.WikimediaConnector
+
+		- elasticsearch.properties:
+			- no change
+
+
+
+	
+
+
+
+
+Run the connectors
+------------------
+
+
+
+First Connector:
+------------------
+-Objective:
+	-  Run the connector to take data from Wikimedia and produce it inot KAfka topic wikimedia.recentchange.connect
+
+We have the following two configuration files which we need to copy to the Kafka directory in WSL:
+	- connect-standalone.properties
+	- wikimedia.properties
+
+The above configuraiton files can be found in : 
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-connect-wikimedia\connector
+	- The same files are aslo availabe in:
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-extended\config	
+
+
+- WSL:
+	- cmd: cd ~/kafka_2.13-3.0.0/bin
+	- cmd:  connect-standalone.sh
+		- Response: 
+USAGE: /home/mailsonymathew/kafka_2.13-3.0.0/bin/connect-standalone.sh [-daemon] connect-standalone.properties		
+
+		- As can be seeen , this refers to the connect-standalone.properties
+
+	
+
+		- Copy the /config folder in D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-extended\config  to WSL:
+			- cmd: cd /mnt/d/OneDrive/Study/DevOps/Kafka/ApacheKafka/KafkaProject/kafka-beginners-course/kafka-extended
+			- cmd: cp -r config  /home/mailsonymathew/kafka_2.13-3.0.0/connectors
+
+
+	. Access to teh connector files:
+		- Make sure the followig cat cmds work:
+			- cmd: cd ~/kafka_2.13-3.0.0/connectors
+			- cmd: cat config/connect-standalone.properties
+			- cmd: cat config/wikimedia.properties	
+	
+	- Run the connector: 
+		- WSL 
+		- Refer 0-kafka-connect-wikimedia.sh in D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-extended
+		- cmd: cd ~/kafka_2.13-3.0.0/connectors
+		- cmd: connect-standalone.sh config/connect-standalone.properties config/wikimedia.properties
+
+		- Will run the producer ([wikimedia-source-connector) which takes data from WikiMedia and sends it to Kafka
+
+
+
+
+- Conduktor:
+	- Connect to cluster
+	- Topics-> wikimedia.recentchange.connect -> consume data 
+		- key format=json
+		- value format = json
+		- Start from = latest
+
+	- You will see a live stream of data from wikimedia coming from kafka connect
+
+
+
+- Note: What we have achieved is taht we took some pre-ecxisting code, do some configurations and we were able to run the connector successfully
+
+
+
+Second connector:
+-------------------
+Objective
+	- take all data from teh topic 'wikimedia.recentchange' and insert it into opensearch directly using a sink connector
+
+
+
+
+We have the following configuration files which we need to copy to the Kafka directory in WSL:
+	- connect-standalone.properties
+	- elasticsearch.properties  ( docker) 
+	- elasticsearchBonsai.properties ( bonsai)
+
+The above configuration files can be found in : 
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-connect-wikimedia\connector
+	- Teh same files are aslo availabe in:
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-extended\config	
+
+
+- WSL:
+	
+
+
+	- Copy the /config folder in D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-extended\config  to WSL:
+			- cmd: cd /mnt/d/OneDrive/Study/DevOps/Kafka/ApacheKafka/KafkaProject/kafka-beginners-course/kafka-extended
+
+
+
+
+			- cmd: cp -r config  /home/mailsonymathew/kafka_2.13-3.0.0/connectors
+
+
+	. Access to teh connector files:
+		- Make sure the followig cat cmds work:
+			- cmd: cd ~/kafka_2.13-3.0.0/connectors
+			- cmd: cat config/connect-standalone.properties
+			- cmd: cat config/elasticsearch.properties
+			- cmd: cat config/elasticsearchBonsai.properties		
+
+	- Start Elasticsearch using Docker 
+		- Refer '10b- OpenSearchConsumerProjectOverview - Setting Up OpenSearch On Docker.txt'
+		- Note: For some reson Docker OPenSearch Dashboard is not working
+		- cd : D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-consumer-opensearch
+			- Start Docker Desktop
+			- cmd: docker-compose up
+
+
+
+	- Start Elasticsearch using Bonsai
+		- Refer '10c- OpenSearchConsumerProjectOverview - Setting Up OpenSearch On Cloud.txt'
+		- Note: or some reson Docker OPenSearch Dashboard is not working
+		- cd : D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-consumer-opensearch
+
+
+
+	
+	- Run the connector: 
+		- WSL 
+		- Refer 1-kafka-connect-elasticsearch.sh in D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-extended
+		- cmd: cd ~/kafka_2.13-3.0.0/connectors
+		- For Docker ElasticSearch: 
+			- cmd: connect-standalone.sh config/connect-standalone.properties config/elasticsearch.properties
+
+		- For Bonsai ElasticSearch: 
+
+		 	- cmd: connect-standalone.sh config/connect-standalone.properties config/elasticsearchBonsai.properties
+
+		- Will run the producer ([wikimedia-source-connector) which takes data from WikiMedia and sends it to Kafka
+
+
+
+
+- Conduktor:
+	- Connect to cluster
+	- Conmsumers-> 
+			- You can see a consumer  named 'connect-elasticsearch-sink' 
+
+
+
+- Elastisearch Dashboard:
+		- Am unable tro access the Docker Dashboard for Elastisearch
+		- Am able to access the Bonsai ElasticSearch dashboard, but the console querying does not work
+
+
+********************************
+
+
+
+
+
+

@@ -1,0 +1,40 @@
+Kafka Command Line Interface 
+----------------------------
+
+
+Intro:
+- Come bundled with Kafka binaries
+- If you have setup the $PATH variable correctly in WSL, then you should be able to invoke the CLI from anywhere on your computer
+- kafka topics : 
+	- Create, Delete, describe or change a topic
+- If you have installed using Kafka binaries:
+		- cmds should end in .sh:
+			- E.g:
+				- kafka-topics.sh(Linux, MAC, Windows)
+				- kafka-topics.bat(Windows non WSL2)
+		- For homebrew. apt..
+			- E.g; 
+				- kafka-topics
+
+- Use the --bootstrap-server option everywhere, not --zookeepers
+		- This is because zookeeper is being decomissioned
+		- So we will be using cmd: kafka-topics --bootstrap-server localhost:9092
+				- We will not be using zookeeper cmd: kafka-topics --zookeeper localhost:2181 ( even if this will work) 
+		
+
+- Errors
+	- $PATH has not been set correctly
+			- one work around is to use the full path to the Kafka binaries
+			- E.g. cmd: ~/kafka_2.13-3.0.0/bin/kafka-topics.sh 
+
+
+	- WINDOWS NON-WSL2 USERS PLEASE READ( not applicable to our demo):
+		- do not run the command to DELETE topics
+		- Because of a bug here: https://issues.apache.org/jira/browse/KAFKA-1194, it doesn't work.
+		- In the meantime, please do not delete topics. Otherwise, your Kafka will crash and you won't be able to do the tutorial.
+
+
+
+
+
+

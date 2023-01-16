@@ -1,0 +1,525 @@
+Kafka CLI: Kafka consumers in Groups
+-----------------------------------
+
+Objectives:
+	- Learn about --group parameters
+
+	- See how parttions are divided amongst multiple CLI consumers
+
+	- List Consumer Groups 
+	
+	- Delete a Consumer Group
+
+	- Reset offsets
+
+
+
+Start Kafka broker:
+---------------------
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the windo wopen
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+
+
+
+
+Topics
+-------
+
+
+(1) Create Kafka Topics:
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-for-beginners-code-part1\1-kafka-cli
+	- Refer '0-kafka-topics.sh'
+	- Open WSL:
+		- Show all commands associated with topics :
+			- cmd: kafka-topics.sh 
+
+
+
+
+
+
+
+
+
+
+	- Open new WSL terminal
+
+	
+
+
+ 	- Create Kafka topic named 'first.topic' with 3 partitions & replication factor 1 :
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first.topic --create --partitions 3 --replication-factor 1	 
+
+Response: WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Error while executing topic command : Topic 'first.topic' collides with existing topics: first_topic
+[2022-10-13 13:17:22,937] ERROR org.apache.kafka.common.errors.InvalidTopicException: Topic 'first.topic' collides with existing topics: first_topic
+ (kafka.admin.TopicCommand$)
+
+
+	- Describe a topic
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --describe	
+
+Topic: first_topic      TopicId: XebTCW8aQq2a6Qz0YiAKXg PartitionCount: 3       ReplicationFactor: 1    Configs: segment.bytes=1073741824
+        Topic: first_topic      Partition: 0    Leader: 0       Replicas: 0     Isr: 0
+        Topic: first_topic      Partition: 1    Leader: 0       Replicas: 0     Isr: 0
+        Topic: first_topic      Partition: 2    Leader: 0       Replicas: 0     Isr: 0
+
+	- Describe all topics:
+		- cmd:kafka-topics.sh --bootstrap-server localhost:9092 --describe
+
+
+	
+Producer
+--------
+
+
+
+
+(2) Documentationof  producer commands:
+	- cmd: kafka-console-producer.sh
+
+
+
+
+(3) Producing into Kafka without a key:
+	- cmd: kafka-console-producer.sh --bootstrap-server localhost:9092 --topic first_topic
+		- Enter whathever data you want
+		- Press ctrl+c to exit
+		- Data now has been sent into the Kafka topic 'first_topic'	
+
+(4) Set producer property:
+	- cmd: kafka-console-producer.sh --bootstrap-server localhost:9092 --topic first_topic --producer-property acks=all
+			- - Producer will wait for leader+replicas acknowledgement( no data loss)
+			- Enter whatever data you want 
+			- Exit: ctrl + c
+
+(5) Producing to a non existing topic without a key:
+	- Let us try to produce to a topic we have nto created 'new_topic'
+	- cmd:kafka-console-producer.sh --bootstrap-server localhost:9092 --topic new_topic
+		- 'new_topic' will automatically be created
+
+		- enter whatever megs you want 
+
+			- you might get a wrning sayign the laeder is not available but Kafka will automatically retry till itis available
+		- Exit: ctrl + c
+
+(6)List topics:
+	- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+first_topic
+new_topic
+
+(7) Describe 'new_topic':
+	- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic new_topic --describe
+		- 'new-topic' has only 1 partition
+	- You can increase the no. of parttions:
+			- edit config/server.properties or config/kraft/server.properties
+			- num.partitions=3
+
+
+(8)Produce with keys:
+	- cmd: kafka-console-producer.sh --bootstrap-server localhost:9092 --topic first_topic --property parse.key=true --property key.separator=:
+		- This essentially means you have to provide a key, value pair sperated using  ':'
+		- if you directly try to produce without followign teh above pattern, excpetion will be thrown:
+org.apache.kafka.common.KafkaException: No key found on line 1: 111
+
+		- provide key,value pairs as such:
+>name:sony
+>adress:chirayil
+
+		- Exit: ctrl + c
+	
+
+	
+
+Consumer
+----------
+
+
+9) Refer : 
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-for-beginners-code-part1\1-kafka-cli
+		- 2-kafka-console-consumer.sh
+
+10)Documentationof  xconsumer commands:
+	- cmd: kafka-console-consumer.sh
+
+
+11) Consume from first_topic:
+	- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic	
+		- nothing will happen asit is by default consuming from tail and only teh latest messages will bes shown 
+
+
+12) Open another WSL console and produce more messages to first_topic
+	- cmd: kafka-console-producer.sh --bootstrap-server localhost:9092 --topic first_topic
+		- Enter any messages you want
+		- go tto the WSL console having teh consumer open and you can see the messages automatically appearing there
+
+
+13)Consuming from beginning 
+	- Go to WSL console with consumer:
+			- exit current consumer: ctrl + c
+			- start new consumer for reading all messages from first_topic:
+				- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --from-beginning	
+
+	- You can see all messages and if you produc enew ones that will also appear here 
+	- However msgs might seem not be ordered but they are actually ordred for a prttion.
+	- Heere we are seeign msgs across all parttions and hence they appear disordered!!!
+
+
+14)Display key, values and timestamp in consumer
+
+		- Go to WSL console with consumer:
+			- exit current consumer: ctrl + c
+		- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --formatter kafka.tools.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --from-beginning		
+		
+	
+
+
+CLI Consumer inGroups
+----------------------
+	- kafka-console.consumer.sh
+
+	- Refer : D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-for-beginners-code-part1\1-kafka-cli
+			- 3-kafka-console-consumer-in-groups.sh
+
+	- Consumer WSL console:
+	
+		- Start one consumer and assign it to a consumer group named 'my-first-consumer-group' and Consume from tail of first_topic
+			 -cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --group my-first-consumer-group
+		
+
+	- Producer WSL console:
+		- Producing into Kafka without a key:
+			- cmd: kafka-console-producer.sh --bootstrap-server localhost:9092 --topic first_topic
+				- Enter whathever data you want
+				- Press ctrl+c to exit
+				- Data now has been sent into the Kafka topic 'first_topic'	and wil lbe available in the consumer console which we have opened above
+
+		
+
+	- New WSL console:
+
+		- Describe 'first-topic' and ensure it has 3 partitions:
+			- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --describe	
+
+Topic: first_topic      TopicId: vBlFRDw1SliCWz54cALNug PartitionCount: 3       ReplicationFactor: 1    Configs: segment.bytes=1073741824
+        Topic: first_topic      Partition: 0    Leader: 0       Replicas: 0     Isr: 0
+        Topic: first_topic      Partition: 1    Leader: 0       Replicas: 0     Isr: 0
+        Topic: first_topic      Partition: 2    Leader: 0       Replicas: 0     Isr:
+
+
+
+		- Start another consumer part of the same group to consume from 'first_topic'. See messages being spread
+			cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --group my-first-consumer-group
+			- Go to producer console and type in msgs and see them being ditributed actross the two comsumers
+
+	
+	- New WSL console
+		- Start third consumer part of the same group to comsume from 'first_topic'. See messages being spread
+			cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --group my-first-consumer-group
+			- Go to producer console and type in msgs and see them being ditributed actross the 3 comsumers
+
+
+	- New WSL console
+		- Start 4th consumer part of the same group to consume from 'first_topic'. 
+			cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --group my-first-consumer-group
+
+		- Note: Now ewe have 4 comsumers and only 3 parttions
+		- You can see that when we produce messages, it will be picked up only by any 3 consumers and 1 consumer will remain idle  
+		- Go to producer console and type in msgs and see them being ditributed actross the 3 comsumers( i.e 1 consumer will be idle)
+
+	- New WSl console:
+		- Try to read teh messages from  'my-first-consumer-group' from beginning:
+			- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --group my-first-consumer-group --from-beginning
+
+				- You will notice nothing will be shown even though we have specified from beginning 
+				- This is because the offsets have already been committted by teh comsumer group and dat awill be read only fom where it was last committed:
+					- Kafka stores the offsets at which a consumer group has been reading
+					- The offsets committed are in Kafka topic named __consumer_offsets 
+					- When a comsumer in a group has processed data recieved from Kafka,it should be periodically committing the offsets( the Kafka broker will write to __consumer_offsets, not the group itself)
+					- if a consumer dies, it will be able to read back form where it left off thanks to the committed comsumer offests.
+
+				- Hence --from-beginning will not work for consumer groups
+
+	- New WSl console:
+		- Keep just one console open for consumer group ''my-first-consumer-group'
+		- Try to read the messages from a new consumer group 'my-second-consumer-group' 
+			- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --group my-second-consumer-group
+		- Write to producer connsole
+		- You will see data being picked up both consumer groups
+		- Note: Only if the consumers are part of the same comsumer group, will they spread the reads
+		
+
+
+
+Kafka Consumer Groups CLI
+-----------------------------
+
+
+
+Refer commands :
+
+	-D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-for-beginners-code-part1
+		- 4-kafka-consumer-groups.sh
+
+- Open new WSL console
+
+
+	- Documentation for the command
+		- cmd: kafka-consumer-groups.sh
+
+	- List consumer groups
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+
+	my-first-consumer-group
+	my-second-consumer-group
+
+
+	- Describe  consumer group	'my-first-consumer-group'
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-first-consumer-group	
+
+GROUP                    TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+my-first-consumer-group first_topic     0          14              14              0               -               -               -
+my-first-consumer-group first_topic     1          16              16              0               -               -               -
+my-first-consumer-group first_topic     2          12              12              0               -               - 
+
+
+
+	- Note: We can notice that the current-offset value is teh same a sthe log-end-offset.
+		- This means our consumer group has read till the end ot topic
+		- Thsi is why lag value is 0 . Else it will be > 0 
+
+-  Open new Producer WSL console:
+		- Producing into Kafka without a key:
+			- cmd: kafka-console-producer.sh --bootstrap-server localhost:9092 --topic first_topic
+				- Enter whathever data you want
+				- Press ctrl+c to exit
+				- Data now has been sent into the Kafka topic 'first_topic'	and wil lbe available in the consumer console which we have opened above
+			
+
+- Open new WSL consumer console:
+	- Describe  consumer group	'my-first-consumer-group'
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-first-consumer-group	
+ 			- You can now notice a lag value > 0 as the log-end-dataset value is different to the current-offset 
+			- This i sbecuase we have not consumer any messages form teh group till now 
+
+
+
+
+GROUP                   TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+my-first-consumer-group first_topic     0          14              16              2               -               -               -
+my-first-consumer-group first_topic     1          16              19              3               -               -               -
+my-first-consumer-group first_topic     2          12              12              0               -               -  
+		
+
+
+	 
+	- Start a consumer for 'my-first-consumer-group' :
+		- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --group my-first-consumer-group
+			- It shows messages produced earlier 
+			- Leave teh consumer console open
+
+
+- Open new WSL consumer description console:
+	
+	- Now again describe consumer group	'my-first-consumer-group':
+	
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-first-consumer-group	
+			- You will notice LAG value is again 0 and  CURRENT-OFFSET values and LOG-END-OFFSET are the same.
+			- You will now alo notic ethe consumer-id column is populated as whe have left the consumer running
+
+
+
+- Open new WSL consumer console:
+	- Start a new consumer for 'my-first-consumer-group' :
+		- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --group my-first-consumer-group
+			- It shows messages produced earlier 
+			- Leave the consumer console open
+
+
+- Go back to WSL consumer description console:
+	- Now again describe consumer group	'my-first-consumer-group':
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-first-consumer-group	
+			- You will notic ehe the consumer-id for the last parttion is different. 
+				i.e, Parttions 0 & 1 have teh same consumer while parttion 2 has a differnt consumer.
+
+
+
+
+GROUP                   TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                                             HOST            CLIENT-ID
+my-first-consumer-group first_topic     0          17              17              0               consumer-my-first-consumer-group-1-84fb9ace-90e7-4a66-b980-c865b719da78 /127.0.0.1      consumer-my-first-consumer-group-1
+my-first-consumer-group first_topic     1          22              22              0               consumer-my-first-consumer-group-1-84fb9ace-90e7-4a66-b980-c865b719da78 /127.0.0.1      consumer-my-first-consumer-group-1
+my-first-consumer-group first_topic     2          12              12              0               consumer-my-first-consumer-group-1-8e3263ff-e515-423e-bf3f-ddc0df749ad9 /127.0.0.1      consumer-my-first-consum
+
+
+
+
+
+
+
+- Open new WSL consumer console:
+	- Start a new consumer without specifying a group and read from beginning :
+		- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --from-beginning
+
+		- Will show all msgs for teh topic 'first_topic' for all consumer groups
+
+
+- Open new WSL  console:
+	- List consumer groups:
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+			- You will see a new console-consumer group 
+			- This is temporray group for my consumer and will get deleted as soon as my consumer is off
+
+my-first-consumer-group
+console-consumer-62096
+my-second-consumer-group
+
+
+	- describe a console consumer group (change the end number)
+		cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group console-consumer-62096
+		
+	- since this is temperoary, current-ooset value will be blank
+
+
+GROUP                  TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                                            HOST            CLIENT-ID
+console-consumer-62096 first_topic     0          -               17              -               consumer-console-consumer-62096-1-823b9c0a-e0f6-41d5-968f-def6201049fe /127.0.0.1      consumer-console-consumer-62096-1
+console-consumer-62096 first_topic     1          -               22              -               consumer-console-consumer-62096-1-823b9c0a-e0f6-41d5-968f-def6201049fe /127.0.0.1      consumer-console-consumer-62096-1
+console-consumer-62096 first_topic     2          -               12              -               consumer-console-consumer-62096-1-823b9c0a-e0f6-41d5-968f-def6201049fe /127.0.0.1      consumer-console-consumer-62096-1
+
+
+
+
+Reset  Offsets:
+---------------
+
+
+Refer commands :
+
+	-D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-for-beginners-code-part1
+
+		- 5-reset-offsets.sh
+
+Objectives:
+	- Start/Stop a Console Consumer
+	- Reset Offsets
+	- Start Console Consumer and see theoutcome
+
+- Close consumer consoles for 'my-first-consumer-group'
+
+- Open new WSL  console:
+	- List consumer groups:
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+
+			my-first-consumer-group
+			my-second-consumer-group
+
+
+	- Describe consumer group	'my-first-consumer-group':
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-first-consumer-group
+
+				- Make sure lag is 0
+
+GROUP                   TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID                                                             HOST            CLIENT-ID
+my-first-consumer-group first_topic     0          17              17              0               consumer-my-first-consumer-group-1-8e3263ff-e515-423e-bf3f-ddc0df749ad9 /127.0.0.1      consumer-my-first-consumer-group-1
+my-first-consumer-group first_topic     1          22              22              0               consumer-my-first-consumer-group-1-8e3263ff-e515-423e-bf3f-ddc0df749ad9 /127.0.0.1      consumer-my-first-consumer-group-1
+my-first-consumer-group first_topic     2          12              12              0               consumer-my-first-consumer-group-1-8e3263ff-e515-423e-bf3f-ddc0df749ad9 /127.0.0.1      consumer-my-first-consumer-group-1
+
+
+	- Reset the offsets of 'my-first-consumer-group'  to the beginning of each partition
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group my-first-consumer-group --reset-offsets --to-earliest
+			- WARN: No action will be performed as the --execute option is missing
+
+	
+	- Reset the offsets of 'my-first-consumer-group'  to the beginning of each partition using execute flag 
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group my-first-consumer-group --reset-offsets --to-earliest --execute
+
+			- No actionis performed as topic flag is required 
+
+
+	- Reset the offsets of 'my-first-consumer-group'  to the beginning of each partition using execute flag & topic flag 
+		- For first_topic
+			- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group my-first-consumer-group --reset-offsets --to-earliest --execute --topic first_topic
+		
+		- For all topics:
+			
+			- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group my-first-consumer-group --reset-offsets --to-earliest --execute --all-topics
+
+				- New offset will be set to 0
+
+
+
+		GROUP                          TOPIC                          PARTITION  NEW-OFFSET
+my-first-consumer-group        first_topic                    0          0
+my-first-consumer-group        first_topic                    1          0
+my-first-consumer-group        first_topic                    2          0
+
+
+
+
+	- Consume from where the offsets have been reset
+
+		- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --group my-first-consumer-group
+
+			- Will read everything form the beginnign for the topic 'first_topic' 
+
+
+- Describe the group again
+cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-first-consumer-group
+
+
+GROUP                   TOPIC           PARTITION  CURRENT-OFFSET  LOG-END-OFFSET  LAG             CONSUMER-ID     HOST            CLIENT-ID
+my-first-consumer-group first_topic     0          17              17              0               -               -               -
+my-first-consumer-group first_topic     1          22              22              0               -               -               -
+my-first-consumer-group first_topic     2          12              12              0               -               -               -
+
+
+
+
+
+- Shift offsets by 2 (backward) as another strategy
+kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group my-first-consumer-group --reset-offsets --shift-by -2 --execute --topic first_topic
+	- Will result in 6 messages to be read ( 2 x 3 parttions) 
+		
+
+-  Consume again
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --group my-first-consumer-group
+	- Will show 6 meessages
+
+
+
+
+
+- Shift offsets by 2 (forward) as another strategy
+cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group my-first-consumer-group --reset-offsets --shift-by 2 --execute --topic first_topic
+
+-  Consume again
+cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --group my-first-consumer-group
+[2022-10-15 15:30:28,860] WARN New offset (19) is higher than latest offset for topic partition first_topic-0. Value will be set to 17 (kafka.admin.ConsumerGroupCommand$)
+[2022-10-15 15:30:28,861] WARN New offset (24) is higher than latest offset for topic partition first_topic-1. Value will be set to 22 (kafka.admin.ConsumerGroupCommand$)
+[2022-10-15 15:30:28,861] WARN New offset (14) is higher than latest offset for topic partition first_topic-2. Value will be set to 12 (kafka.admin.ConsumerGroupCommand$)
+
+***************
+- Delete a topic 
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --delete
+			- Wil delete first_topic
+
+
+		- Note: # (only works if delete.topic.enable=true)
+
+		
+
+
+
+
+ 	 

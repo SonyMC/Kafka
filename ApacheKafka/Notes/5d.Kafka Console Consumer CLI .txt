@@ -1,0 +1,210 @@
+Kafka CLI: Consumer
+--------------------
+
+Objectives:
+	- Produce into Kakfa topics without keys
+		- Data will be distributed across all parttions
+
+	- Produce into Kakfa topics with keys
+		- Data will be will be written to a single parttion fo rteh same key
+
+	- Consume from tail of topic
+		- i.e only new messages
+	- Consume from beginnign of topic
+		- i.e. al lmessages
+	- Show both key and values in the output	
+
+
+Start Kafka broker:
+--------------------
+		-  Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window sopen
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+
+			Note: keep both windows open 
+
+
+
+Topics
+-------
+
+
+(1) Create Kafka Topics:
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-for-beginners-code-part1\1-kafka-cli
+	- Refer '0-kafka-topics.sh'
+	- Open WSL:
+		- Show all commands associated with topics :
+			- cmd: kafka-topics.sh 
+
+
+
+
+
+
+
+
+	- Open new WSL terminal
+
+	
+
+	- Create Kafka topic named 'first_topic' with 3 partitions & replication factor 1 :
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --create --partitions 3 --replication-factor 1
+
+		- Response: 
+WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Created topic first_topic.
+
+
+
+
+ 	- Create Kafka topic named 'first.topic' with 3 partitions & replication factor 1 :
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first.topic --create --partitions 3 --replication-factor 1	 
+
+Response: WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Error while executing topic command : Topic 'first.topic' collides with existing topics: first_topic
+[2022-10-13 13:17:22,937] ERROR org.apache.kafka.common.errors.InvalidTopicException: Topic 'first.topic' collides with existing topics: first_topic
+ (kafka.admin.TopicCommand$)
+
+
+	- Describe a topic
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --describe	
+
+Topic: first_topic      TopicId: XebTCW8aQq2a6Qz0YiAKXg PartitionCount: 3       ReplicationFactor: 1    Configs: segment.bytes=1073741824
+        Topic: first_topic      Partition: 0    Leader: 0       Replicas: 0     Isr: 0
+        Topic: first_topic      Partition: 1    Leader: 0       Replicas: 0     Isr: 0
+        Topic: first_topic      Partition: 2    Leader: 0       Replicas: 0     Isr: 0
+
+	- Describe all topics:
+		- cmd:kafka-topics.sh --bootstrap-server localhost:9092 --describe
+
+
+	
+Producer
+--------
+
+
+
+
+(2) Documentationof  producer commands:
+	- cmd: kafka-console-producer.sh
+
+
+
+
+(3) Producing into Kafka without a key:
+	- cmd: kafka-console-producer.sh --bootstrap-server localhost:9092 --topic first_topic
+		- Enter whathever data you want
+		- Press ctrl+c to exit
+		- Data now has been sent into the Kafka topic 'first_topic'	
+
+(4) Set producer property:
+	- cmd: kafka-console-producer.sh --bootstrap-server localhost:9092 --topic first_topic --producer-property acks=all
+			- - Producer will wait for leader+replicas acknowledgement( no data loss)
+			- Enter whatever data you want 
+			- Exit: ctrl + c
+
+(5) Producing to a non existing topic without a key:
+	- Let us try to produce to a topic we have nto created 'new_topic'
+	- cmd:kafka-console-producer.sh --bootstrap-server localhost:9092 --topic new_topic
+		- 'new_topic' will automatically be created
+
+		- enter whatever megs you want 
+
+			- you might get a wrning sayign the laeder is not available but Kafka will automatically retry till itis available
+		- Exit: ctrl + c
+
+(6)List topics:
+	- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+first_topic
+new_topic
+
+(7) Describe 'new_topic':
+	- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic new_topic --describe
+		- 'new-topic' has only 1 partition
+	- You can increase the no. of parttions:
+			- edit config/server.properties or config/kraft/server.properties
+			- num.partitions=3
+
+
+(8)Produce with keys:
+	- cmd: kafka-console-producer.sh --bootstrap-server localhost:9092 --topic first_topic --property parse.key=true --property key.separator=:
+		- This essentially means you have to provide a key, value pair sperated using  ':'
+		- if you directly try to produce without followign teh above pattern, excpetion will be thrown:
+org.apache.kafka.common.KafkaException: No key found on line 1: 111
+
+		- provide key,value pairs as such:
+>name:sony
+>adress:chirayil
+
+		- Exit: ctrl + c
+	
+
+	
+
+Consumer
+----------
+
+
+9) Refer : 
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-for-beginners-code-part1\1-kafka-cli
+		- 2-kafka-console-consumer.sh
+
+10)Documentationof  xconsumer commands:
+	- cmd: kafka-console-consumer.sh
+
+
+11) Consume from first_topic:
+	- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic	
+		- nothing will happen asit is by default consuming from tail and only teh latest messages will bes shown 
+
+
+12) Open another WSL console and produce more messages to first_topic
+	- cmd: kafka-console-producer.sh --bootstrap-server localhost:9092 --topic first_topic
+		- Enter any messages you want
+		- go tto the WSL console having teh consumer open and you can see the messages automatically appearing there
+
+
+13)Consuming from beginning 
+	- Go to WSL console with consumer:
+			- exit current consumer: ctrl + c
+			- start new consumer for reading all messages from first_topic:
+				- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --from-beginning	
+
+	- You can see all messages and if you produc enew ones that will also appear here 
+	- However msgs might seem not be ordered but they are actually ordred for a prttion.
+	- Heere we are seeign msgs across all parttions and hence they appear disordered!!!
+
+
+14)Display key, values and timestamp in consumer
+
+		- Go to WSL console with consumer:
+			- exit current consumer: ctrl + c
+		- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic first_topic --formatter kafka.tools.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property print.value=true --from-beginning		
+		
+	
+
+
+
+*******************
+
+- Delete a topic 
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic first_topic --delete
+			- Wil delete first_topic
+
+
+		- Note: # (only works if delete.topic.enable=true)
+
+
+
+
+ 	 

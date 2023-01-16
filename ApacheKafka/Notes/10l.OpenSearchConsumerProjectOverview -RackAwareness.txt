@@ -1,0 +1,21 @@
+Consumer REplica Fetching - Rack Awareness
+----------------------------------------------
+
+Default Consumer Behaviour with PArtition Leaders:
+	- Kafka consumers by default will read from leader broker for a partittion
+	- Possibly higher latency( multiple data center) + higher NW charges($$$)
+
+- Since Kafka 2.4, it is possible to configure consumers to read from the closest replica
+- This may improve latency and decrease cloud NW closts
+
+
+Consumer Rack Awareness( v2.4+) - How o setup:
+	- Broker setting:
+		- must be version >= 2.4
+		- rack.id must be set to the data center id( E.g. AZ ID in AWS)
+			- E.g of AWS: AZ ID rack.id=usw2-az1
+		- replica.selector.class mus tbe set to 
+				org.apache.kafka.common.replica.RackReplicaSelector
+	= Consumer client setting:
+		- Set client.rack to the data center ID teh consumer is launched on 
+

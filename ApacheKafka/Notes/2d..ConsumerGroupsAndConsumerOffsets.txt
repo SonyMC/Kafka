@@ -1,0 +1,31 @@
+Consumer Groups and Consumer Offsets
+------------------------------------
+
+- Consumer Groups
+-----------------
+- All the consumers in an application read data as a consumer group
+- If you have more consumers than partitions, some consumers will1 be inactive
+- You can have multiple consumer groups on the same topic
+- To create distinct consumer groups, use the consumer property group.id
+
+- Consumer offsets:
+---------------------
+- Kafka stores the offsets at which a consumer group has been reading
+- The offsets committed are in Kafka topic named __consumer_offsets
+- When a comsumer in a group has processed data recieved from Kafka,it should be periodically committing the offsets( the Kafka broker will write to __consumer_offsets, not the group itself)
+- If a consumer dies, it will be able to read back form where it left off thanks to the committed comsumer offests.
+
+Delivery Semantics for consumers 
+-----------------------------------
+- By default, Java consumers will automatically commit offsets( atleast once)
+- There are 3 delivery semanticsif you choose to commit manually 
+	(1) Alteast once( usually preferred):
+		- offsets are committed after the message is processed 
+		- Adv: If the message processign goes wrong, the message will be read again
+		- This can result in duplicate processing of messages. Make sure your processing is idempotent(i.e. processign again teh messages won;t impact your system)
+	(2) Atmost once:
+		- Offsets are committed as soon as the messageis recieved 
+		- If the processing goes wrong, some messages will be lost(they won't be read again)
+	(3) Excatly once:
+		- For Kafka -> Kafka workflows : use the Transactional API(easy with Kafka Streams API) 
+		    

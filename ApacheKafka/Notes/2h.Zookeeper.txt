@@ -1,0 +1,32 @@
+ZooKeeper
+------------
+
+- S/W that manages brokers(keeps a list of them)
+- Helps in performing leader election for parttions
+- Sends notification to Kafka in case of changes
+	- E.g. New topic, broker dies, broker comes up, deelte topics, etc.
+
+- Kafka 2.x can't work without Zookeeper
+- Kafka 3.x canwork without Zookeeper(KIP-500) 
+		- uses Kafka Raft instead
+- Kafka 4.x will not have Zookeeper
+
+- Zookeeper by design operates with an odd nuber of servers(1,3,5,7,...)
+- Zookeepr has a leader(writes) and teh rest of teh servers are followers(reads)
+- Zookeeper DOES NOT store consumer offsets with Kafka > v0.10
+	- Now the offsets committed are in Kafka topic named '__consumer_offsets'
+
+
+Should you use Zookeeper?
+	- With Kafka Brokers:
+		- Yes, until Kafka 4.0 is out while waiting for Kafka without Zookeeper to be production ready
+
+	- With Kafka Clients:
+		- Over time, Kafka clients and CLI have been migrated to leverage the brokers as a connection endpoint instead of Zookeeper
+
+		 -Since Kafka 0.10, consumers store offset in Kafka and Zookeeper and must not connect to Zookeeper as it is depreciated
+		- Since Kafka 2.2, teh kafka-topics.sh CLI command references Kafka brokers and not Zookeeper for topic management( creation, deltion, etc.) and the Zookeeper CLI argumetn is deprecated
+		- All API's and cmd's that were previously leveraging Zookeeper are migrated to use Kafka instead , so that when clusters are migrated to be without Zookeeperr, the change is invisible to clients. 
+		- Zookeeper is also less secure than Kafka, and therefore Zookeeper ports should only be opened to allow traffic from Kafka brokers, and not Kafka clients
+		- Therefore, in modern day, do not use Zookeeper as a configuration in your Kafka clients, and other programs that connect to Kafka
+ 

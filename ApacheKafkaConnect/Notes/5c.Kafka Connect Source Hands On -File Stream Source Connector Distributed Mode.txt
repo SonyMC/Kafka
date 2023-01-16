@@ -1,0 +1,193 @@
+Kafka Connect Source - FIle Stream Connector - Distributed Mode
+--------------------------------------------------------------
+
+
+- Goal:
+	- Read a file and load the content directly into Kafka 
+	- Run a connector in distributed mode on our already setup Kafka Connect Cluster
+	- Flow:
+		file -> connector 2(Schema Enabled) -> Kafka Topic 2
+
+Learning:
+	- Uderstand how to configure a connector in distributed mode 
+	- Get a first feel for Kafka Connect Cluster
+	- Understand the schema configuration option 
+
+
+
+
+
+
+
+Starting Kafka Connect Cluster using Docker Compose
+----------------------------------------------------
+
+	- Ensure that Docker has atleast 4 GB of memory allocated :
+settings.json
+C:\Users\DELL\AppData\Roaming\Docker
+
+You can also set the memory used by docker by editing the json file C:\Users\Personal\AppData\Roaming\Docker\settings.json . Look for a property called MemoryMiB and update its value to be the number of megabytes you want your docker installation to use
+
+
+
+	- docker-compose.yml :
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	- Start Docker Desktop
+	- Commands used:
+		- Refer 'kafka-connect-tutorial-sources.sh' in D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	- C:\Windows\System32\cmd.exe
+	- Start our kafka cluster
+		- cmd: docker-compose up kafka-cluster
+	- Wait 2 minutes for the kafka cluster to be started	
+
+	- Kafka cluster url: 
+		- http://127.0.0.1:3030/
+			- Will land you onto Kafka Development Environment UI
+			- Ensure atealst 1 connector is running
+
+
+Update Landoop container for viewing logs:
+------------------------------------------
+	- Start Docker desktop
+	- cmd: docker pull landoop/fast-data-dev
+
+
+
+Kafka connect UI
+-----------------
+- url : http://127.0.0.1:3030/
+- View Logs: At bottom of Ui -> Browse -> Click on 'running services log files' -> click on 'connect-distributed.log'
+
+
+
+Source files
+-------------
+Parent folder : D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\source
+
+- Demo 1: 
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\source\demo-2
+	
+		(1) file-stream-demo-standalone.properties
+			- Contains setup/configuration of the connector 
+			- The file is commented and self expanatory
+
+	
+		Note: 
+			- Since we are in distributed mode, we won't require a worker.properties
+			- Since we are runnign in a distributed mode , the input file 'demo-file.txt' needs to be inside teh cluster and not ouside it. We will do this further down
+
+
+
+Commands executed:
+----------------
+
+Note: Use PowerShell to execute the followign :
+
+-  kafka-connect-tutorial-sources.sh:
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	
+		- 
+		
+
+		- Open Powershell
+			- Bash into the container:
+				- When using image:landoop/fast-data-dev:cp3.3.0 in docker-compose 
+					- cmd: docker run --rm -it --net=host landoop/fast-data-dev:cp3.3.0 bash
+
+					- Create the topic we're going to write to 'demo-2-distributed'
+						- cmd: kafka-topics --create --topic demo-2-distributed --partitions 3 --replication-factor 1 --zookeeper 127.0.0.1:2181
+
+				- When using image:landoop/fast-data-dev:latest in docker-compose 
+					- cmd: docker run --rm -it --net=host landoop/fast-data-dev:latest bash
+
+				- Create the topic we're going to write to 'demo-2-distributed'
+					- cmd: kafka-topics --create --topic demo-2-distributed --partitions 3 --replication-factor 1 --bootstrap-server 127.0.0.1:9092
+
+
+			- You can now close the new shell
+
+
+			- Go to the Kafka Cluster UI : http://127.0.0.1:3030/
+				-Topics :
+					- You should be able to see the newly created topic 'demo-2-distributed'
+						- Click on the topic:
+							- Data = Topic is empty
+
+				- When using image:landoop/fast-data-dev:cp3.3.0 in docker-compose :
+					- Click on Connectors -> Kafka Connect UI -> Enter :
+						- You can see 1 conector for 'logs-broker'
+
+						- Create a New File Source Connector:
+												- Click on 'New' :
+							- Will list out all available connectors :
+								- Select 'File' connector:
+									- Description of Connector: Tail File or folders and stream data into Kafka 	
+										- Will openup a configurable UI for New Connector with class : org.apache.kafka.connect.file.FileStreamSourceConnector
+
+										- Enable Optional Fields:
+												- Fill in the UI form referencing teh following :
+													- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\source\demo-2
+														- file-stream-demo-distributed.properties 
+													- Note: Do not include the commented lines as it will throw an error	
+														  - Delete 'transform' field in the form				
+													- Click on 'Create'
+										- You can see the new connector 'file-stream-demo-distributed':
+												- Click on it.
+												- You can seem message banner with icons : 'File  Kafka is RUNNING'
+												- YOu can also see teh 'Task' IP and Topic
+											
+				
+
+			- When using image:landoop/fast-data-dev:latest in docker-compose :
+					- Postman :
+						- Collections = KAfka
+						- Execute POST request:  FileConnect
+							- REsponse: 210 Created
+	
+				
+				
+				- Enter topics- > demo-2-distributed:
+						- Input data into the 'demo-file.txt' as shown below and you will see data appearing in the topics
+							-  Note : 
+									- Expand the 'Value' dropdown to see the data
+									- Since we have enabled 'schema' in the configuraiton you can see the schema
+											-  { type: string, optional: false }
+
+
+		-  Create the input file  'demo-file.txt' within the cluster
+					- Login to the docker container and create teh input file 
+						- Show containers:
+							cmd: docker ps
+								- Copy the container id for 'landoop/fast-data-dev'
+									- Note: if there are tow containers listed, use the oldest one which has te hports listed
+						- Bash into the container : 
+							cmd: docker exec -it <containerId> bash
+								- Will open bash cosole within teh container
+
+						- Create 'demo-file.txt' within the container:
+							cmd: touch demo-file.txt
+
+						- Enter data :
+					
+							echo "hi" >> demo-file.txt
+							echo "hello" >> demo-file.txt
+							echo "from the other side" >> demo-file.txt		
+
+		- Read the topic data from beginning using Kafka console 
+				- If Image: landoop/fast-data-dev:cp3.3.0 bash
+					- Bash into the Kafka CLuster container if not already done: 
+					 - cmd: docker run --rm -it --net=host landoop/fast-data-dev:cp3.3.0 bash
+					 - cmd: kafka-console-consumer --topic demo-2-distributed --from-beginning --zookeeper 127.0.0.1:2181 
+			
+
+				- If Image : landoop/fast-data-dev:latest
+					- Bash into the Kafka CLuster container if not already done: 
+					 - cmd: docker run --rm -it --net=host landoop/fast-data-dev:latest
+					 - cmd: kafka-console-consumer --topic demo-2-distributed --from-beginning --bootstrap-server 127.0.0.1:9092
+			 observe we now have json as an output, even though the input was text!			
+
+
+
+*******
+										 
+

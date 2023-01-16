@@ -1,0 +1,310 @@
+Kafka Connect Source - Twitter Source COnnector - Distributed Mode
+------------------------------------------------------------------
+
+
+Note 
+	- The following demo fails to startup the Kafka Cluster. 
+	- However good to follow from a learning perspective
+	- For sinks demo ( further in the course) we will be suing distributed file connector instead 
+	- This demo uses teh latest Landoop version
+
+
+- Goal:
+	- Gather data from Twitter in Kafka Connect Distributed Mode 
+	- Run a connector in distributed mode on our already setup Kafka Connect Cluster
+	- Flow:
+		Twiiter -> Kafka Connect -> Twitter Topic
+
+Learning:
+	- Gather real data using the connector :
+		- Connector used :
+			- https://github.com/jcustenborder/kafka-connect-twitter
+			- Download the code as a zip file 
+				- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\docker-compose-other-versions\connectors
+
+
+
+*****  Remove
+
+			- Unzip
+			- Run maven packaging command (mvn clean install)
+				- cd D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\docker-compose-other-versions\connectors\kafka-connect-twitter-master
+				- cmd: mvn clean install	
+				- 3 jar files will be geenrated in target folder:
+					(1)kafka-connect-twitter-0.3-SNAPSHOT.jar
+					(2)kafka-connect-twitter-0.3-SNAPSHOT-javadoc.jar
+					(3)kafka-connect-twitter-0.3-SNAPSHOT-sources.jar 				
+
+			- This will give the connector jars and third party jars	
+			
+****
+			
+
+
+
+Twitter Developer APP Setup:
+	_ Refer 'Setup' section of https://github.com/jcustenborder/kafka-connect-twitter
+	- Creating a Twitter application:
+		- To obtain the required keys, visit https://apps.twitter.com/ 
+		- Login using your Twitter Account
+		- Create a New App:
+			- In the form:
+				- use case = select 'Building tools for Twitter users'
+				- Will you make Twitter content or derived information available to a government entity or a government affiliated entity = no
+				- Click on 'Let's do this':
+					- Accept Developer agreement & policy
+				- Submit
+				- Verify 	your email
+					- click on the 'Confirm your email' button in the verification emai
+					- You will be redirected to a new page 'Welcome to the Twitter Developer Platform':
+						- App name = Kafka _ bobu.mathew
+						- Get keys :
+							API key = gmrZBxEAyL41KKP3e4aJoapE5
+							API secret key = SWlkiKkr9SJWvUeBKZDKYseIQKYhnZaW5pTCXRrRLoCriYUBvm
+							Bearer Token = AAAAAAAAAAAAAAAAAAAAABrvkQEAAAAAj9iGiqLAfXL59bDUWBH33Z5z4So%3DtZucskc97PKxgLdRMG9ka6VektPBl4iExGNrApOSZ7tVxQRWm7
+
+						- Once you have created the app:
+								- Developer pOrtal -> Project & Apps -> Project 1 -> Kafka_bobu.mathew
+								- Click on 'Keys and Tokens' tab:
+									- Access Token and Secret -> geenrate -> scrol ldown in the pop window:
+										- Access Token = 1489794384732196867-8J3Mljjm73q4pwF3aiYIlpTm1pn0vx
+										- Access Token Secret = b509ehXdujy6h9woN8ZYaxeMiYckJAIJkYCUhj6qFfylS
+							
+
+					- Note: If application description or purpose is asked, type in something similar:
+
+I intend to use this Twitter feed to get real time data streams into an application that will put data into Kafka.This data will end up in ElasticSearch at the end and thsi is just for POC purposes. No commercial application will result out of this and I won't have any users besides just myself.Twiiter data will not be displayed, and we will only extract tweets on low volume terms.
+
+
+
+
+
+
+
+
+
+
+
+Starting Kafka Connect Cluster using Docker Compose
+----------------------------------------------------
+
+- Ensure that Docker has atleast 4 GB of memory allocated :
+settings.json
+C:\Users\DELL\AppData\Roaming\Docker
+
+You can also set the memory used by docker by editing the json file C:\Users\Personal\AppData\Roaming\Docker\settings.json . Look for a property called MemoryMiB and update its value to be the number of megabytes you want your docker installation to use
+
+	
+
+	- docker-compose.yml :
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\docker-compose-other-versions
+	- Start Docker Desktop 
+	- Commands used:
+		- Refer 'kafka-connect-tutorial-sources.sh' in D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	- C:\Windows\System32\cmd.exe
+	- Start our docker image only for kafka cluster
+		- cmd: docker-compose up kafka-cluster
+	- Wait 2 minutes for the kafka cluster to be started	
+
+	- Kafka cluster url: 
+		- http://127.0.0.1:3030/
+			- Will land you onto Kafka Development Environment UI
+			- Ensure atealst 1 connector is running
+
+
+
+
+
+Source files
+-------------
+Parent folder : D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\
+
+- Demo 3: 
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\source\demo-3
+	
+		(1) source-twitter-distributed.properties
+			- Contains setup/configuration of the twtiier connector 
+			- The file is commented and self explanatory
+
+	
+
+
+
+
+Commands executed:
+----------------
+
+Note: Use PowerShell to execute the followign :
+
+-  kafka-connect-tutorial-sources.sh:
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+
+
+
+
+
+- Copy the contents of 'kafka-connect-twitter-master' in your windows directory to the DOcker container 
+ 	- cd into D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\docker-compose-other-versions\connectors
+	- list containars 
+		- cmd: docker ps
+			- Note the container id 
+
+	-  Copy contents of 'kafka-connect-twitter-master'  to the existing folder 'coonectors' in the Docker container 
+     		- cmd : docker cp D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\docker-compose-other-versions\connectors\kafka-connect-twitter-master  4a09:/connectors
+	
+- Bash into the container:
+	- cmd: docker exec -it 4a09 bash
+
+
+- Verify contents have been copied:
+	- List contents of 'connectots directory in the container:
+		- cmd: ls /connectors
+
+
+- Update apt-get
+	- cmd: apt-get update
+
+- Install jq to pretty print json
+	- cmd: apt-get install -y jq
+
+- Install maven
+	- cmd: apt-get install -y maven
+		
+	
+- cd into 'connectors f
+	- cmd: cd /connectors/kafka-connect-twitter-master/
+
+
+- Run maven packaging command 
+	- cmd: mvn -Dmaven.javadoc.skip=true verify
+		- Note : The cmd 'mvn clean install' wil lthrow a javadoc not found error. Hence use the above command to build jar.
+	
+	- 3 files will be generated in target folder:
+		(1)kafka-connect-twitter-0.3-SNAPSHOT.jar
+		(2)kafka-connect-twitter-0.3-SNAPSHOT-sources.jar
+		(3)kafka-connect-twitter-0.3-SNAPSHOT.tar.gz				
+
+	- This will give the connector jars and third party jars
+		- cmd: ls target/
+
+
+- Copy jar 'kafka-connect-twitter-0.3-SNAPSHOT.jar' to the /connectors folder 
+		- cmd:  cp target/kafka-connect-twitter-0.3-SNAPSHOT.jar /connectors
+
+
+
+- Verify :
+	- cmd: ls /connectors/
+		- You should see 'kafka-connect-twitter-0.3-SNAPSHOT.jar' here
+		
+- Copy the *.jar files we geernated using maven to  /opt/landoop/kafka/share/java/
+		- cmd:  cp  kafka-connect-twitter-master/target/*.jar /opt/landoop/kafka/share/java/
+
+- Verify:
+	- cmd: ls /opt/landoop/kafka/share/java/
+
+		- You should see the jars kafka-connect-twitter-0.3-SNAPSHOT.jar & kafka-connect-twitter-0.3-SNAPSHOT-sources.jar here
+
+
+- Stop the docker, and restart it
+	- Docker console : ctrl +c
+		 
+	- cmd: docker-compose up kafka-cluster
+
+
+- After some initial errors in the compose log for zookeepr and broker, after a minute ot 2 you will see it restartign and stabiising.
+
+- 
+
+
+****
+
+	
+- Create directory 'frm_docker'in your windows local system:
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\docker-compose-other-versions\connectors
+			- frm_docker
+
+-The third-party directory referred by docker image is available at this location: 
+			- /opt/landoop/kafka/share/java
+			- TO see this:
+					- Open Powershell
+					- List containers:
+						- cmd: docker ps 
+					- Bash into the container:
+					- cmd: docker exec -it 59c7 bash
+					- List directory contents:
+						- cmd :ls /opt/landoop/kafka/share/java
+			
+- We will copy the contents of third-party directory in the docker image  to our new windows folder 'frm_docker':
+			- cmd: docker cp 59c7:/opt/landoop/kafka/share/java D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\docker-compose-other-versions\connectors\frm_docker
+
+			- If you now go into the windows folder 'frm_docker' , you will the 'java' folder and contents has been copied to the  'frm_docker' directory
+
+
+			
+
+- The third party jars that we downloaded are avialable in :
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\docker-compose-other-versions\connectors\kafka-connect-twitter-master\target\kafka-connect-target\usr\share\kafka-connect\kafka-connect-twitter 
+		- Copy the third party jars that we downloaded in the path above to windows folder 'frm_docker'
+			 
+
+
+
+- Modify the docker-compose.yml file to refer the new connector and supporting jars. It should be volume mapped like this now (please change the directories in volumes in the left side of the ':' as per your system) :
+
+	- Note:
+		- My docker-compose.yml is in D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\docker-compose-other-versions
+		- So the volume paths I have defined will be relative to the docker-compose.yml file location, as I will be executing the docker-compose from this path
+
+	Volumes:
+
+      - /connectors/kafka-connect-twitter-master/target/kafka-connect-twitter-0.3-SNAPSHOT.jar:/connectors/kafka-connect-twitter-0.3-SNAPSHOT.jar
+
+	- /connectors/frm_docker:/opt/landoop/kafka/share/java
+
+
+
+- Stop the docker, and restart it
+	- Docker console : ctrl +c
+		 
+	- cmd: docker-compose up kafka-cluster
+
+
+- Open Powershell
+
+		- List containers:
+			-cmd: docker ps 
+		
+		-  Bash into the container:
+			- cmd:  docker exec -it 1b17 bash
+	
+		- Create the topic we're going to write to 'demo-3-twitter'
+				- cmd: kafka-topics --create --topic demo-3-twitter --partitions 3 --replication-factor 1 --zookeeper 127.0.0.1:2181
+
+
+			- Go to the Kafka CLuster UI : http://127.0.0.1:3030/
+				-Topics :
+					- You should be able to see teh newly created topic 'demo-3-twitter'
+						- Click on the topic:
+							- Data = Topic is empty
+
+
+
+
+Create new connector usign a POST request 
+--------------------------------------------------
+
+-------------------------------------------------------------
+- Postman -> Collections = Kafka
+- Execute POST REquest:	
+	- TwitterConnect-v2
+
+- Response : 201 Created
+
+
+Start a console consumer on that topic
+-------------------------------------------
+Use the bash console odf the container:
+cmd: kafka-console-consumer --topic demo-3-twitter --bootstrap-server 127.0.0.1:9092
+
+	- If your connection works, you will see data in the consumer

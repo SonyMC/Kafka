@@ -1,0 +1,36 @@
+
+
+: Note: Am switching to Eclpise, as IntellIJ seems to have problems with trying to download ceertain repos.
+
+
+Code Directory:
+D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+
+_ Open Eclipse -> Import-> Existing MAven Project -> D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+
+Connector Class:
+----------------:
+
+- That's the class of your Kafka Connector that is referenced from the configs.
+- It should load the config, and create a few taskss  
+
+
+
+-GitHubSourceConnector.java
+----------------------------------
+	- \src\main\java\com\mailsonymathew\kafka
+	- Code is documented and self-explanatory
+		
+
+- Testing the Connector
+------------------------
+	- GitHubSourceConnectorTest.java
+			- test/java/com/mailsonymathew/kafka/GitHubSourceConnectorTest.java
+			
+	- Run:
+		- Right click on file -> Run as JUnit Test
+			- Tests shouls run successfully with some warnings
+
+

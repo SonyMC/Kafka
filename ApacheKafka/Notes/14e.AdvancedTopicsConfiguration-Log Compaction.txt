@@ -1,0 +1,150 @@
+Log Cleanup Policy: Compact
+-----------------------------
+
+Refer : https://www.conduktor.io/kafka/kafka-topic-configuration-log-compaction
+
+
+- Log compaction ensures that your log contains at least the last known value for a specific key within a partition 
+- Very useful if we just require a SNAPSHOT instead of full history(such as for a data table in a DB)
+- The idea is that we only keep teh latest update for a key in our log 
+
+- Any consumer that is readign from the tail of a log(most current data) will still see all teh messages sen tto the topic
+- Ordering of messages it kept, log compaction only removes some messages, but does not re-order them
+- The offset of a message is immutable(it never changes). Offsets are just skipped if a message is missing
+- Deleted records can still be seen by consumers for a period of delete.retention.ms(default is 24 hours)
+
+- Log compaction log.cleanup.policy=compact is impacted by:
+	- segment.ms(default 7 days): Max amount of time to wait to close the active segment
+	- segment.bytes(default 1 G): max. size of a segment
+	- min.compaction.lag.ms(default 0) : how long to wait before a message can be compacted
+	- delete.retention.ms( default 24 hours):wait before deletign data marked for compaction
+	- min.cleanable.dirty.ratio(default 0.5) : higher -> less but more efficient cleaning. lower ->  more but less efficient cleaning
+
+
+
+Myth busting:
+- It does not prevent you from pushing duplicate data to Kafka
+	- De-duplication is done after a segment is committed
+	- Your consumers will still read from tail as soon as data arrives
+- It does not prevent you from reading duplicate data from Kafka:
+	- Same points as above
+- Log compaction can fail from time to time:
+	- It is an optimization and teh compaction thread might crash
+	- Make sure you assign enough memory to it and that it gets trigerred
+	- Restart Kafka is log compaction is broken
+- You can't trigger Log Compaction using an API call(for now)
+
+
+
+
+NOte: Windows users have to use WSL2 for Kafka for log comaction else it will crash
+	- Windows has a long-standing bug (KAFKA-1194) that makes Kafka crash if you use log cleaning. The only way to recover from the crash is to manually delete the folders in log.dirs directory.
+
+
+ 
+
+Start Kafka 
+-------------
+
+
+(1) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+(2)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window open
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+
+
+(3)List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+__consumer_offsets
+demo_java
+
+
+
+
+(4) Create a log-compacted topic named employee-salary with a single partition and a replication factor of 1. Use Kafka topics CLI and pass appropriate configs as shown below. :
+
+
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --create --topic employee-salary   --partitions 1 --replication-factor 1 --config cleanup.policy=compact --config min.cleanable.dirty.ratio=0.001 --config segment.ms=5000
+
+
+
+			- Number of partitions=1. This is to ensure all messages go the same partition.
+
+			- cleanup.policy=compact. This enables log compaction for the topic.
+
+			- min.cleanable.dirty.ratio=0.001. This is just to ensure log cleanup is triggered always.
+
+			- segment.ms=5000. New segment will be created every 5 seconds. Log compaction will happen on closed segments only
+
+
+(5) Describe the topic to make sure the configurations have been applied correctly.
+	- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --describe --topic employee-salary
+
+- Response:
+Topic: employee-salary  TopicId: XlFGTgduRM-bMvK4SFtiPA PartitionCount: 1       ReplicationFactor: 1    Configs: cleanup.policy=compact,segment.bytes=1073741824,min.cleanable.dirty.ratio=0.001,segment.ms=5000
+        Topic: employee-salary  Partition: 0    Leader: 0       Replicas: 0     Isr: 0
+
+
+(6)Start a Kafka console consumer.
+
+	- Use the following command to show both the key and value, separated by a comma.
+
+		- cmd: kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic employee-salary --from-beginning --property print.key=true --property key.separator=,
+
+
+
+(7) Launch another shell to create a Kafka console producer. We want to send keys for the messages. The separator between the key and the value is a comma.
+	- cmd: kafka-console-producer.sh --bootstrap-server localhost:9092 --topic employee-salary --property parse.key=true --property key.separator=,
+
+
+(8) Produce a few messages one by one with duplicate keys. In the first message shown below, the key is Mark and the value is salary: 1000
+Lucy is teh duoplicate key
+
+Mark,salary: 1000
+Lucy,salary: 20000
+Bob,salary: 20000
+Patrick,salary: 25000
+Lucy,salary: 30000
+Patrick,salary: 30000
+
+
+	- All of tshi s pushed to the consumer cosole
+
+(9) Wait a minute, and produce a few more messages (it could be the same messages)
+Stephane,salary: 0
+
+
+
+(10) Stop the Kafka console consumer( ctrl + C) and start a new one. We are fetching all the messages from the beginning. We'll see only the unique keys with their corresponding latest values.
+
+Mark,salary: 1000
+Bob,salary: 20000
+Lucy,salary: 30000
+Patrick,salary: 30000
+Stephane,salary:
+
+
+(11) Log compaction will take place in the background automatically. We cannot trigger it explicitly. However, we can control how often it is triggered with the log compaction properties.

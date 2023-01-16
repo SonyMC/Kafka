@@ -1,0 +1,20 @@
+Unclean Leader Election
+-----------------------------
+
+unclean.leader.election.enable
+
+- In case all your in sync replicas go offline( but you still have out of sync replicas up), you have the following option
+	- You can wait for an ISR to come back online(default)
+	- Alternatively, you can set unclean.leader.election.enable= true
+				- non ISR parttion becomes the leader
+				- and start producing to non ISR partitions
+				- improves availbility, but you will lose data because other messages on the ISR will be discarded when they come back online and relicate data from the new leader
+				- overall this is a reisky setting, and its implcations must be undertood fully before enabling it.s
+
+Use case: 
+	- metrics collection, log collection and other use cases where data loss is somewhat acceptable, at the trade-off of availibility
+
+
+ 
+
+

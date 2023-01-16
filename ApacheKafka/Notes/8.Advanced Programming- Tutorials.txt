@@ -1,0 +1,11 @@
+Programming - Advanced Tutorials
+----------------------------------
+Refer: https://www.conduktor.io/kafka/advanced-kafka-consumer-with-java
+
+Refer Codebase: D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\advanced
+
+
+
+Codebase : D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-advanced
+
+

@@ -1,0 +1,44 @@
+JAva Consumer Reblance Listener 
+----------------------------------
+https://www.conduktor.io/kafka/java-consumer-rebalance-listener
+
+
+
+Codebase : D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-advanced
+
+
+Objectives
+---------
+Consumer rebalances happen for the following events:
+
+	- Number of partitions change for any of the subscribed topics
+	
+	- A subscribed topic is created or deleted
+
+	- An existing member of the consumer group is shutdown or fails
+
+	- A new member is added to the consumer group
+
+	- When any of these events are triggered, the provided listener will be invoked twice: first to indicate that the consumer's assignment has been revoked, and then again when the new assignment has been received.
+
+	- In that case, we have a chance to commit offsets and some cleanup work before our partition is revoked. This includes maybe closing database connections, etc..
+
+	- If we handle this case gracefully, we will not process duplicate messages through rebalances.
+
+
+
+Very important:
+Note that rebalances will only occur during an active call to poll(Duration), so callbacks will also only be invoked during that time. You do not need to worry about threading because calls happen in the same consumer thread.
+
+
+When should you use a Consumer Rebalance?
+- One common use is saving offsets in a custom store. By saving offsets in the onPartitionsRevoked(Collection) call we can ensure that any time partition assignment changes the offset gets saved
+- Another use is flushing out any kind of cache of intermediate results the consumer may be keeping
+
+
+
+
+Code:
+-----
+ConsumerRebalanceListenerImpl.java
+ConsumerDemoRebalanceListener.java

@@ -1,0 +1,22 @@
+Kafka KRaft - Removing Zookeeper
+----------------------------------
+
+Kafka KRaft
+-------------
+- in 2020, Apache Kafka project started work to remove teh Zookeer dependency for itz( KIP-500)
+- Zookeeper shows scaling issues when Kafka clusters have > 100,000 parttions
+- By Removing Zookeeper, Apache Kafka can:
+	- Scale to millions of parttions, and become easier to maintain and setup
+	- Improve stability, makes it easier to monitor, supoort and administer
+	- Single security model for whole system 
+	- Single process to start with Kafka
+	- Faster controller shutdown and recovery time
+
+- Kafka 3.X now implements the Raft protocol(kRaft) in order to replace Zookeeper
+	- Refer:https://github.com/apache/kafka/blob/trunk/config/kraft/README.md
+	- Not production ready
+	- Uses Quorom Controller to manage brokers 
+			- Has a Quorom Leader 
+			- Refer : https://www.confluent.io/blog/kafka-without-zookeeper-a-sneak-peek/
+
+

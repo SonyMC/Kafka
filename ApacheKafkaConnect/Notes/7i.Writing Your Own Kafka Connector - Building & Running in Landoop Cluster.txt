@@ -1,0 +1,92 @@
+Building and Running Connector in Landoop CLuster
+--------------------------------------------------
+
+
+
+(1) Build:
+	- Clean , Test and Build
+	- cd: D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+	- cmd:mvn clean package
+			OR
+	- In Eclipe IDE:
+		- Right click project -> Run as -> Mavan Build -> Goals = clean install
+
+		- Application jar file will be geenrated in tarhget folder:
+			- kafka-connect-github-source-1.1.jar
+			
+		- Alljar files needed for this connector(including the applicatio njar generated above will be auto-geernated in:
+			- \target\kafka-connect-github-source-1.1-package\share\java\kafka-connect-github-source
+
+
+
+(2)Mount jars into your Landoop Image during run time
+	- Start Docker Desktop 
+	- cmd:
+		- cd D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+			
+		- docker run -it --rm -p 2181:2181 -p 3030:3030 -p 8081:8081 -p 8082:8082 -p 8083:8083 -p 9092:9092 -e ADV_HOST=127.0.0.1 -e RUNTESTS=0 -v ~/target/kafka-connect-github-source-1.1-package/share/java/kafka-connect-github-source:/connectors/GitHub landoop/fast-data-dev
+
+
+
+		
+		- Note: 
+			- The image we are using here is 'landoop/fast-data-dev'
+			- We are mapping the 	following directory( containing the maven generated connector jars) in our system to the'/connectors/GitHub' folder in the container  
+
+					- 'D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1\target\kafka-connect-github-source-1.1-package\share\java\kafka-connect-github-source'
+
+
+
+
+
+
+
+- Use the Connect UI to launch teh connector
+
+	- UI urL ; http://localhost:3030/
+	- Log Files:
+		- Go to the 'Browse' section at teh end:
+			- Click on link :'log files of runnign services'
+				- connect-distributed.log
+
+	- Wait till you see 1 connector to be alive in the UI
+			- The connector running will be 'logs-broker'
+	- Open tabs for 'Connectors' and 'Topics':
+			- Connectors:
+				- New:
+					- If it works , you should see the following connector : 'GitHubSourceConnector'
+
+					- Note: This is not shown for me
+						
+						- configuration:
+				{
+
+"name": "GitHubSourceConnector",
+
+"config":{
+
+  "connector.class": "com.mailsonymathew.kafka.GitHubSourceConnector",
+
+  "tasks.max": "1",
+
+  "github.owner": "kubernetes",
+
+  "topic": "github-issues",
+  
+  "github.repo": "kubernetes"
+
+}
+
+}
+		
+		- Topics:
+					
+		 	- Topic 'github-issues" will be auto generated( though if you want you could manually create it before hand which is the recommended way)
+			- You can see the key.values
+				- Note: DOes not work for me
+
+			
+
+
+d
+

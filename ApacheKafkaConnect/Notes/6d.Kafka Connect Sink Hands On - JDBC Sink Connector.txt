@@ -1,0 +1,168 @@
+JDBC Sink COnnector
+-------------------
+
+
+Prerequisite:
+--------------
+Setup Distributd File Sounrce COnnector or Twitter Source Connector :
+	- Distributed File Connector:
+		- Refer '5c.Kafka Connect Source Hands On -File Stream Source Connector Distributed Mode.txt'
+
+	- Twitter Connnctor:
+		- Refer '5f.Kafka Connect Source Hands On - Twitter Source Connector Distributed Mode-Landoop Image V Latest.txt'
+
+Since Twitter Source Connector is not working we we will eb using File Source Connector for this demo
+
+
+
+
+
+Goals:
+-------
+- We are going to start a PostgreSQLinstance to Sink teh dat ato 
+- PostgreSQL is a Relational DB
+- This will serve as our Sink for our second Sink COnnector
+- No knowledge of PostgreSQL is required for this demo
+- We will use DOcker to start our PostgreSQL instance
+- Run in distributed mode with multiple tasks
+- Flow:
+	File Topic -> JDBC Sink Connector -> PostGeSQL
+
+
+
+Refer
+-----
+- JDBC Sink demo:http://docs.confluent.io/3.2.0/connect/managing.html#common-rest-examples
+- PostgresSQL demo :http://docs.confluent.io/3.2.0/connect/connect-jdbc/docs/sink_connector.html#quickstart
+
+
+
+
+Commands used:
+--------------
+See File sink/demo-rest-api/demo-rest-api.sh
+
+
+
+Increase Docker memory for ElasticSearch
+------------------------------------------
+- ElasticSearch Container needs more memory.To set this:
+	- Open powershell in admin mode:
+		- cmd: wsl -d docker-desktop
+		- cmd: sysctl -w vm.max_map_count=262144
+		- cmd: exit
+
+			OR ( to set permenantly)
+	-  Open powershell in admin mode:
+		- cmd: wsl -d docker-desktop
+		- cmd: vi /etc/wsl.conf
+		- add these lines at the end:
+			[boot]
+			kernelCommandLine = "sysctl.vm.max_map_count=262144"
+		- quit VI : esc + type ':wq'
+		- Restart Docker Desktop
+
+
+
+
+docker-compose.yml:
+-------------------
+
+	-D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code
+	-Line 18 onwards contains the configuration for elasticsearch  
+	- Start Docker Desktop
+
+
+	- Start our kafka cluster , elasticsearch and postgres containers
+		- cmd: docker-compose up
+
+		- Make sure you see teh folliwng message in your DOcker console:
+code-postgres-1       | LOG:  database system is ready to accept connections
+
+
+- Install S/W on your Docker container
+-------------------------------------
+
+	- Open Kafka COnnect CLuster UI:
+		- http://127.0.0.1:3030/
+
+	-Let's start a Powershell to all have linux commands
+	
+		- cmd: docker run --rm -it --net=host landoop/fast-data-dev:latest
+
+	- Install jq to pretty print json
+		- cmd: apt-get update
+ 		- cmd: apt-get install -y jq
+
+
+
+Sink Connector Properties
+-------------------------
+
+- Twitter Sink COnnector:
+	- sink-postgres-twitter-distributed.properties
+			- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\sink\demo-postgres
+
+
+- File Sink Connector:
+	- sink-postgres-file-distributed.properties
+			- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\sink\demo-postgres
+
+
+
+- Create new Sink Connector 
+----------------------------
+
+	- Note: The Kaffka COnnector UI does not work and we will be using POTMAN isntead t create the connector
+	- Option 1: Via Kafka Connect Cluster UI:
+		- http://127.0.0.1:3030/
+
+		- Connectors-> New:
+			- Sinks -> JDBC
+				- Copy-paste contents of 'sink-postgres-file-distributed.properties'
+		
+
+	- Option 2:
+		- POSTMAN:
+			- Collections: KAfka
+			- Request :
+				- JDBC Sink for File Source : JDBCSinkConnectForFileSource
+				- JDBC Sink for Twitter Source : JDBCSinkConnectForTwitterSource	 
+
+
+		- 201 Success Response
+
+
+- Check that dats is written out to postGreSQL
+---------------------------------------------
+	- Download SQLECTRON
+		- https://sqlectron.github.io/
+			- For windows download '*.exe' to '.zip'
+
+		- Launch executable 
+			- Add :
+				- Name = postgres
+				- Database Type = PostgreSQL
+				- Server Address= 127.0.0.1
+				- Port = 5432
+				- User = postgres
+				- Password = postgres
+				- Database = postgres
+				- Intial Schema = leave blank
+				- Do noteenable SSH tunnel or Filter
+				- Test
+					- Connection Test
+					- Successfully connected		
+				- Save
+				- Click on the connection:
+					- postgres -> Connect
+						- Seelct your table 
+
+
+	- Note : Could not see the file connect
+
+
+- SMT - Simple Message Transforms
+----------------------------------
+- Refer : https://www.confluent.io/blog/simplest-useful-kafka-connect-data-pipeline-world-thereabouts-part-3/
+

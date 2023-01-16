@@ -1,0 +1,26 @@
+Logging & Metrics Aggegation  
+-----------------------------
+
+- One of the first use of Kafka was to ingest logs and metrics from various applications
+- This kind of deployment usually wants highthroughput, has less restriction regarding data loss, replication of data etc.
+- Application logs can end up in your favourite logging solution such as Splunk, CloudWatch, ELK etc.
+
+Topics:
+	- applicaiton_logs
+	- applicaion_metrics
+
+Producers:
+	- Log forwarders
+	- Metric collectors
+
+
+Connector:
+	 - Kafka COnnect Sink
+		- Send data from topics to logging app such as Splunk
+
+
+
+
+
+
+

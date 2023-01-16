@@ -1,0 +1,153 @@
+REplaying Data
+-------------------------------------
+
+
+
+Replaying data for Consumers
+-------------------------------
+- To replay data for a consumer group:
+ 	- Take all consumers from a specific group down 
+	- Use kafka-consumer-groups command to set offset to what you want 
+	 
+
+Bottom Line
+-------------
+	- Set proper data retention period & offset retention period
+	- Ensure the auto reset bahavious is the oe you expect/want
+	- Use replay capability in case of unexpected behaviour
+
+
+
+Implementation 
+---------------
+
+
+
+
+
+Code Directory: D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-beginners-course-part2\kafka-consumer-opensearch
+
+
+
+
+
+Before running the code
+-----------------------
+
+(1) Start Docker-Desktop/Login to Bonsai OpenSearch cluster
+
+(2) If using Docker, Execute docker-compose.yml to run the OpenSearch DB and Dashboard containers
+
+Note: Docker Desktop has a problem conecting to wsl when we have kafka brokers running. So for teh demo will use Bonsai 
+	
+
+
+
+(3) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+(4)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window open
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+
+
+(5)List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+__consumer_offsets
+demo_java
+first_topic
+java_demo
+new_topic
+thrid_topic
+wikimedia.recentchange
+
+
+
+(6) Create Kafka topic named 'wikimedia.recentchange' with 3 partitions & replication factor 1 :
+
+Note: Create the topic ''wikimedia.recentchange''  only if it is hase notbeen created before
+
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic wikimedia.recentchange --create --partitions 3 --replication-factor 1
+
+
+WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Created topic demo_java.	
+
+
+
+
+
+ Implementation:
+------------------------
+
+
+
+Class:
+OpenSearchConsumerPart6.java:
+----------------------------------
+
+OpenSearchConsumerPart6.java
+
+
+- Open Conduktor:
+	- Consumers -> Consumer Group = consumer-opensearch-demo( we had created this earlier and linked to the topic wikimedia.recentchanges)
+	- Mak a note of tje lag shown in teh parittions
+
+
+- Run OpenSearchConsumerPart6.java
+
+- Go to Conduktor and see how fast the lag in Consumer Group = consumer-opensearch-demo becomes 0
+
+- Reset consumer:
+	- Find the consuer id sepcified:
+			- We can find it in teh beginning of teh KAfka function:
+				private static KafkaConsumer<String, String> createKafkaConsumer()
+					- String groupId = "consumer-opensearch-demo";
+	- Find topic:
+			- This is specified in main():
+				- consumer.subscribe(Collections.singleton("wikimedia.recentchange"));	
+	
+
+	- OPen new WSL console and execute followign cmd:
+
+		- Set offset to earliest:
+			- cmd:kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group consumer-opensearch-demo --reset-					offsets --to-earliest --execute --topic wikimedia.recentchange
+				- Respomse:
+GROUP                          TOPIC                          PARTITION  NEW-OFFSET
+consumer-opensearch-demo       wikimedia.recentchange         0          3956
+consumer-opensearch-demo       wikimedia.recentchange         1          4312
+consumer-opensearch-demo       wikimedia.recentchange         2          3892	
+
+			- Note: Make sure you have stoppe dteh consumer before executign thsi cmd. In cas eof error, wait for some tiem and try again
+	
+
+
+			- Shift offsets by 2 (backward) as another strategy
+				- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group consumer-opensearch-demo --reset-offsets --shift-by -2 --execute --topic wikimedia.recentchange
+				- Will result in 6 messages to be read ( 2 x 3 parttions) 
+				
+
+
+
+

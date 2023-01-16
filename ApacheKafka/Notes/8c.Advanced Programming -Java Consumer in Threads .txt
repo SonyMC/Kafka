@@ -1,0 +1,36 @@
+JAva Consumer Rebalance Listener 
+----------------------------------https://www.conduktor.io/kafka/java-consumer-in-threads
+
+
+
+Codebase : D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-advanced
+
+
+Objectives
+---------
+
+Running a Java Consumer in a separate thread allows you to perform other tasks in the main thread.
+
+This is only recommended if you know about multi-threaded programming
+
+
+
+
+Code:
+-----
+ConsumerDemoThreads.java
+
+
+
+
+Output:
+[Thread-0]  Consumer poll woke up
+[Thread-0]  Revoke previously assigned partitions demo_java-0
+[Thread-0]  Member consumer-my-sixth-application-1-fecba584-5838-418d-83b8-c88a528bc0e5 sending LeaveGroup request to coordinator 127.0.0.1:9094 (id: 2147483644 rack: null) due to the consumer is being closed
+[Thread-0]  Resetting generation due to: consumer pro-actively leaving the group
+[Thread-0]  Request joining group due to: consumer pro-actively leaving the group
+[Thread-0]  Metrics scheduler closed
+[Thread-0]  Closing reporter org.apache.kafka.common.metrics.JmxReporter
+[Thread-0]  Metrics reporters closed
+[Thread-0]  App info kafka.consumer for consumer-my-sixth-application-1 unregistered
+[Thread-1]  Consumer closed

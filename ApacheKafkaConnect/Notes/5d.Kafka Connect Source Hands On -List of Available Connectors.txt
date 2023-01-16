@@ -1,0 +1,16 @@
+Kafka Connect Source - List of Available Connectors
+---------------------------------------------------
+
+
+- There are many source and sinks conenctors
+- The best place to find them is the Confluent Website:
+	- https://www.confluent.io/hub/
+		- Select ' Verified' Connectors ot of which 'Verified gold' is the best
+		- You can filter by Sink. Source, Transform, Converter etc.
+
+- The second place to find is 'Google' 
+
+
+- Connectors in Landoop distribution:
+	- Many connectors are bundled with the Landoop Docker image so you can use them right away 
+	- If you want to add your own , you need to map your volumes to your Landoop Docker image on start-up

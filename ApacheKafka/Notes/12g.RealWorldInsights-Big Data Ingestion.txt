@@ -1,0 +1,18 @@
+Big Data Ingestion 
+------------------
+
+- It is common to have "generic" connectors or solutions to offload data from Kafka to HDFS, Amazon S3, and Elastic Search etc.
+-It is also very common to have KAfka serve a "speed layer" for real tiem applications, while having a a "slow layer"  which helps with data ingestions into stores for later analystics
+- Kafka as a front to Big Data Ingestion is a very common pattern in Big Data to provide an "ingestion buffer" in front of some stores
+- Speed Layer:
+	- Use Kafka Connect for Spark, Storm, Flink etc. which in turn send data to Real Time analystics, Dashboard alerts and apps/consumers
+- Slow Layer:
+	- Use Kafka Connect for Hadoop, Amazon S3, RDBMS etc,. which will in tun send data to Data Science, Reporting, Audit , Backup/ Storage etc.
+	- Used for Data Sceince, REporting , Ausits or just for long term storage
+
+
+
+
+
+
+

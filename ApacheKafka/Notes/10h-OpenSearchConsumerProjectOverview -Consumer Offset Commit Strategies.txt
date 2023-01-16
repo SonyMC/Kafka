@@ -1,0 +1,179 @@
+Consumer Offset Commit Strategies
+-------------------------------------
+
+
+There are 2 most common patterns for committing offsets in a consumer application:
+
+Strategy 1: 
+	- enable.auto.commit=true & synchronous processign of batches
+	- easy implementation
+	- In the Java Consumer API, offsets are regularly committed
+	- Enable at-least once reading scenario by default( under conditions)
+	- Offsets are committed when you call .poll() and auto.commit.interval.ms has elapsed
+	- Make sure messages are successfully processed before you invoke poll() again
+		- If you don't, you will not be in at-least-once readign scenario
+		- In teh rare case that you must disbale enable.auto.commit, and most likely mov eprocessing to a separate thread, and then from time to time call .commitSync() or .commitAsync() with the correct offsets  set manually 
+
+	- Note : Thsi is what we have been using in previous demos
+
+Strategy 2:
+
+	- enable.auto.commit=false & manual commit of offsets
+	- medium difficulty in implmenetation 
+	- in this approach you accumlate to the batch using consumer.poll()
+	- You control whne you commit offsets and what's the condition for committing them
+	- E.g: accumulating recs into a buffer and then flushing the buffer to a DB + committing offsets asynchronously then
+
+	- Note ; We will be demoing this.
+
+
+Strategy 3:
+
+	- enable.auto.commit=false & storign offsets externally
+	- This is advanced and we will not be demoing this here
+	- You need to assign parttions to your consumers at launch manually using .seek() API
+	- You need to model and store your offsets in a DB for E.g.
+	- E.g: If you need exactly once processing & can't find any way to do idempotent processing, then you "process data" + "commit offsets" as part of a single transaction. 
+
+
+
+Implementation 
+---------------
+
+
+
+
+
+Code Directory: D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-beginners-course-part2\kafka-consumer-opensearch
+
+
+
+
+
+Before running the code
+-----------------------
+
+(1) Start Docker-Desktop/Login to Bonsai OpenSearch cluster
+
+(2) If usign Docker, Execute docker-compose.yml to run the OpenSearch DB and Dashboard containers
+
+Note: Docker Desktop has a problem conecting to wsl when we have kafka brokers running. So for teh demo will use Bonsai 
+	
+
+
+
+(3) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+(4)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window open
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+
+
+(5)List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+__consumer_offsets
+demo_java
+first_topic
+java_demo
+new_topic
+thrid_topic
+wikimedia.recentchange
+
+
+
+(6) Create Kafka topic named 'wikimedia.recentchange' with 3 partitions & replication factor 1 :
+
+Note: Create the topic ''wikimedia.recentchange''  only if it is hase notbeen created before
+
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic wikimedia.recentchange --create --partitions 3 --replication-factor 1
+
+
+WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Created topic demo_java.	
+
+
+
+
+
+ Implmentation:
+------------------------
+
+
+
+Class:
+OpenSearchConsumerPart5.java:
+----------------------------------
+- Run and stop.
+- From logs :
+	- auto.commit.interval.ms = 5000 
+	- enable.auto.commit = true
+
+
+- private static KafkaConsumer<String, String> createKafkaConsumer() 
+	- properties.setProperty(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, "false"); // turn off auto-committing
+
+- If you run teh code, you will not ethat offsets are not commited( verfiy through Conduktor)
+
+- main(0:
+
+                // commit offsets after the batch is consumed
+                consumer.commitSync();  // you can also use consumer.commitAsync();
+                log.info("Offsets have been committed!");
+
+
+- Run the code :
+Wait for soem time to see such messages in the logs:
+[main] INFO OpenSearchConsumerPart5 - Received 500 record(s)
+[main] INFO OpenSearchConsumerPart5 - Offsets have been committed!
+[main] INFO OpenSearchConsumerPart5 - Received 500 record(s)
+[main] INFO OpenSearchConsumerPart5 - Offsets have been committed!
+[main] INFO OpenSearchConsumerPart5 - Received 500 record(
+
+
+
+
+
+
+
+Implment Bulk Request
+------------------------
+OpenSearchConsumerPart6.java
+
+
+- Open Conduktor:
+	- Consumers -> Consumer Group = consumer-opensearch-demo( we had created this earlier and linked to the topic wikimedia.recentchanges)
+	- Mak a note of tje lag shown in teh parittions
+
+
+- Run OpenSearchConsumerPart6.java
+
+- Go to Conduktor and see how fast the lag in Consumer Group = consumer-opensearch-demo becomes 0
+
+
+
+
+
+
+

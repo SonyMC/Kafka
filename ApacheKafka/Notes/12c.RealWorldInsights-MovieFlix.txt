@@ -1,0 +1,57 @@
+Movie Flix - Video Analytics
+---------------------------------------
+
+- Is a company that allows you to watch TV shows and Movies on demand. The bsuiness wants the following capbilities:
+	- Make sure the user can resume the video where they left off 
+	- Build a user profile in real time 
+	- Recommend the next show to the user in real time
+  	- Store all the data in the anlaytics store
+
+How to implement
+----------------
+
+Video Position & Resume:
+
+
+	- Topic :
+		-New topic -  Show Position
+		- Is a topic that tells us how far users have consumed a TV show and within a video 
+		- can have multiple producers
+		- should be highly distributed if hugh volumes > 30 parttions
+		- If I were to choose a key , I would choose "user_id" which would be the partioning key
+
+	_ Producer:
+		- Video Position Service
+			- While video is playing ( browser/tv etc.) , it will once in  awhile send data to the thsi producer
+			- this producer will send the data from Kafka , to show the position 
+			
+
+
+	- Consumer:
+		- REsuming Service:
+			- Will consume from the 'Show Position' topic 
+			- Video player will request from the Resuming Service to get position  
+
+
+
+REcommnedations:
+		
+	- Topic:
+		-From existing topic 'Show Position' we already know shich user is watching which show from which position
+		  - We thus know what the user likes and whether they go all the way to end of a show or watch 5 mins and never go back
+	
+		- New Topic : Recommendation 
+				- Feeds back to the Portal/Website
+				- Maybe  alow volume topic( there is not goingto be recommendation every 30 secs) 
+				- If I were to choose a key it woul dbe user_id
+
+
+	- Kafka Stream:
+		- Recommendation Engine in real time 
+			- takes data from topic  existing topic 'Show Position' and computes recommendations
+			- writes recommendations to new topic 'Recommendation
+			
+			
+
+	- Kafka Connect:
+		- Analytics consmer : which will put all the computed data in an Analytics Store ( like Hadooop) 

@@ -1,0 +1,8 @@
+More Resources:
+	- List of Open Source Connectors:
+		- https://www.confluent.io/product/connectors/
+	- General Guildelines:
+		-https://www.confluent.io/wp-content/uploads/Partner-Dev-Guide-for-Kafka-Connect.pdf?x18424
+	- Development Guide:
+		-  https://docs.confluent.io/3.2.0/connect/devguide.html
+

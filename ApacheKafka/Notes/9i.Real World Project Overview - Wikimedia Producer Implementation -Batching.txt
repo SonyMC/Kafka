@@ -1,0 +1,35 @@
+Wikimedia Producer - Batching
+-------------------------------
+
+linger.ms & batch.size:
+	- By default, Kafka producers tey to send records asap
+		- It will have max.in.flight.requests.per.connection=5
+			- this means utp 5 message batches being in flight(being sent between the producer in teh broker) at most
+			- after this, if more messages are to be sent while others ar ein flight, Kafka is smart and will start batching them before the next batch-send'
+			- The smart batching helps increase throughput while maintaining very low latency
+				- Added benefit : Batched have higher compression ratio so better efficiency 
+									
+	
+- Two settings to influence the batching mechanism:
+	- linger.ms(default 0) :
+		- how long to wait until we send a batch
+		- Adding a small number ( For E.g. 5 ms) helps add more messages in teh batch at teh expense of latency
+	- batch.size:
+		- if a batch is filled before linger.ms,increase the batch size
+		- default size = 16kb
+		- max. no. of bytes that will be included in abatch
+		- increasing the batch size to somethign like 32 kbor 64 kb can help increase teh compression , throughput , and efficiency of of requests
+		- any msg. that is bigger than teh batch size will not be batched and will eb send right away
+		- A batch is allocated per parttion, so make sure that you don't set it to a number that's too high, otherwise you'll run waste memory  
+		- you camn monitor the average batch size metric using the Kafka Producer Metrics
+
+
+Setting a High Througput Producer:
+-----------------------------------
+-  Increase linger.ms and the producer will ait for few more milliseconds for the batches to fill up before sending
+- If you are sending full batches and have memory to spare	, you can increase batch.size and send larger batches
+- Inroduce some producer-level comression for more efficiency in sends.
+
+
+
+

@@ -1,0 +1,121 @@
+Conduktor - Demo
+----------------
+
+
+Starting Kafka with Conduktor
+------------------------------
+
+- Download Conductor- Refer 'https://www.conduktor.io/download/'
+- Free for all platforms
+- Compatible with all versions
+- Can add separate components such as Schema REgistry
+
+
+- Dowload msi file for Windows:
+	- https://www.conduktor.io/download/
+- Install 
+
+	- Conduktor login:
+		- Use GitHub for login
+	- Cluster name= Kafka Course
+	- Cluster version -> choose highest -> Click on DOwnload
+	- Scheme Registry = do not enable	
+	- Color: Choose any
+	- Click on 'Start Cluster'
+		- You will see Zookeeper starting 
+		- Note: If it does not start the frst time, try again
+		- Once successfully started:
+			- Click on OVerview:
+				- Cluster local url: http://127.0.0.1:9092 OR http://localhost:9092 
+
+
+
+
+Start Kafka broker:
+---------------------
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the windo wopen
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+
+
+
+Get CLuster id
+--------------------
+
+- We can get the cluster id from Zookeeper:
+	- Open WSL console:
+		- cmd: zookeeper-shell.sh localhost:2181 get /cluster/id
+
+Connecting to localhost:2181
+
+WATCHER::
+
+WatchedEvent state:SyncConnected type:None path:null
+{"version":"1","id":"sVGy0SdnTwaoksHuD0X3XQ"}
+[2022-10-17 14:41:43,511] ERROR Exiting JVM with code 0 (org.apache.zookeeper.util.ServiceUtils)
+
+
+	- CLuster id in this E.g is 'sVGy0SdnTwaoksHuD0X3XQ'
+
+
+Connect Conduktor to existing Kafka Cluster which we started above
+------------------------------------------------------------------
+
+- Start Conduktor:
+	- Click on 'Connect on Existign Cluster' -> New Kafka Cluster:		
+			- Cluster name = Kafka-Cluster
+			- Bootstrap servers = localhost:9092
+			- Zookeper= localhost:2181
+			- Test Kafka connectivity
+				- If you get msg ok -> Save
+	- Doube click on 'Kafka-Cluster' on right pane for Conduktor to connect to existing Kafka culster
+
+	- Note: If you run into any problems , redo the steps detailed in '3c.Wsl2NetworkBug.txt'
+
+
+- Topics:
+	- Click on eye icon to unhid eprovate topics
+
+	- Browse through existign topics 
+		- _consumer_offsets
+		- first_topic
+		- second_topic
+
+	- Create new topic:
+		- Create:
+			- Name=third_topic
+			- Parttions = 3
+			- REplicaton Factor = 1
+
+	- Produce data to 'third_topic':
+		- Click on 'Producer' button on top 
+		- Pick the topic to be written to 
+			= third_topic
+		- Enter key/value
+		- Press on 'Pruce to Topic' button 
+	
+	- Consume data from 'third_topic':
+		- Click on 'Consumer' button on top
+		- Pick topic = third_topic 
+		- Key format = string
+		- Value FOrmat = String 
+		- Start from = The beginning(earliest)
+		- Limit = None(forever)
+		- Start
+
+	- Consumer Group management:
+		- CLick on 'Comsumer' on the left pane 
+		- Wil show all consumer groups
+
+

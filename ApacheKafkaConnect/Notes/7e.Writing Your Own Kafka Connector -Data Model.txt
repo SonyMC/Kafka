@@ -1,0 +1,45 @@
+
+
+: Note: Am switching to Eclpise, as IntellIJ seems to have problems with trying to download ceertain repos.
+
+
+Code Directory:
+D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+
+_ Open Eclipse -> Import-> Existing MAven Project -> D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+
+
+
+Data Model
+-----------
+- It is always good to have your data exist in classes in a "model" package
+- In this demo, you will find models for Issue, User and Pull Request as POJOs.
+
+
+
+Package:
+	- com.mailsonymathew.kafka.model
+	- You will find the following ,odels:
+		- Assignee.java
+		- Creator.java
+		- Issue.java
+		- Label.java
+		- Milestone.java
+		- PullRequest.java
+		- User.java
+
+
+
+Tests
+------
+ /kafka-connect-github-source/src/test/java
+
+- Package : com.mailsonymathew.kafka.model
+- Tests:
+	- IssueTest.java
+	- UserTest.java
+
+- Executiion:
+	- Right CLick -> Run as -> JUnit

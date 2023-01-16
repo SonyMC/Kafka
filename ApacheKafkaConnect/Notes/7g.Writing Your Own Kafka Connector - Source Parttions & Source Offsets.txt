@@ -1,0 +1,38 @@
+
+
+: Note: Am switching to Eclpise, as IntellIJ seems to have problems with trying to download ceertain repos.
+
+
+Code Directory:
+D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+
+_ Open Eclipse -> Import-> Existing MAven Project -> D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+
+
+Source Parttions, Source offsets
+----------------------------------
+
+- Source Parttion allows Kafka COnnect to know whih source you've been reading
+- Source Offsets allow Kafka Connect to Track until whne you've been reading for the Source PArttion you choses 
+- Important: 
+	- This is different from Kafka topics partitions and offsets
+	- Source Parttion and Source Offsets are for Kafka COnnect Source
+
+
+Class:
+	- GitHubSourceTask.java
+		- /kafka-connect-github-source/src/main/java/com/mailsonymathew/kafka/GitHubSourceTask.java
+	- This class does the actual work
+	- It's supposed to initialize, then find where to resume from , and finally poll the source for records
+	
+
+
+Test:
+----
+-/kafka-connect-github-source/src/test/java
+	-GitHubSourceTaskTest.java
+		- Right click -> Run as -> JUnit Test
+		- Visit the url geenrated in the terminal after runing the test:
+			- The firs tissue will have no.272 wich is what we have specified in teh test

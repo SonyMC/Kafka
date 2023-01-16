@@ -1,0 +1,99 @@
+
+Creating Kafka Project
+----------------------
+
+Kafka SDK List:
+
+	- https://www.conduktor.io/kafka/kafka-sdk-list
+	- The official SDK for Apache KAfka is JAva SDK 
+	- However it supports SDKS for all languages and details can be found in link above
+
+
+Prerequisites:
+	- IntelliJ Community IDEA
+		- https://www.jetbrains.com/idea/download/#section=windows
+	- Java 11 
+		-Amazon Corretto 11
+			- https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/what-is-corretto-11.html
+		- Any version wil lwork fine
+
+
+Refer:
+	- Creating a Kafka Java Project using Gradle:
+		- https://www.conduktor.io/kafka/creating-a-kafka-java-project-using-gradle-build-gradle((build.gradle)
+	- https://www.conduktor.io/kafka/creating-a-kafka-java-project-using-gradle-build-gradle
+		- https://www.conduktor.io/kafka/creating-a-kafka-java-project-using-maven-pom-xml
+
+
+Start IntellIJ:
+	- File -> Ne w-> New Project
+		- Name = kafka-beginners-course
+		- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject
+		- Language = Java
+		- Build System = Gradle
+		- JDK = select your Java JDK  
+		- Gradle DSL = Groovy
+		- Advanced Settings:
+			- Group id= com.mailsonymathew
+			- Artifact id = kafka-beginners-course
+		- Create
+			- Wait for Gradle configuraton to be complete
+		- Special step: Delete 'src' folder( with 'main' and 'test' subfolders)  as we will be creatign subprojects within this project 
+		- Create new subproject:
+			- Right click on main project 'kafka-beginners-course':
+				- New-> Module:
+					- Name= kafka-basics
+					- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course
+					- Language = Java
+					- Build System = Gradle
+					- JDK = select your Java JDK 
+					- Gradle DSL = Groovy					
+					- Parent = kafka-beginners-course 
+					- Advanced Settings:
+						- Group id= com.mailsonymathew
+						- Artifact id = kafka-basics
+				- Create
+				- kafka-basics/main/java/com.mailsonymathew 
+					- main.java:
+						- Delete
+
+		- kafka-basics:
+			- build.gradle:
+				- Add dependencies:
+    // https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients
+    // Dependency for Kafka client
+    implementation 'org.apache.kafka:kafka-clients:3.3.1'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    // Dependency for slf4j api for logging
+    implementation 'org.slf4j:slf4j-api:2.0.3'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+    // Dependency for slf4j-simple for logging
+    implementation 'org.slf4j:slf4j-simple:2.0.3'
+
+
+			- Click on 'Load Grade changes' elephant icon on top RHS corner
+
+
+			- Dependcies will be pulled into as an external library
+					- Click on 'Externl Libraries' in the LHS pane to validate
+
+
+	- New class 'ProducerDemo':
+			- Right click on kafka-basics/main/java/com.mailsonymathew -> New Java class
+			- Add main method:
+				- type main' -> tab for auto complete
+				- type a sample print statement 
+				- Right click on class -> Run 'ProducerDemo.main()'
+					_ If you have setup everyhing right, you will see 'Hello Tigers!!' pringt statement
+
+
+
+	
+- IntellIj Configuration:
+	- File -> Settings -> Build, Execution, Deployment:
+		- Build Tools -> Gradle:
+				- Build and run using: ItellIj IDEA
+				- Run tests using : Gradle 
+

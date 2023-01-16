@@ -1,0 +1,115 @@
+
+Kafka Streams Hands On 
+--------------------------
+Highlevel Workflow:
+
+	- topic = Wikimedia -> KAfka Producer -> Kafka Cluster and brokers  contining topic 'wikimedia.recentchange' -> Kafka Stream Applicaition will run alongside on the topic 'wikimedia.recentchange' to compute some statistics such as :
+									- wikimedia.stats.bots ( no. of bots)
+									- wikimedia.stats.website(Analyze number of changes per website ( ru.wikipedia.org vs e.wikipedia.org))
+									- wikimedia.stats.timeseries ( how many events we get per sec) 
+
+
+
+Code base: D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-streams-wikimedia
+
+
+
+Before ruuning the code
+
+-----------------------
+
+
+
+(1) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+
+(2)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window open
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+
+
+
+
+
+
+Run the code:
+--------------
+
+- Run WikimediaStreamsApp.java
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-streams-wikimedia\src\main\java\com\mailsonymathew\WikimediaStreamsApp.java
+
+- In parallel, run WikimediaChangesProducerHighThroughPut.java:
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-producer-wikimedia\src\main\java\com\mailsonymathew\WikiMediaChangesProducerHighThroughPut.java
+
+
+
+
+Conduktor:
+----------
+- Select cluster :
+	- Topics: 
+		- New topics will be autocreated and we can consume data to see various stats from following topics:
+				- wikimedia.stats.website
+				- wikimedia.stats.timeseries
+				- wikimedia.stats.bots
+
+	- Note: 
+		- Since we are on a trial version of Conducktor, only a max. of 10 topics can be shown. Hence we will not be able to see the above topics unless we delete the old er topics.
+		- Once you start seeign teh new topics, consume from it in JSON format to see content.
+
+			- E.g: 
+				- topic : wikimedia.stats.bots
+				- consume data ->key format = JSON, value format = JSON-> Start from = latest, Limit = none
+					- you wil lsee labels  #bot, #non-ot in the data stream
+
+		- If required, teh topics can be consumed prgramitacally
+
+
+
+WSL:
+----
+- List topics:
+	- cmd:  kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+__consumer_offsets
+demo_java
+first_topic
+java_demo
+new_topic
+thrid_topic
+wikimedia-stats-application-bot-count-store-changelog
+wikimedia-stats-application-bot-count-store-repartition
+wikimedia-stats-application-event-count-store-changelog
+wikimedia-stats-application-event-count-store-repartition
+wikimedia-stats-application-website-count-store-changelog
+wikimedia-stats-application-website-count-store-repartition
+wikimedia.recentchange
+wikimedia.recentchange.connect
+wikimedia.stats.bots
+wikimedia.stats.timeseries
+wikimedia.stats.website
+
+**********
+
+

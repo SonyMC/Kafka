@@ -1,0 +1,23 @@
+RealWorld Project Overview :
+----------------------------
+
+	- Project Goal - Wikimedia Stream to OpenSearch
+		- Wikimedia -> Kaka Producer -> Kafka -> Kafka COnsumer -> OpenSearch
+
+	- After implmenting thsis with programming , we'll run the following architecture with advanced conepts( Kafka Connect. KAfka Stream) in the following sections
+		- Wikimedia -> KAfka COnnect SSE Source Connector -> Kafka  -> Kafka COnnect ElastiSearch Sink -> OpenSearch
+										           |		
+												v
+										          Kafka Streams counter application 	
+
+
+	- Wikimedia Recent change stream :
+		-https://stream.wikimedia.org/v2/stream/recentchange
+	- Wikimedia Recent Change Stats:
+		- https://codepen.io/Krinkle/pen/BwEKgW?editors=1010
+	- Wikimedia Event Stream Demo:
+		- https://esjewett.github.io/wm-eventsource-demo/   		
+
+
+	- Code Reference:
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-beginners-course-part2

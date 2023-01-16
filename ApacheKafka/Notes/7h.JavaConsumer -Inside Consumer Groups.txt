@@ -1,0 +1,196 @@
+
+Java Consumer - Consumer Groups Rebalancing Behaviour using mutiple consumer instances 
+--------------------------------------------------------------------------------------
+
+
+- Project : kafka-beginners-course\kafka-basics
+
+- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-basics
+
+Refer: D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-beginners-course-part2\kafka-basics\src\main\java\io\conduktor\demos\kafka
+
+
+
+
+Objectives:
+	- Learn how to write a basic consumer to receive data from Kafka
+	- View basic configuration parameters
+	- Confirm we recieve the data from the Kafka Producer written in Java
+	- Ensure we have code in place to respond to termination signals
+	- Make your consumer in Java consume data as part of consumer group
+	- Observe rebalance mechanisms
+
+
+
+
+
+Class 'ConsumerDemoWithShutdown.java':
+			- Refer code for documentation
+			
+
+
+
+Before running the code
+-----------------------
+
+
+
+(1) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+(2)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window open
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+
+
+
+
+
+
+(3) Create Kafka topic named 'demo_java' with 3 partitions & replication factor 1 :
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic demo_java --create --partitions 3 --replication-factor 1
+
+
+WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Created topic demo_java.	
+
+
+(4)List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+
+__consumer_offsets
+demo_java
+first_topic
+new_topic
+thrid_topic
+
+
+
+
+(5) List consumer groups;
+
+	- Creating consumer groups:
+		- Refer '5e.Kafka Consumer in Groups  CLI .txt'
+
+	- Open WSL console:
+		- cmd: kafka-consumer-groups.sh --bootstrap-server localhost:9092 --list
+
+my-first-consumer-group
+console-consumer-88257
+my-second-consumer-group
+
+
+
+
+Run the code
+-------------
+
+
+
+- - Project : kafka-beginners-course\kafka-basics
+
+- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-basics
+
+
+- ConsumerDemoWithShutdown.java:
+		- Right click -> Run ConsumerDemoWithShutdown.main()
+		
+
+				- Code will keep on running
+				- Data consumed will be shown from beginning across all partitions
+				- You can produce more data by running 'ProducerDemoWithKeys.java'
+				- If you restart the applicaiton, data will be consumed from the latest committed offset and not from the beginning 
+				- Exit the application:
+					- Return code will now be '1'
+					- In IntelIj console log you can see:
+						- [Thread-0] INFO ConsumerDemoWithShutdown - Detected a shutdown, let's exit by calling consumer.wakeup()..
+						-  msg: 'main] INFO ConsumerDemoWithShutdown - The consumer is now gracefully closed'
+
+
+
+			- Restart the application:
+				- Nothing will be consumed as the offset has been committted and we have not published anything 
+				- Open Konductoe to verify that the lag on consumer group 'my-second-cosumer-group' is 0 ( or you can describe teh consumer group on the WSL console to verify this)
+				- Clear the IntellIJ console by pressing on teh 'dustbin' icon on teh LHS
+				
+
+			- Start second instance of 'ConsumerDemoWithShutdown.java' parallely to eh first instance:
+				- Go to the drop down box on teh top RHS corner bedide the hammer icon( Builfd Project icon) :
+					- Select 'EDit COnfigurations'
+						- Select 'ConsumerDemoWithShutdown':
+								- Click on 'Modify Options' link in right pane 
+									- Select ' Allow MUltiple Instances' 
+				-  ConsumerDemoWithShutdown.java:
+					- Right click -> Run ConsumerDemoWithShutdown.main() 
+					= second instance will start
+
+			- On first instance IntelliIj logs: 
+				- log msg: 
+					- Request joining group due to: group is already rebalancing
+					- Revoke previously assigned partitions demo_java-0, demo_java-1, demo_java-2
+					- (Re-)joining group
+					- Successfully joined group with...
+					- Successfully synced group in generation... 
+					- Adding newly assigned partitions: demo_java-2
+
+			- On second instance IntelliIj logs: 
+				- log msg: 
+					- Discovered group coordinator localhost:9092 ...
+					- (Re-)joining group
+					- Request joining group due to: need to re-join with the given member-id: consumer-my-second-consumer-group...
+					- Request joining group due to: rebalance failed due to 'The group member needs to have a valid member id before actually entering a consumer group.' (MemberIdRequiredException)
+
+					- (Re-)joining group
+
+					- Successfully joined group with generation Generation..
+					- Successfully synced group in generation ...
+					- Notifying assignor about the new Assignment(partitions=[demo_java-0, demo_java-1])
+					- Adding newly assigned partitions: demo_java-0, demo_java-1
+
+			- Clear the logs and run 'ProducerDemoWithKeys.java'
+			- You can see data being sent to both consumer instances
+				- First instance will consume data only from partion demo_java-2
+				- Second instance will consume data from from  parttions	demo_java-0, demo_java-1	
+
+
+			- Run third consumer isntance parallely with one and two and again observe rebalancing behaviour from logs
+				- Adding newly assigned partitions: demo_java-2
+			
+			- Consumer Instance 2
+				- Adding newly assigned partitions: demo_java-0
+
+			- Consumer Instance 1 : 
+				- Adding newly assigned partitions: demo_java-1 		
+			
+
+
+			- Shut down first consumer instance 
+				- The remainign two instances will automatically rebalance again
+		
+
+********************
+
+Tips:
+	- Import: Alt + Enter
+	- Auto complete = tabs

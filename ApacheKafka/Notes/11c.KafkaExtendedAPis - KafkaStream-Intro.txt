@@ -1,0 +1,37 @@
+
+Kafka Streams
+-------------
+
+Intro:
+
+- You want to do the following from the wikimedia.recentchange topic:
+		- Count the number of times a change was created by a bot versus a human	
+		- Analyze number of changes per website ( ru.wikipedia.org vs e.wikipedia.org)
+		- No. of edits per 10s as a time series
+		
+
+- We can achieve the above by suign a Producer/Consumer but that's low level and not developer firendly 
+
+- Instead we can use a Kafka Streams application 
+
+- Objective:
+	- Kafka Streams applicaiton will read from teh topic wikimedia.recentchange
+	- The app will then output the stats for teh bots, website and timeseries
+
+
+
+What is Kafka Streams:
+	- Easy data & transformation library within Kafka
+	- Standard Java application 
+	- Highly Scalable, elastic and fault tolerant
+	- Exactly once capabilities
+	- One record at a time procesing( no batching)
+	- Works for any appliation size
+	-
+
+
+Streams are used for:
+	- Data Transformations
+	- Data Enrichment
+	- Fraud Detection 
+	- Monitorign & Alerting

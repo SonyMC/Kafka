@@ -1,0 +1,56 @@
+Wikimedia Producer - Message Compresion
+--------------------------------------------------
+
+Refer : https://blog.cloudflare.com/squeezing-the-firehose/
+
+
+- Producer usually sends that is text based , for E.g. JJSON data
+- In this case, it is important to apply compression to teh producer.
+- Compression can be enabled at the Producer level and doesn't require any configuration changes in the Brokers and the Consumers
+- Compression.type can be:
+	- none(default)
+	- gzip
+	- lz4
+	- snappy
+	- zstd(from Kafka 2.1)
+
+- Compression is more effective the bigger the batch of message being sen tto KAfka
+- Advantages:
+	- Much smaller producer request size(compression ratio upto 4x) 
+	- Faster to transfer data over the N/W 	=> less latency 
+	- Better throughput
+	- Better disk utilization in Kafka( stored message son disk are smaller)
+- Disadvantages( very minor):
+	- Producer must commit some CPU cycles to compression
+	- Consumers must also commit some CPU cycles for decompression
+- Overall:
+	- Consider testing 'snappy' or 'lz4' for optimal speed/compression ratio( test others too)
+	- Consider tweaking 'linger.ms' and 'batch.size' to have bigger batches , and therefore more compession and higher output
+	- Use compression in production   
+
+
+	
+
+
+Message Compression at Broker/Topic level:
+--------------------------------------------
+
+	- compression.type=producer
+		- default setting
+		- the broker takes teh compressed batch from thw producer client and writes it direclty to the topic's log file 	without compressing the data
+
+	- There is also a setting you can set at the broker level( all-topics) or topic level
+
+	- compression.type=none
+		- all batches are decompressed by the broker
+
+- You can set a specific type of compression:
+		- E.g. compression.type=lz4	
+			- If it is matching with the producer setting, data is stored on disk as is 
+			- If it's a different compression setting than that of the producer, batches are decompressed by the broker and then re-compressed using the compression algorithm specified
+
+- Warning: If you enable broker side compression, it will consume extra CPU cycles
+			
+ 
+
+

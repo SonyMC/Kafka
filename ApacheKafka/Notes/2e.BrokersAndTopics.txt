@@ -1,0 +1,43 @@
+Brokers And Topics
+---------------------
+
+
+Kafka Brokers
+-----------
+- A Kafka cluster is composed of multiple brokers( servers)
+- Each broker is identified with its ID(integer)
+- Each Broker contains certain topic parttions
+- After connecting to any broker( called a bootstrap broker), you will be connected to the entire cluster(Kafka clients have smart mechanics for that)
+- A good number to get started is 3 brokers, but some big clusters have  over 100 brokers
+
+
+Brokers and Topics
+--------------------
+- Example of Topic-A with 3 partitions and Topic-B with 2 partitioons
+- 3 brokers: Broker 101, 102 & 103
+- Broker 101:
+	- Topic A , Partion 0
+	- Topic B,  Partion 1
+	
+- Broker 102:
+	- Topic A , Partion 2
+	- Topic B,  Partion 0
+- Broker 101:
+	- Topic A , Partion 0
+
+
+- Note: 
+	- Data is distributed
+	- Broker 103 doesn't have any Topic B data
+
+Kafka Broker Discovery
+----------------------
+- Each Kafka broker is called a "bootstrap server"
+- This means you need to connect to only one broker , and the Kafka clients will know how to be connected to the entire cluster(smart clients)
+- Once the Kafka client intiates a successful coneection to any one broker, it gets as response list of all brokers and topics
+- Client can connect to any broker it wants
+ 
+	
+- Broker 103:
+	- Topic A , Partion 1
+		

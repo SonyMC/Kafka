@@ -1,0 +1,34 @@
+Advertised Listeners : Understanding communications between Client and with Kafka 
+---------------------------------------------------------------------------------
+
+Refer: https://www.confluent.io/blog/kafka-listeners-explained/
+
+
+- Advertised listeners is a very important settign of Kafka
+- In real world, client and your Kafka brokers will be on different machines
+- Kafka broker has public IPs or private IPs 
+- You will setup an advertised hostname  which is what you want clients to connect to 
+- This is what happens when a client wants to connect to the Kafka server/broker:
+		- Client will first try to connect with the public IP of the KAfka broker
+		- Kafka broker will refuse connection and send teh advertised hostname to teh client 
+		- Client will try to connect to the advertised host name:
+			- If the Client resided in the same private NW as the KAfka broker, connection will be successful 
+			- If the Kafka Client is not on the same NW, can't find advertised host IP
+				- This is a most common failure as thoughteh Broker public IP is public, the advertised host IP is private 
+			Making it work:
+				1)Use localhost as advertised address:  The above scenario will work if teh advertised host is set as teh local host and teh client and teh Kafka broker are on the same machine . However this is not soemthign that will be done in a real workld scenario
+				2)Use public IP as advertised host :Wil lwork but after a reboot the Kafka public IP would have changed and you will again face a communication error 
+			
+
+				3) Ideal setting of teh advertised host(advertised.listeners):
+				-------------------------------------------------------------		
+					- If your clients are on the private NW, set either:
+						- advertised.listeners= the internal private IP  	
+								OR
+						- advertised.listeners= the internal private DNS host name 
+
+					- If your clients are on the public NW, set either:
+						- advertised.listeners= external public IP
+								OR
+						- advertised.listeners= the external public DNS host name pointing to the public IP
+

@@ -1,0 +1,54 @@
+Wikimedia Producer - Producer Acknowledgements(acks)
+-----------------------------------------------------
+- Producers can choose to receive ackowledgment of data writes
+	
+	- acks=0 :
+		- Producer won't wait for acknowledgement( possible data loss) 
+		- Producer sonsiders messages as successfully written the moment the msg was sent without waiting for teh broker to accept it all.
+		- If the broker goes offline or if an exception happens, we won't know and will lose data
+		- Useful for cases where it's ok to lose msgs , such as metric collection
+		- Produces t ehighest throughput settign because the NW overhead is minimized
+		
+
+	- acks=1 :
+		- Producer will wait for acknowledgement( limited data loss)
+		- Producers consider msg as "written successfully" when the msg was acknowledged only by the leader
+		- Default for Kafka v1.0 to v2.8
+		- Replication s not guranteed as it happens in teh background
+		- If teh leader borker goes offline unexpectedly but replicas haven't replicated the data yet, we have a data loss
+		- If an ack is not received, teh producer may retry the request
+		 
+ 
+	- acks=all ( or acks=-1) :
+		- Leader + replicas acknowledgement(no data loss)	
+		- Producers consider messages as "written successfully" whne the message is accepted by all in-sync replicas(ISR)
+		- Default for Kafka 3.0+
+		- Goes hand in hand with the min.inysnc.replicas
+			-The leader replica for a partion checks to see if tehre are enough in-sync replicas for safely writing the message( controlled by the broker setting min.inysnc.replicas)
+				- min.inysnc.replicas = 1: 
+					- only the broker leader needs ot successfully ack
+				- min.inysnc.replicas = 2: 
+					- only the broker leader + 1 replica needs ot successfully ack
+
+- Kafka Topic Availbility
+--------------------------
+- Availbility (considering Replica Facor = 3) :
+	- acks=0 & acks=1: 
+		- If one broker is up and considered an ISR, the topic will be available for writes 
+	- acks=all(or -1): 
+		- min.inysnc.replicas = 1( default):
+			- the topic must have alteast 1 parttion up as an ISR ( that includes tehleader) and so we can tolerate 2 brokers beign down 
+		 				 
+		- min.inysnc.replicas = 2:
+			- the topic must have alteast 2 ISR up therefore we can tolerate at most one broker being down( in thes case of replication factor of 3) , and we have the guarantee that for every write, the data will be at least written twice 
+
+	 				 
+		- min.inysnc.replicas = 3:
+			- Would not make sense for a corresponding RF of 3 and we could not tolerate any of the brokers going down
+
+		- In summary, with a RF = N and min.inysnc.replicas = M, we can tolerate N-M brokers going down
+
+	- acks=all and min.inysnc.replicas = 2, is the most popular option for data durability and availability and allows you to withstand the loss of one Kafka broker!!!
+
+
+

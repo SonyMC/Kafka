@@ -1,0 +1,64 @@
+
+
+Setting up OpenSearch on Docker
+-------------------------------
+
+Objective: 
+	- Start OpenSearch project using docker 
+
+
+
+
+- Docker file: 'docker-compose.yml' in D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-consumer-opensearch
+
+
+- Enable Docker directly from IntellIj:
+
+	- Install Docker Plugin in IntellIj:
+		- File -> Settings -> Plugins -> Search for 'Docker' -> 
+
+		- Install 'Docker'
+
+- Start Docker Desktop 
+
+- IntelliJ:
+	- docker-compose.yml:
+		-Click on the double arrow shown on teh line numbers in the editor
+		- Thsi will start pullign the images and start teh container 
+
+	- Starts the 'opensearch' DB 
+	- Starts the console for the open-search DB
+
+
+- Access teh Open-Search DB url:
+	- http://localhost:9200/
+	- Response: 
+{
+  "name": "8de8548944fa",
+  "cluster_name": "docker-cluster",
+  "cluster_uuid": "aCFm5wy_RnKkMNGh2wxHBQ",
+  "version": {
+    "number": "7.10.2",
+    "build_type": "tar",
+    "build_hash": "6f6e84ebc54af31a976f53af36a5c69d474a5140",
+    "build_date": "2022-09-09T00:07:12.137133581Z",
+    "build_snapshot": false,
+    "lucene_version": "9.3.0",
+    "minimum_wire_compatibility_version": "7.10.0",
+    "minimum_index_compatibility_version": "7.0.0"
+  },
+  "tagline": "The OpenSearch Project: https://opensearch.org/"
+}
+
+
+
+
+- Access teh OpeNSearch dashborad:
+	- url: http://localhost:5601/
+	- Browse to dev-tools console: http://localhost:5601/app/dev_tools#/console
+		- Allows us to run REST APIs queries againt ElastSearch
+
+
+
+
+

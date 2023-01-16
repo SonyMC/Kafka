@@ -1,0 +1,4 @@
+Architecture : 
+	- Refer diagram in 'Connect&StreamsArchitecture.png'
+	- For this demo we will just be taking data from the 'Source' and using the 'Connect CLuster' we will push data into the KAfka Cluster
+	- The 'Sink' flow will be covered in a later demo. 

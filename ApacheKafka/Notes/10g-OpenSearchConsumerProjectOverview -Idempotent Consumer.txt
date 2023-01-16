@@ -1,0 +1,233 @@
+Idempotent Consumer
+-------------------
+
+At Most once:
+	- Offsets are committed as soon as the message batch is received.If the processign goes wrong, teh message will be lost( it won't be read again)
+	
+
+At Least Once:
+	- Offsets are committed after the message is processed. If the processing goes wrong, the message will eb read again. This can result in duplicate processing of messages. Make sure you rprocesing is idempotent(i.e processign again teh sam emessage won't impact your systems)
+	- 
+
+	- Also refer '9e.Real World Project Overview - Wikimedia Producer Implementation -Idempotent Producer.txt'
+
+
+Exaclty Once:
+	- Can be acheived for Kafka => Kafka work flowsuisng the Transactional API( easy with Kafka Streams API). 
+     - For Kafka => Sink workflows, use an idempotent consumer. (E.g. OpenSearch Consumer) 
+
+
+
+
+
+
+
+
+
+Idempotent Open Search Implementation 
+---------------------------
+
+
+Objective : Implmnt code for Idempotent Open Search Consumer
+
+
+Code Directory: D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\kafka-beginners-course-part2\kafka-consumer-opensearch
+
+
+Note: 
+Using the latest versions in gradle and docker images will not work for this demo.
+Stick to the versions provided.
+
+
+Before running the code
+-----------------------
+
+(1) Start Docker-Desktop/Login to Bonsai OpenSearch cluster
+
+(2) If usign Docker, Execute docker-compose.yml to run the OpenSearch DB and Dashboard containers
+
+Note: Docker Desktop has a problem conecting to wsl when we have kafka brokers running. So for teh demo will use Bonsai 
+	
+
+
+
+(3) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+(4)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window open
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+
+
+(5)List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+__consumer_offsets
+demo_java
+first_topic
+java_demo
+new_topic
+thrid_topic
+wikimedia.recentchange
+
+
+
+(6) Create Kafka topic named 'wikimedia.recentchange' with 3 partitions & replication factor 1 :
+
+Note: Create the topic ''wikimedia.recentchange''  only if it is hase notbeen created before
+
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic wikimedia.recentchange --create --partitions 3 --replication-factor 1
+
+
+WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Created topic demo_java.	
+
+
+
+
+
+ Implmentation:
+------------------------
+
+
+
+- Two Strategies:
+	(1) Startegy 1 : Define an unique ID using Kafka REcord Co-ordintes
+		- Unique id wil lcotnain topic + parttion + offset in main block
+
+		- Class : OpenSearchConsumerPart3.java
+				- Objective:
+				- Implement Kafka idempotent consumer using unique id created above
+
+		- Unique id wil lcotnain topic + parttion + offset in main block
+
+
+		-  Run code
+
+
+	(2) Startegy 2 : Use the id provided within the data
+
+		- Open Conduktor:
+			- Connect to local cluster
+			- Consumers -> Consumer topic = 	wikipedia.recentchange
+			- Key format = JSON, Value Forma t= JSON
+			- Read from beginning 
+			- Click on any message-> click on details 	
+			- you can see a field called 'id" in the 'meta' section 
+				- we will use the value of thsi field as an id			  
+
+
+"/mediawiki/recentchange/1.0.0",
+meta:
+{
+uri:
+"https://zh.wiktionary.org/wiki/Category:%E6%97%A5%E8%AF%AD%E6%B1%89%E5%AD%97",
+request_id:
+"42620cbc-4338-48bb-b8e5-97faa8fffca3",
+id:
+"1be7c808-8697-4b74-aa16-b0f6942191c3",
+
+
+
+
+		- Class : OpenSearchConsumerPart4.java
+				- Objective:
+				- Implement Kafka idempotent consumer using unique id created above
+				- Create a function and extract id from json 
+					- private static String extractId(String json){
+
+				- In main() use thsi function to extract id from json data and send to index request
+
+
+
+		-  Run code
+		- Now you can see teh dataq is beign used in teh index
+
+
+		- In case of error in comsumer , OPenSearch is smart enough to not process the messages withthe same id. Hence we have made our consumer idempotent.
+
+
+
+- Run 'WikiMediaChangesProducerHighThroughPut.java' to produce some records and see the OPenSearchCLient picking it up in the 
+- You wil see some records beign inserted with response.id before program fails with:
+Exception in thread "main" OpenSearchStatusExceptio: OpenSearch exception [type=mapper_parsing_exception, reason=object mapping for [log_params] tried to parse field [null] as object, but found a concrete value]]
+
+
+
+- From the ids that were printed selct one:
+- E.g.: 
+
+
+
+- Got to the opesearch console:
+	- Docker: http://localhost:5601/app/dev_tools#/console
+
+	- Bonsai: 	https://app.bonsai.io/clusters/mailsonymathew-kafka-3660389779/console
+
+
+	- Run query: 
+		- GET /wikimedia/_doc/qXrmVoQB-ev0m1Hszg08
+
+{
+  "_index": "wikimedia",
+  "_type": "_doc",
+  "_id": "qXrmVoQB-ev0m1Hszg08",
+  "_version": 1,
+  "_seq_no": 151,
+  "_primary_term": 1,
+  "found": true,
+  "_source": {
+    "$schema": "/mediawiki/recentchange/1.0.0",
+    "meta": {
+      "uri": "https://zh.wikipedia.org/wiki/Category:%E9%9D%9E%E4%B8%AD%E6%96%87%E9%87%8D%E5%AE%9A%E5%90%91",
+      "request_id": "2329378d-c35f-4b14-882a-d0c93e76d546",
+      "id": "ca2e5e3c-2b6b-4be7-a0c4-ce6054568be0",
+      "dt": "2022-11-05T10:39:33Z",
+      "domain": "zh.wikipedia.org",
+      "stream": "mediawiki.recentchange",
+      "topic": "eqiad.mediawiki.recentchange",
+      "partition": 0,
+      "offset": 4286180770
+    },
+    "id": 153660877,
+    "type": "categorize",
+    "namespace": 14,
+    "title": "Category:非中文重定向",
+    "comment": "[[:Moema quiii]]已从分类中移除",
+    "timestamp": 1667644773,
+    "user": "Cewbot",
+    "bot": true,
+    "server_url": "https://zh.wikipedia.org",
+    "server_name": "zh.wikipedia.org",
+    "server_script_path": "/w",
+    "wiki": "zhwiki",
+    "parsedcomment": "<a href=\"/wiki/Moema_quiii\" class=\"mw-redirect\" title=\"Moema quiii\">Moema quiii</a>已从分类中移除"
+  }
+}
+
+
+
+
+
+
+

@@ -1,0 +1,65 @@
+Choosing Parttion Count & Replication Factor
+--------------------------------------------
+- 2 most parameters when creating a topic
+- They impact performance and durability of the system overall
+
+- It is best to get the parameters right the first time:
+	- If the partitions count increases during a topic lifecycle, you will break your keys ordering guarentees
+	- If the replication factor increases during a topic lifecycle, you put more pressure on your cluster, which can lead to unexpected performance decrease( due to increased N/W bad and disk space use) 
+
+
+Partitions Count
+-----------------------------
+	- Each partition can handle a throughput of a few MB/s(measure it for your setup)
+	- More parttions implies:
+		- Better parallelism,better throughput
+		- Ability to run more consumers in a group to scale(max as many consumers per group as partitions)
+		- Ability to leverage more brokers if you have a large cluster
+		- But more elections to perform for Zookeeper(if suing Zookeeper)
+		- But more files opened on Kafka
+
+
+Guidelines for setting Parttion Count
+-------------------------------------------
+- Partitions per topic = Million Dollar Question
+	- (Intuition) Small Cluster ( < 6 brokers)  : 3 x # brokers
+	- (Intuition) Big Cluster   ( > 12 brokers) : 2 x # brokers  
+	- Adjust for no. of consumers you need to runin parallel at peak throughput
+	- Adjust for producer throughput( increase if super-high throughput or projected increase in the next 2 years)
+	- Test:  every Kafka cluster will have different performance
+	- Don't systematically create topics wih 1000 parttions.
+
+
+
+
+ Replication Factor:
+---------------------
+
+	- Should be alteast 2, usually 3, maximum 4
+	- Higher the replication factor(N):
+		- Better durability of your system( N-1 brokers can fail)
+		- Better availability of your system( N-min,insync.replicas if producer acks=all)
+		- But Higher repliation ( higher latency if acks = all)
+		- But more disk space onyour system(50% more if RF is 3 instead of 2)
+
+ 
+Guidelines for setting REplication Factor
+-------------------------------------------
+- Set it to 3 to get started( you must have atleast 3 brokers for that)
+- If replication performance is an issue, get a better broker instead of less RF
+- Never set to 1 in prod
+
+
+Cluster Guildelines
+----------------------
+- Total no. of partitions in the cluster:
+	- Kafka with Zookeeper:
+		- max. 200,000 parttions( Nov 2018) - Zookeeper Scaling limit
+		- still recommended a max. of 400,000 parttiosn per broker ( soft limit) 
+	- KAfka with KRaft:
+		- potentially millions of parttions
+
+- If you need more than 200,000 partttiosnin your cluster ( it will take time to get there), follow the Netflix model and create more Kafka clusters.  
+
+- Overall , you don't need a topic with 1000 parttions to achieve high throughput.
+Start at a reasonable number and test the performance.

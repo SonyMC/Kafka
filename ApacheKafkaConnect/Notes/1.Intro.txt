@@ -1,0 +1,24 @@
+Pre-Requisites
+--------------
+- Course covers soem more advanced and recent Kafka APIs
+- Knowledge of Apache Kafka , Docker and JAva
+
+
+Course Objectives
+--------------------
+- We are going to build a pipeline to ingest data from Twitter in real time and sink them into Elastic Search and PostgreSQL
+- Learn about Kafka Connect:
+	- Kafka Connect Concepts & Architecture
+	- Standalone, Distributed mode
+	- Setup and Launch Kafka COnnect Cluster using Docker Compose
+	- Source Connectors Configuration
+		- Kafka Connect Source API
+			- Get data from a file into a Kafka Topic(FileStreamSourceConnector)
+			- Get data from Twitter into a Kafka topic(TwitteSourceConnector)
+	- Sink Connector Configuration
+		- Kafka Connect Sink API
+			- Store the data from Kafka into Elastic Search( ElasticSearchSinkConnector)
+			- Store the data from KAfka into PostgreSQL(JDBCSinkConnector)
+	- Kafka COnnect UI
+	- KAfka COnnect REST API
+

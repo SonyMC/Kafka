@@ -1,0 +1,49 @@
+KKAfka Security 
+-----------------------------
+
+
+- Currently any client can access your Kafka cluster(authntication)
+- The clients can publish/consume on any topic data(authorisation)
+- All the data that is sent is funny visible in the NW(encryption)
+
+- Someone could intercept data, publish bad data, steal data, deelte topics etc.
+
+- All these reasons push for more security and an authentication model
+
+
+Encryption : In flight encryption in Kafka:
+-------------------------------------------
+- Encryption in Kafka ensures that the data exchanged between clients and brokers is secret to routers on the way 
+- This is a similar concept to an https website
+- Performance imrovement but negligible is using Java JDK 11
+
+
+Authentication: SSL & SASL in Kafka
+----------------------------------------
+- Authentication in Kafka ensures that only clients that can prove their id can connect to our Kafka cluster
+- This is a similar concept to a login(username/pwd)
+- SSL authentication: clients authenticate to Kafka using SSL certificates
+- SASL/plaintext: 
+	- clients authenticate using username/pwd
+	- weak and easy to setuo 
+	- must enable SSL encryption broker-side as well
+	- Changes in pwd require brokers reboot( good for dev only)
+- SASL/SCRAM:
+	- Username/pwd with a challenge( salt) , more secure
+	- must enable SSL encryption broker-side as well
+	- Authentication data is in Zookeeper( until removed) - add without restarting brokers
+- SASL/GSSAPI(Kerberos):
+	- Kerberos: such as Microsoft AD9 strong - hard to setup)
+	- Very secure and enterprise friendly
+- SASL/OAUTHBEARER:
+	- Leverage OATH2 tokens for authentocation
+
+Authorisation
+---------------
+- Once a client is authentcated, Kafka can verify it's identity
+- It still needs to be combined with authorisation, so that KAfka knows that
+= ACL( Access Control Lists) must be maintained by admins to onboard new users
+
+
+
+	

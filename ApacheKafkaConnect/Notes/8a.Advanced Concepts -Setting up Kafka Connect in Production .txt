@@ -1,0 +1,100 @@
+Objective
+-----------
+- Setup Kafka COnnect on an existing Production Kafka Cluster
+
+
+What we know
+-------------
+- Use Connectors
+- Create COnnectors
+- Add Connectors
+- Use the Landoop Kafka Connect UI
+
+
+
+To setup Kafka COnnect in Production 
+------------------------------------
+
+Setup Instrcutions:
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\setup\
+			- setup.sh
+		
+
+
+(1) Download Kafka Binaries
+		- https://kafka.apache.org/downloads
+		- Binary Downloads 
+			- Scala 2.13
+		- Downloaded to : D:\OneDrive\Study\DevOps\Kafka\KafkaBinary
+		- Extract using WinRar
+		- All Kafka Binaries will be extracted to: 
+			- D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1\bin
+		- For Windows, use the binaries( appended with .bat) in :
+			- D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1\bin\windows
+
+		- Config Library:
+			- D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1\config
+			- Contains propoertis files
+							
+		- Jar files:	
+			- D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1\libs
+
+		- Create folder 'connectors'
+
+		
+
+(2) Setup the connect-distributed.properties file as needed
+		- D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1\config
+			- connect-distributed.properties
+	
+		- Refer :
+			- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\setup\connect-distributed.properties
+		
+
+
+(3) Launch Kafka COnnect
+	- Start Docker Desktop
+	- docker-compose.yml:
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\Docker-Compose for Last Demo\docker-compose.yml
+		- cmd: docker-compose up kafka-cluster
+
+		- Once teh container is running, wait for a minute:
+			- Connect UI : http://127.0.0.1:3030/
+				- Topics-> Enable 'System Topics':
+						- connect-configs
+						- _schemas
+						- connect-statuses
+						- connect-oosets
+
+(4) Launch the connect-distributed.properties:
+		- Open GitBash
+		- cmd: cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+		- cmd:  bin/connect-distributed.sh config/connect-distributed.properties
+
+			- If successful you will see the logs 
+			- Note: Though I see teh cluster has started I am unable to ping it:
+							- cmd: curl localhost:8084		
+
+	
+(5) Settign up a Connector:
+	- url: https://debezium.io/releases
+			- Click on latest stable version -> Releases in this series -> 2.1.1.Final -> Click on DOwnloads dropdown -> PostGres SQL connector
+			- Extract download to :
+				- D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1\connectors
+			- Note: This is teh same path we have mentioned in our connect-distributed.properties for our plugins
+			- Stop and restart cluster in Gitbash:
+					- cmd: ctrl + c
+					-  cmd: bin/connect-distributed.sh config/connect-distributed.properties
+
+
+(6) Add second worker to COnnect CLuster
+		- D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1\config
+		- Copy 'connect-distributed.properties	' as 'connect-distributed-2nd-worker.properties'
+		- Make configuration/port changes
+		- Open GitBash
+		- cmd: cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+		- cmd:  bin/connect-distributed.sh config/connect-distributed-2nd-worker.properties
+
+			- If successful you will see the logs 
+
+			- Note: I am gettign a bind exception

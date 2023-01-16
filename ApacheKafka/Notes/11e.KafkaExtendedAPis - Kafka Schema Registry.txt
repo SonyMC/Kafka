@@ -1,0 +1,178 @@
+
+Kafka Schema Registry
+---------------------
+
+
+Need for a schema registry:
+	- Kafka takes bytes a sinput and publishes them
+	- No data verification
+
+- What if the producer sends bad data?
+- What if a field gets renamed?
+- What if the data format changes from one to another?
+- In such cases, teh consumers will break!!!
+- We need data to be self describable
+- We need to evolve data without breaking downstream consumers
+- We need schemas...and a schema registry
+
+- What if the Kafka Brokers were verifying teh messages they receive?
+	- It would break what makes Kafka so good:
+		 - Kafka doesn't parse or even read your data(no CPU usage)
+		 - Kafka takes bytes as input without even loading them into memory ( that's called zero copy)
+		 - Kafka distributes bytes
+		 - As far as Kafka is concerned, it doensn't even know if your data is an integer, string etc.
+		
+
+Schema Registry
+---------------
+- ThE Schem REgistry must be seperate componenets
+- Producers and COnsumers need to be bale ot talk to it
+- It must be able to reject bad data
+- A common data format must be agreed upon:
+	- It needs to support schemas
+	- It needs to support schema evolution( i.e changes to teh schema)
+	- It needs ot be lightweight
+
+- Enter..Schema Registry
+- Apache Avro is the data format(Protobuf, JSON schema also supported)
+- Stores and retrieves schemas for Producers/Consumers
+- Enforce Backward/Forward/Full compatibilty on topics( if you want to evolve your scemas)
+- Decrease the size of teh payload of data sent to Kafka
+
+Pipeline without a Schema REgistry:
+	- Source -> Producer-> Kafka -> Consumer-> Target
+
+- Pipeline with Schema REgistry: Registry
+	- Source -> Producer -> Send Schema to Schema Registry for First Time -> Schema Registry Validates Schema with KAfka -> If validation is all good , then Producer serializes & sends Avro data to KAfka  -> Consumer reads Avro data from KAfka -> Deserializer of teh COnsumer will request a scehema from the Schema REgistry-?> Consumer will produce object based on the retrieved schema -> Object is wriiten to the target
+
+Note:
+- Utilizing a schema has lots of benefits
+- But it implies you need to:
+	- Set it up well
+	- Make sure it is highly available
+	- Partially change the producer and consumer code to implment Schema Registry
+	- Apache Avro as a format is awesome but has a learnign curve
+	- Other formats include Protobuf and Json schema
+	- The Confluent Schema REgistry is free and Source available
+	- Other open-source alternatives may exist
+	- This demo does not cover implmentation
+
+
+
+Demo:
+----
+- Start Kafka adn Schema Registry using Conduktor( to save time)
+- Create a Schema
+- Send data using a Producer
+- Consume data using a Consumer
+
+Note: The demo uses licensed vewrsion of KAfka and I cannot replicate the expected results
+
+
+Before ruuning 
+
+--------------
+
+
+
+(1) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+
+(2)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window open
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+
+
+
+
+
+
+Demo:
+----
+JSON files:
+- D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-extended\schema-registry
+
+
+Start Conduktor:
+	- Existing Local Cluster ->
+		- Hover the mouse over the cluster name on LHS tab -> Hamburger icon with drop down will appear-> Cick on dropdown -> Edit cluster configuration :
+			-> Got to the Schema Registry tab ->  
+			-> url= http://localhost::8888
+			-> Security = none
+			-> Save
+	- Start the existing cluster
+	- Topics:
+		- Create:
+			- name = demo-schemaRegistry
+			- defaults for partitions and replication factor -> create topic  
+
+	- Schema Registry tab:
+		- Create :
+			- Format = Avro
+			- Strategy = Topic + RecordName
+			- Key or Value = Value
+			- Topic = demo-schemaRegistry	
+			- Record name= will be auto computed
+			- Computed name = will eb auto computed	
+
+	- Create a Schema within the Schema Registry-> 
+		- Name= Kafka_Cluster_Schema_Reg	
+			- Scehma:
+				- schema-v1.json:
+					- from D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-extended\schema-registry
+			- The file represents what the data structure should be for teh specified topic
+			- copy JSON
+			- Paste in place provided for Avro Schema 
+
+		- Testing:
+			-> Start a Producer :
+				- topic = demo-schemaRegistry
+				- key = string
+				- value = Avro(Schema REgistry)
+				- Topic + REcord NAme = demo-schemaregistry-myrecord
+				- copy data from 'producer-v1.json'  in D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-extended\schema-registry
+				- If you try to end data in a diffrent format than specified in teh schema, you will get an error	
+			
+			-> Start a Consumer:
+				- topic = demo-schemaRegistry
+				- Key format = string
+				- Value format = Avro(SR)
+				- Read from the beginning
+				- Date wil leb read in specified format
+
+
+		- Scema Evolution:
+			- Change Scehma:
+				- schema-v21.json:
+					- from D:\OneDrive\Study\DevOps\Kafka\ApacheKafka\KafkaProject\kafka-beginners-course\kafka-extended\schema-registry
+
+
+			- Schema Registry tab:
+				- Update Schema :
+					- paste teh new format
+			- test as previously based on new format
+
+
+
+		 

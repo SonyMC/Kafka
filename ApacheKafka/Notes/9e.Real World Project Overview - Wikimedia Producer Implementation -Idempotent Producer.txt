@@ -1,0 +1,22 @@
+Wikimedia Producer - Idempotent Producer
+-----------------------------------------
+
+- The Producer can introduce duplicate messages in Kafka due to N/W errors
+- In Kafka >=0.11, you can define an "idempoten producer", which won't introduce duplicates on N/W error 
+	- Kafka is smart to enough to recognize the duplicate and does not commit teh duplicate, but sends a succes ack to producer 
+  
+- Idempotent producers are great to guarantee a stable and safe pipeline
+- They are default since Kafka 3.0, recommended to use them
+
+- They come with:
+	- retries=Integer.MAX_VALUE(2^31 -1) 
+	- max.in.flight.requests=1(Kafka==0.11) 
+			OR
+	
+       max.in.flight.requests=5(Kafka>=1.0 - higher performance & keep orderig - KAFKA-5494)
+	- acks=all
+
+- These settings are appied automatically after your producer has started ii not manually set
+- Manual setting:
+	- producerProps.put("enable.idempotence", true)
+ 

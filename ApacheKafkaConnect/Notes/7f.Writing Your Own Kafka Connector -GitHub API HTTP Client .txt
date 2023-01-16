@@ -1,0 +1,36 @@
+
+
+: Note: Am switching to Eclpise, as IntellIJ seems to have problems with trying to download ceertain repos.
+
+
+Code Directory:
+D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+
+_ Open Eclipse -> Import-> Existing MAven Project -> D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+
+
+Getting Data from GitHub API
+------------------------------
+- Query the GitHub API uisn gthe Unirest Library, that we wrap in pur own client
+- Concpets implmented:
+	- Dynamic url
+	- Pagination
+	- Rate Throttling
+	- Error Handling
+
+
+Package:
+	- com.mailsonymathew.kafka
+
+
+Class:
+
+	- GitHubAPIHttpClient.java:
+		- /kafka-connect-github-source/src/main/java/com/mailsonymathew/kafka/GitHubAPIHttpClient.java
+	 	
+
+
+
+

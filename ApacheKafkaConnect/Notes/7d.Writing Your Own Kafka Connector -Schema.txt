@@ -1,0 +1,28 @@
+Writing a Schema
+-----------------
+
+: Note: Am switching to Eclpise, as IntellIJ seems to have problems with trying to download ceertain repos.
+
+
+Code Directory:
+D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+
+_ Open Eclipse -> Import-> Existing MAven Project -> D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaConnect\Code\kafka-connect-github-source-1.1
+
+
+
+
+
+Schemas
+-----------
+- Schema is an abstraction that allows you to define how your data structure will look like.
+- It is uisn gprimitive types, and then the KAfka Connect Framework will construct teh JSON or AVRO as needed.
+_ it is necesary to correctly design your schema before you program
+
+
+
+GitHubSchemas.java
+--------------------
+- /kafka-connect-github-source/src/main/java/com/mailsonymathew/kafka/GitHubSchemas.java
+- Schema is designed based on the JSON received from the GitHUb GET request which is what we are trying to build the connector for : https://api.github.com/repos/kubernetes/kubernetes/issues

@@ -1,0 +1,166 @@
+Wikimedia Producer -High Throughput Implementation
+--------------------------------------------------------
+
+
+
+Code :
+
+	- Compression:
+		- Add snappy message compression in our producer
+		- snappy is very helpful if you rmessages are text based, for example log lines or JSON documents
+		- snappy has a good balance of CPU/compression ratio
+
+	- Batch Size:
+		- Increase the batch.size to 32kb and introduce a small delay through linger.ms( 20 ms)
+	- Check which parttioner is being used
+
+
+
+
+
+
+- Producer will take data from Wikimedia in a Kafka Producer and finally into Kafka
+- Java libraries:
+	- Okhttp3
+	- Okhttp-eventsource
+
+
+- Wikimedia Recent change stream :
+		
+	-url: https://stream.wikimedia.org/v2/stream/recentchange
+	- page keeps on gettign updates very fast
+	- Is realtime and shown all changes happening in Wikimedia
+	-  What is Wikimedia used for?
+		- The nonprofit Wikimedia Foundation provides the essential infrastructure for free knowledge
+	- What's the difference between Wikipedia and Wikimedia?
+		- Based in San Francisco, the Wikimedia Foundation (WMF) is the organization that owns the domain wikipedia.org
+
+	- We will use thsi streeam to send data into Apache Kafka 
+
+- Wikimedia Recent Change Stats:
+		- https://codepen.io/Krinkle/pen/BwEKgW?editors=1010
+- Wikimedia Event Stream Demo:
+		- https://esjewett.github.io/wm-eventsource-demo/s
+
+
+
+
+
+- Classes:
+	- WikiMediaChangesProducerHighThroughPut.java
+	- WikimediaChangeHandler.java( implements EventHandler)
+
+
+
+
+
+
+Before running the code
+-----------------------
+
+
+
+(1) Disable IPV6:
+
+WSL console: 
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+(2)Start Kafka broker:
+
+
+	- Start Zookeeper and Kafka
+
+			(1) Start Zookeeper using binaries in WSL2:
+			- Open WSL:
+				- Start Zookeper:
+					- cmd: zookeeper-server-start.sh ~/kafka_2.13-3.0.0/config/zookeeper.properties
+				- Keep the window open
+			
+
+
+			(2) Start Kafka using binaries in another process in WSL2:
+					- Start Kafka:
+						- cmd: kafka-server-start.sh ~/kafka_2.13-3.0.0/config/server.properties
+							_ if you get an error, run the cmd again
+
+
+
+(3)List Kafka topics:
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --list
+
+__consumer_offsets
+demo_java
+first_topic
+java_demo
+new_topic
+thrid_topic
+wikimedia.recentchange
+
+
+
+(4) Create Kafka topic named 'wikimedia.recentchange' with 3 partitions & replication factor 1 :
+
+Note: Create the topic ''wikimedia.recentchange''  only if it is hase notbeen created before
+
+		- cmd: kafka-topics.sh --bootstrap-server localhost:9092 --topic wikimedia.recentchange --create --partitions 3 --replication-factor 1
+
+
+WARNING: Due to limitations in metric names, topics with a period ('.') or underscore ('_') could collide. To avoid issues it is best to use either, but not both.
+Created topic demo_java.	
+
+
+
+
+Wikimedia Producer Run
+------------------------
+
+
+
+- New WSL console for a consumer from topic 'wikimedia.recentchange' to read from earliest msg and display the key as a string and value as a json
+	- cmd: 
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic wikimedia.recentchange --formatter kafka.tools.DefaultMessageFormatter --property print.timestamp=true --property print.key=true --property format.key=string --property print.value=true  --property format.value=json --from-beginning		
+
+
+
+			OR
+
+- - New WSL console for a simple consumer from topic 'wikimedia.recentchange'  
+	- cmd: 
+kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic wikimedia.recentchange
+
+
+
+- We will  read from the latest 
+- Nothing will be shown as we have not started our producer  
+
+- Start producer: 
+	- Run WikiMediaChangesProducerHighThroughPut.main()
+		- Startup log:
+			- acks = -1
+			- batch.size = 32768
+			- compression.type = snappy
+			- enable.idempotence = true
+			- linger.ms = 20
+			- partitioner.class=class.org.apache.clients.producer.internals.DefaultPartitioner
+				- Default Parttioner uses the StickyParttionCache.
+				- Refer system library class DefaultPartitioner.java
+			- [main] INFO com.launchdarkly.eventsource.EventSource - Starting EventSource client using URI: https://stream.wikimedia.org/v2/stream/recentchange
+
+
+			
+
+
+- Go to WSL consumer console:
+	- You can see data being consumed from the topic to which we have produced using the java code
+		 
+
+- Start Conduktor:
+	- Connect to teh runnign local KAfka CLuster
+	- Start a consumer to teh topic 'wikimedia.recentchange'
+	- You will see losts of msgs coming through. You can see the details of teh msg ( after stoppignteh consumer) by clicking on the msg and seelcting the 'details' button 
+
+
+	

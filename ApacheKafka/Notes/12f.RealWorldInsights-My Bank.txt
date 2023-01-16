@@ -1,0 +1,52 @@
+My Bank 
+------------------
+
+- Is a company that allows real time banking. The business want to deploy a barnd new capability to alert users in case of large transactions:
+	- The transaction data already exists in DB 
+	- Threshholds can be defined by users
+	- Alerts must be sent in real time to the users
+
+
+
+
+
+How to implement
+---------------
+
+
+- New Topic : 
+	-Bank_transactions 
+	-User_Settings
+	-User_Alerts
+
+	
+		
+	
+	 
+
+
+- Producer:
+	- App_Threshold_Service  :  sends threshhold data from user app to topic ' Bank_transactions'
+
+
+
+-Kafka Stream:
+	- Real time Big Transaction Detection: 	
+		- takes data from topics 'Bank_transactions ', 'User_Settings' and computes aggregations and writes to topic  'User_Alerts'	
+
+
+
+- Consumer: 
+	- Notification Service:
+		- takes data from topic 'User_Alerts' and sends it to user app
+
+- Kafka Connect:
+	- Kafka Connect Source CDC Connector(Debezium):
+		- CDC is Change Data Capture
+		- One of the CDC flavous is Debezium
+		- Allows us to reald all the transactions in real time from the DB and put them in Kafka in a nice format
+		- Very powerful 
+		- Connects to DB of transactions and sends data to the topic 'BanK_transactions' 
+
+- Events:
+	- It is better to sned events to the topic( E.g. User 123 enabled threshhold at $1000 at 12 pm on JUly 12th, 2018) rather than sending teh state of the user( E.g. User 123: threshhold $1000)

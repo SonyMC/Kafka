@@ -1,0 +1,30 @@
+plugins {
+    id 'java'
+}
+
+group 'com.mailsonymathew'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    // https://mvnrepository.com/artifact/org.apache.kafka/kafka-clients
+    // Dependency for Kafka client
+    implementation 'org.apache.kafka:kafka-clients:3.3.1'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    // Dependency for slf4j api for logging
+    implementation 'org.slf4j:slf4j-api:2.0.3'
+
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-simple
+    // Dependency for slf4j-simple for logging
+    implementation 'org.slf4j:slf4j-simple:2.0.3'
+
+}
+
+test {
+    useJUnitPlatform()
+}

@@ -1,0 +1,68 @@
+WSL N/W bug
+--------------
+
+WSL2 currently has a networking issue that prevents outside programs to connect to Kafka running on WSL2 (for example your Java programs, Conduktor, etc...);
+
+
+To fix this, we recommend disabling IPv6 on WSL2. Your Windows password will be prompted on the first command:
+
+Open WSL:
+
+
+
+Option 1(recommended) :
+
+Disable IPV6:
+
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=1
+
+
+
+
+Edit server.properties:
+- Open wsl:
+
+
+
+	- cmd: cd /home/mailsonymathew/kafka_2.13-3.0.0
+	- cmd: vi config/server.properties
+			- change the line as follows:
+				 - press 'i' key once to edit text
+				 - original text : #listeners=PLAINTEXT://:9092
+				 - change to    : listeners=PLAINTEXT://localhost:9092
+
+			# Hostname and port the broker will advertise to producers and consumers. If not set,
+			# it uses the value for "listeners" if configured.  Otherwise, it will use the value
+			# returned from java.net.InetAddress.getCanonicalHostName().
+				advertised.listeners=PLAINTEXT://localhost:9092
+
+				 - save file : Press 'Esc" then type ":x" and then press "Enter"
+				 - verify change: 
+					- cmd: cat config/server.properties
+
+
+
+Option 2:
+If you do not want to disbale IPV6:
+
+To renable IPV6:
+cmds:
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=0
+sudo sysctl -w net.ipv6.conf.default.disable_ipv6=0
+
+
+
+- Open wsl:
+	- cmd: cd /home/mailsonymathew/kafka_2.13-3.0.0
+	- cmd: vi config/server.properties
+			- change the line as follows:
+				 - press 'i' key once to edit text
+				 - original text : #listeners=PLAINTEXT://:9092
+				 - change to    : listeners=PLAINTEXT://[::1]:9092
+				 - Theis is the looback server
+				 - save file : Press 'Esc" then type ":x" and then press "Enter"
+				 - verify change: 
+					- cmd: cat config/server.properties
+

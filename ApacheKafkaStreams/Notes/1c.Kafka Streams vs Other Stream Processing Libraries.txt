@@ -1,0 +1,10 @@
+Kafka Streams versus other Stream Processing Libraries( Spark Streaming, NiFi, Flink) 
+-------------------------------------------------------------------------------------
+- Kafka Streams is per data streaming while others are micro batches
+- Seperate Cluster is not required for Kafka Streams while others require sperate clusters
+- Kafka Streams Scales easily by just adding java processes ( no re-configuration required)
+- Kafka streams has exactly once semantics( vs atleast once for Spark) 
+- KAfka Streams an others ( except Nifi) is all code based
+
+Refer : https://www.quora.com/What-are-the-differences-and-similarities-between-Kafka-and-Spark-Streaming
+****
