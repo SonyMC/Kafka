@@ -1,0 +1,38 @@
+Word Count Stream App Propoerties
+-----------------------------------
+
+- A Stream application , when communicating to Kafka, is leveraging the Consumer and Producer API
+- Therefore all configurations we learnt before aare still applicable.
+	- bootstap.servers
+		-  need to connect to kafka( usually port 9092)
+	- auto.ofset.reset.config
+		- set to 'earliest' to consume the topic from start
+	- application.id:
+		- specific to Streams application, will be used for
+				- Consumer group.id = application.id( most important one to remember)
+				- Default client.id prefix
+				- Prefix to internal changelog topics
+	- default.[key/value].serde
+			- for Serialization and Deserialization of data	 
+
+
+
+Code location:
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project\streams-starter-project-word-count
+
+
+
+Code reference:
+	- streams-starter-projec
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Refer\kafka-streams-course-2.0.0\streams-starter-projectt
+
+
+
+
+New Java Class = StreamStarterApp:
+	- src/main/java -> Right click -> New Java Class 
+		- Source Folder = streams-starter-project-word-count/src/main/java
+		- Package = com.mailsonymathew.kafka.streams	
+		- Name = StreamStarterApp
+
+	- Thsi wil lcontain the app configusrations

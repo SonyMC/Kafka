@@ -1,0 +1,72 @@
+First E2E KAfka Streams Application - Word Count
+--------------------------------------------------
+
+Objectives : 
+--------------
+	- Understand fundamentals of KAfka Streams ( Topology theory)
+	- IDE Setup( Development Env)
+	- Understand basic KAfka Streams configurations 
+	- Understand JAva 8 Lambdas
+	- First application write-up(WordCount)
+	- Demo to run it in development env
+	- Learn about Kafka Streams App internal topics
+	- How to package as a jar to run anywhere else
+	- How to scale the Kafka Streams Application
+
+
+
+
+Kafka Streams Core Concepts
+----------------------------
+
+- Refer diagram : KafkaStreamApplicationTerminology.jpg
+
+-  Stream:
+	- A stream is a sequence of immutable data records, that fully ordered, can be replayed, and is fault tolerant(think of a Kafka Topic as a parallel)
+- Stream Processor:
+	- A Stream processor is a node in the processor topology(graph).It transforms incoming streams, record by record, aand may create a new stream from it.
+- Topology:
+	- Is a graph of procesors chained together by streams.
+- Source Processor:
+	- Is a special processor that takes data directlyu from a KAfka topic. It has no predecessors in a topology, and doensn't transform data
+- Sink Processor:
+	- Is a processor that does not have children, it sends stream data directly to a KAfka topic
+
+
+High Level DSL:
+	- In this demo, we will leverage the High Level DSL
+		- It is simple
+		- It has all the operations we need to perform most transformations tasks
+		- It contains a lost of syntax helpers to make our life super easy
+		
+
+Low Level Processor API
+	- We will not be coverign this in teh demo
+	- It is an imperative API
+	- Can be used to implment the most complex logic, but it's rarely needed  
+
+
+Environment and IDE Setup : JAva 8, MAven , IntelliJ IDEA Community edition/Eclipse 
+---------------------------------------------------------------------------
+- Java 8//11/17 JDK 
+	- cmd: java -version
+	- Java 11 
+		-Amazon Corretto 11
+			- https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/what-is-corretto-11.html
+		- Any version wil lwork fine
+
+-  Maven 3
+	- https://maven.apache.org/download.cgi
+	- cmd: mvn --version 
+- IntellIJ IDEA Community Edition/Eclipse
+	- IntelliJ Community IDEA
+		- https://www.jetbrains.com/idea/download/#section=windows
+
+
+
+S
+
+
+
+
+

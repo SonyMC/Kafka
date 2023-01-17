@@ -36,13 +36,14 @@ Objectives:
 	- Change permissions of folder to allow acess to all users( Note: only for DEV ):
 		- Right click on folder -> properties-> Security-> Users/Athelas -> Edit -> Allo = Full COntrol
 	
-	- Refer coomads:
+	- Refer commands:
 			- Windows:
 				- course-intro-windows.bat
-					- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project\code\1-course-intro\
+					- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\code_v2\code\1-course-intro
+
 			- MAC/Linux:
 				- course-intro-mac-linux.sh
-					- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project\code\1-course-intro\
+					- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\code_v2\code\1-course-intro
 
 			- We will be following Windows commands for this demo
 
@@ -68,7 +69,8 @@ for %%i in ("%BASE_DIR%\libs\*") do (
 
 	- Closecm console and try command again
 
-	- Start Zookeeper:
+	- Optional Step: Start Zookeeper:
+		- Note: Zookeeper is used in older versionsof Kafka and we will not be requiring it here.	
 		- - zookeeper is at localhost:2181		
 		- cmd: cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
 		- cmd: bin\windows\zookeeper-server-start.bat config\zookeeper.properties
