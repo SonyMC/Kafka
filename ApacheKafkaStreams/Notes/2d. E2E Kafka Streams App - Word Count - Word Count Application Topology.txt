@@ -1,0 +1,43 @@
+WordCount Streams App Topology
+-----------------------------------
+
+- Let us write the topology using the High Level DSL for our application
+- Remember data in Kafka Streams is <Key,Value>
+
+- We will do the followign 7 operations to do a word counts:
+
+1. Create a Stream from Kafka
+		- E.g. <null, "Kafka Kafka Streams">
+2. Map the values to lowercase
+		- E.g. <null, "kafka kafka streams"> 
+3. FlatMapValues split by space
+		- E.g. <null,"kafka">,<null,"kafka">,<null,"streams">
+4. SelectKey to apply a key
+		- E.g. <"kafka","kafka">,<"kafka","kafka">,<"streams","streams">
+5. GroupByKey before aggrgation
+		- E.g. (<"kafka","kafka">,<"kafka","kafka">),(<"streams","streams">)
+6. Count occurences in each group
+		- E.g. <"kafka",2>,<"streams",1>)
+7. 'To' operation in order to write results back to Kafka
+		- data point is written to Kafka
+
+
+Tip: In iIntellIj, to see return type of an expression, use ctrl+shift+P
+
+
+Code location:
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project\streams-starter-project-word-count
+
+
+
+Code reference:
+	- word-count
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Refer\kafka-streams-course-2.0.0\word-count
+
+
+
+Class :
+	 WordCountApp
+
+
+	

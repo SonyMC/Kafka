@@ -1,0 +1,28 @@
+WordCount : Graceful Shutdown
+-----------------------------
+
+
+Tip: In iIntellIj, to see return type of an expression, use ctrl+shift+P
+
+- Adding a shutdown hook is key for a graceful shutdown of Kafka Streams application, which will help the speed of restart
+- This should be in every Kafka Streams application you create	
+
+
+
+
+Code location:
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project\streams-starter-project-word-count
+
+
+
+Code reference:
+	- word-count
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Refer\kafka-streams-course-2.0.0\word-count
+
+
+
+Class :
+	 WordCountApp
+
+
+	

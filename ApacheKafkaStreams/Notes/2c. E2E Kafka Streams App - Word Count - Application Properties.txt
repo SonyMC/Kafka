@@ -1,4 +1,4 @@
-Word Count Stream App Propoerties
+Word Count Stream App Properties
 -----------------------------------
 
 - A Stream application , when communicating to Kafka, is leveraging the Consumer and Producer API
@@ -23,16 +23,16 @@ Code location:
 
 
 Code reference:
-	- streams-starter-projec
-		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Refer\kafka-streams-course-2.0.0\streams-starter-projectt
+	- word-count
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Refer\kafka-streams-course-2.0.0\word-count
 
 
 
 
-New Java Class = StreamStarterApp:
+
+New Java Class = WordCountApp:
 	- src/main/java -> Right click -> New Java Class 
 		- Source Folder = streams-starter-project-word-count/src/main/java
 		- Package = com.mailsonymathew.kafka.streams	
-		- Name = StreamStarterApp
-
-	- Thsi wil lcontain the app configusrations
+		- Name = WordCountApp
+	- Thsi will lcontain the app configusrations

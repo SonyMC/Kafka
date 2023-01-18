@@ -1,0 +1,7 @@
+Lambda Functions in JAva 8
+----------------------------
+
+Refer : https://www.tutorialspoint.com/java8/java8_lambda_expressions.html
+
+
+E.g: See diagram 'JavaLambdaEg.jpg'

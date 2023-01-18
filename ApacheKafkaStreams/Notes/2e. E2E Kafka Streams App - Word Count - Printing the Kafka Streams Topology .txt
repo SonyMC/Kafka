@@ -1,0 +1,27 @@
+WordCount : Printing the KAfka Streams Topology
+-----------------------------------
+
+
+Tip: In iIntellIj, to see return type of an expression, use ctrl+shift+P
+
+- Printing the topology at teh start of the application is helpful while developing ( and even in production) as it helps understand the application flow directly from the first lines of the logs
+- Reminder : The topology represents all teh streams and procesors of your Streams application 
+
+
+
+Code location:
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project\streams-starter-project-word-count
+
+
+
+Code reference:
+	- word-count
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Refer\kafka-streams-course-2.0.0\word-count
+
+
+
+Class :
+	 WordCountApp
+
+
+	
