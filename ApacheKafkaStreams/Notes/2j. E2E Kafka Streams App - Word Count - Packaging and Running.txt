@@ -1,0 +1,72 @@
+WordCount - Packagign the Application as a 	fat jar
+-------------------------------------------------------------
+
+Tip: In iIntellIj, to see return type of an expression, use ctrl+shift+P
+
+
+
+- In order to deploy the application to other machines, we often need to compile it as a .jar( Java Archive)
+- Default compilation in java only includes the code you write in the .jar file without the dependencies
+- Maven has a plugin to allow us to package all our code + the dependencies into one jar, simply called a fat jar
+
+- Specify the maven plugin and the mainfest(main class) as follows in your pom.xml:
+       <!--package as one fat jar-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>com.mailsonymathew.kafka.streams.WordCountApp</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>assemble-all</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>  
+  
+
+
+- Creating the jar :
+	- Option 1 for IntelliJ: 
+		- In RHS , click on MAven tab -> streams-> starter-project-word-count 
+			-> clean
+			-> package
+
+	- Option 2: command line 
+		- cd D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project\streams-starter-project-word-count
+			-> cmd: mvn clean package
+	
+
+
+- Response:
+[INFO] Building jar: D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project\streams-starter-project-word-count\target\streams-starter-project-word-count-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  42.639 s
+[INFO] Finished at: 2023-01-19T12:58:04+05:30
+[INFO] -----------------------------------------------------------------------
+
+
+- Running the jar:
+	-cd  D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project\streams-starter-project-word-count\
+	- cmd: java -jar target\streams-starter-project-word-count-0.0.1-SNAPSHOT-jar-with-dependencies.jar
+
+	- Application will start
+
+	- Shutdown: ctrl + 

@@ -1,0 +1,44 @@
+WordCount - Internal Topics
+-------------------------------
+
+- Running a Kafka Streams may eventually create internal intermediary topics
+- Two types:
+	- Repartioning topics: 
+		- In case you start transforming the key of your stream, a repartitioning will happen at some processor
+	- Changelog topics:
+		- In case you perform aggregations, Kafka Streams will save compacted data in these topics
+
+- Internal topics:
+	- Are managed by KAfka Streams
+	- Are used by Kafka Streams to save/restore and re-parttion data
+	- Are prefixed by application.id parameter
+	- Should never be deleted, altered or published to. They are internal.
+
+
+Tip: In iIntellIj, to see return type of an expression, use ctrl+shift+P
+
+
+
+
+
+
+
+
+
+(1)List topics:
+	- After startign Kafka Zookeeper and Broker:
+
+	- Old version using Zookeeper:
+		cmd: bin\windows\kafka-topics.bat --zookeeper localhost:2181 --list
+	- Newer Version of Kafka that does not have Zookeeper
+		cmd: bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --list
+		- Note: We are following the newer version cmd( without zookeeper)
+		- Response:
+streams-wordcount-output
+word-count-input
+word-count-output
+wordcount-application-Counts-changelog
+wordcount-application-Counts-repartition
+
+
+

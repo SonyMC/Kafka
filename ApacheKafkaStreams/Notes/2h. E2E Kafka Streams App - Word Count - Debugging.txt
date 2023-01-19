@@ -1,0 +1,15 @@
+Debugging Application - IntelliJ
+-------------------------------
+
+
+Tip: In iIntellIj, to see return type of an expression, use ctrl+shift+P
+
+
+-- Click on RHS of the line no. to set a breakpoint
+-- WordCountApp.java ->Right click -< Debug main()
+-- Execution wil lstop at the debug point
+- Press resume execution button in teh IntelliJ debug console 
+
+
+
+

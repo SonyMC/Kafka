@@ -1,8 +1,14 @@
 rem create input topic with two partitions
+rem -  Older versions of Kafka using Zookeeper
 bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 2 --topic word-count-input
+rem - Newer Version of Kafka
+bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 2 --topic word-count-input
 
 rem create output topic
+rem -  Older versions of Kafka using Zookeeper
 bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 2 --topic word-count-output
+rem - Newer Version of Kafka 
+bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 2 --topic word-count-output
 
 rem launch a Kafka consumer
 bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 ^

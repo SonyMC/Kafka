@@ -12,14 +12,14 @@ bin\windows\kafka-server-start.bat config\server.properties
 rem create input topic
 rem -  Older versions of Kafka using Zookeeper
 bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic streams-plaintext-input
-rem - Newer Version of Kafka that does not have Zookeeper
+rem - Newer Version of Kafka 
 bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic streams-plaintext-input
 
 
 rem create output topic
 rem -  Older versions of Kafka using Zookeeper
 bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic streams-wordcount-output
-rem - Newer Version of Kafka that does not have Zookeeper
+rem - Newer Version of Kafka t
 bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic streams-wordcount-output
 
 

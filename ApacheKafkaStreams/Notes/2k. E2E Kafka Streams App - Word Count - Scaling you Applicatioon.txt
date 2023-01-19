@@ -1,0 +1,70 @@
+WordCount - Scaling our Application
+-----------------------------------
+
+- Our input topic has 2 partitions, therefore we can launch upto 2 instances of our application in parallel without any changes in the code
+ 
+- So if we had 6 parttions in ur input topic, we could hav elaunched 6 instances
+
+
+- This is because a Kafka Streams application relies on KafkaConsumer, and we know we could add consumers to a consumer group by just running the same code
+
+
+
+- This makes scaling super easy, without the need of any applcation cluster
+
+Demo:
+	- Ensure input topic has 2 partitions
+	- Run the 2 instances of our Kafka Streams Application
+	- Start publishing data to the sourc topic
+	- Observe our Kafka Streams application receive distinct data and still work
+
+
+- Enable mutiple instances run in IntellIj:
+	- Run -> Edit cofigurations -> Application = WordCountApp -> Click on link on RHS 'Modify Options' -> Allow Multiple Instances -> Ok
+
+
+- Runnign the app:
+	- In Intellij, click on run button twice to launch two instance
+
+
+- Note : Am gettign the following error and need to investigate
+WARN Using an OS temp directory in the state.dir property can cause failures with writing the checkpoint file due to the fact that this directory can be cleared by the OS. Resolved state.dir: [C:\Users\DELL\AppData\Local\Temp\\kafka-streams] (org.apache.kafka.streams.processor.internals.StateDirectory:138) 
+ERROR Failed to change permissions for the directory C:\Users\DELL\AppData\Local\Temp\kafka-streams (org.apache.kafka.streams.processor.internals.StateDirectory:163) 
+ERROR Failed to change permissions for the directory C:\Users\DELL\AppData\Local\Temp\kafka-streams\wordcount-application (org.apache.kafka.streams.processor.internals.StateDirectory:163) 
+ERROR Unable to obtain lock as state directory is already locked by another process (org.apache.kafka.streams.processor.internals.StateDirectory:190) 
+
+
+
+
+-Launch a Kafka consumer
+
+cmd: 
+bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 ^
+    --topic word-count-output ^
+    --from-beginning ^
+    --formatter kafka.tools.DefaultMessageFormatter ^
+    --property print.key=true ^
+    --property print.value=true ^
+    --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer ^
+    --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
+
+
+	- Response:
+		- You will see blinking cursor which means consumer is waiting for a producer to provide it with data
+
+
+
+- Produce data to the topic 'word-count-input':
+	- cmd: bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic word-count-input
+	- Enter any data in the console:
+			- >
+>KAfka Streams is working
+>Hrray
+>I am KAfka awesome
+>Kafka ILU
+>
+
+
+- You will see the output in the console
+
+- If you shutdown one instnce,the remaining active instance will go onto a rebalance stepd

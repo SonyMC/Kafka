@@ -1,0 +1,163 @@
+Running Application - IntelliJ
+-------------------------------
+
+
+Tip: In iIntellIj, to see return type of an expression, use ctrl+shift+P
+
+
+- Running the Kafka Streams applicaiton can be done directly from IntelliJ
+- Use the green arrow button on the top RHS corner to run the app and the stop button to stop it.
+
+Demo:
+	- Create the final topic using kafka-topics
+	- Run a kafka-console-consumer
+	- Run the application from Intellij
+	- Publish some more data to our input topic using kafka-console-producer
+
+
+
+
+(1) Start Zookeeper and Kafka
+		- cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+
+	- Change permissions of folder to allow access to all users( Note: only for DEV ):
+		- Right click on folder -> properties-> Security-> Users/Athelas -> Edit -> Allo = Full COntrol
+	
+	- Refer commands:
+			- Windows:
+				- course-intro-windows.bat
+					- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\code_v2\code\1-course-intro
+
+			- MAC/Linux:
+				- course-intro-mac-linux.sh
+					- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\code_v2\code\1-course-intro
+
+			- We will be following Windows commands for this demo
+
+	- Open cmd
+		- cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+	
+	-Start zookeeper 
+		- cmd: bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+			-  Error : 'The input line is too long. The syntax of the command is incorrect'
+
+
+	 - Open file 'kafka-run-class.bat' in editor
+			- Refer : https://narayanatutorial.com/jms/apache-kafka/the-input-line-is-too-long-the-syntax-of-the-command-is-incorrect
+			- Replace: 
+for %%i in ("%BASE_DIR%\libs\*") do (
+	call :concat "%%i"
+)	
+
+
+			- With:
+	call :concat "%BASE_DIR%\libs\*;"
+
+
+	- Close cm dconsole and try command again
+
+	- Start Zookeeper:
+		- Note: Zookeeper is used in older versionsof Kafka and we will not be requiring it here.	
+		- - zookeeper is at localhost:2181		
+		- cmd: cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+		- cmd: bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+	
+	- You should be seeing the following msg towards teh en din your powershell console:
+		- INFO binding to port 0.0.0.0/0.0.0.0:2181 (org.apache.zookeeper.server.NIOServerCnxnFactory)
+
+	- Start Kafka:
+		- open another cmd console  shell 
+			-  kafka is at localhost:9092		
+			- cmd: bin\windows\kafka-server-start.bat config\server.properties	
+
+		- You should see something like teh following:
+[2023-01-16 14:23:05,887] INFO [KafkaServer id=0] started (kafka.server.KafkaServer)
+
+
+	- Leave the two consoles for Zookeepr and KAfka running 
+
+
+			
+(2)Create input topic with two partitions
+ -  Older versions of Kafka using Zookeeper
+	cmd: bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 2 --topic word-count-input
+ - Newer Version of Kafka
+	cmd: bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 2 --topic word-count-input
+
+(3)create output topic
+ -  Older versions of Kafka using Zookeeper
+	- cmd:bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 2 --topic word-count-output
+- Newer Version of Kafka 
+	cmd:bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 2 --topic word-count-output
+
+
+(3)List topics:
+	- Old version using Zookeeper:
+		cmd: bin\windows\kafka-topics.bat --zookeeper localhost:2181 --list
+	- Newer Version of Kafka that does not have Zookeeper
+		cmd: bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --list
+		- Note: We are following the newer version cmd( without zookeeper)
+		- Response:
+streams-plaintext-input
+streams-wordcount-output
+
+
+(4)Launch a Kafka consumer
+
+cmd: 
+bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 ^
+    --topic word-count-output ^
+    --from-beginning ^
+    --formatter kafka.tools.DefaultMessageFormatter ^
+    --property print.key=true ^
+    --property print.value=true ^
+    --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer ^
+    --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
+
+
+	- Response:
+		- You will see blinking cursor which means consumer is waiting for a producer to provide it with data
+
+(5) Launch the streams application:
+	- Click on WordCountApp.java
+		- Click on Play button
+		- The app wil start and you wil lsee log output in teh IntellIj console
+		- YOu can verify teh Stream has started by seein the following info in the log:
+INFO stream-thread [wordcount-application-90433819-2bc2-4e5a-9ca3-978ff7816e43-StreamThread-1-consumer] Client 90433819-2bc2-4e5a-9ca3-978ff7816e43 per-consumer assignment:
+	prev owned active {}
+	prev owned standby {wordcount-application-90433819-2bc2-4e5a-9ca3-978ff7816e43-StreamThread-1-consumer-ae611e3c-a41e-48f6-9734-1d931461518f=[]}
+	assigned active {wordcount-application-90433819-2bc2-4e5a-9ca3-978ff7816e43-StreamThread-1-consumer-ae611e3c-a41e-48f6-9734-1d931461518f=[1_0, 0_1, 1_1, 0_0]}
+	revoking active {}
+	assigned standby {}
+
+
+(6)Produce data to the topic 'word-count-input':
+	- cmd: bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic word-count-input
+	- Enter any data in the console:
+			- >
+>KAfka Streams is working
+>Hrray
+>I am KAfka awesome
+>Kafka ILU
+>
+
+
+(7)Go to your consumer console window and you can see the following:
+streams 1
+is      1
+hrray   1
+i       1
+am      1
+awesome 1
+kafka   3
+ilu     1
+working 1
+
+Note; You wil lhave to do atelast a couple of entries in the producer console to see the result in the consumer works in batches.
+
+
+(7) Graceful Shutodown of application :
+	- Do a ctrl+C ot push the stop button in IntelliJ
+	- Response:
+INFO stream-client [wordcount-application-90433819-2bc2-4e5a-9ca3-978ff7816e43] State transition from PENDING_SHUTDOWN to NOT_RUNNING (org.apache.kafka.streams.KafkaStreams:342) 
+INFO stream-client [wordcount-application-90433819-2bc2-4e5a-9ca3-978ff7816e43] Streams client stopped completely (org.apache.kafka.streams.KafkaStreams:1451) 

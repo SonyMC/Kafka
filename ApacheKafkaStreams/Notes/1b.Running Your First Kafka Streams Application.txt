@@ -67,9 +67,9 @@ for %%i in ("%BASE_DIR%\libs\*") do (
 	call :concat "%BASE_DIR%\libs\*;"
 
 
-	- Closecm console and try command again
+	- Close cm dconsole and try command again
 
-	- Optional Step: Start Zookeeper:
+	- Start Zookeeper:
 		- Note: Zookeeper is used in older versionsof Kafka and we will not be requiring it here.	
 		- - zookeeper is at localhost:2181		
 		- cmd: cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
