@@ -1,0 +1,14 @@
+KStream & KTable
+Stateless vs Stateful Operations
+--------------------------------
+
+- Stateless:
+	- means that the result of the trasnsformaiton only depends on the data-point you proces
+		- E.g: "multiply a value by 2" operation is stateless because it doesn't need memory of the past to be achieved
+		
+
+- Stateful:
+	- means that the result of the transformation also depends on an external information - the state  
+	- E.g: a count operation is stateful becuase your app needs to know what happened since it started running in order to know the computation result
+
+	

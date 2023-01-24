@@ -1,0 +1,17 @@
+KStream & KTable
+Filter /FilterNot
+-----------------
+
+- Takes one record and produces zero or one recrd
+
+
+Filter
+------
+	- Does not change keys/values
+	- Does not trigger a repartition
+	- For KStream and KTables
+
+
+FilterNot
+-----------
+	- Inverse of Filter 

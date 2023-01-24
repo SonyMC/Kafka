@@ -1,0 +1,19 @@
+KStream
+Writing To Kafka
+------------------
+
+- You can write any KSream or KTable back to Kafka
+- If you write a KTable back to Kafka, think about screating a log compacted topic.
+
+- To: Terminal Opertion - write records to a Topic
+	- E.g. 
+		stream.to("my-stream-poutput-topic");
+		table.to("my-table-output-topic");
+
+- Through: write to a topic and get a stream/table from the topic
+	- E.g. 
+		KStream<String, Long> newStream = stream.through("user-clicks-topic");
+		KStream<String, Long> newTable  = table.through("my-table-output-topic");
+
+
+

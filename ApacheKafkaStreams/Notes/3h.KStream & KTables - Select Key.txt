@@ -1,0 +1,17 @@
+KStream & KTable
+Select Key
+----------------
+
+- Assigns a new Key to the record( from old key and value)
+- Marks the data for reparttioning
+- Best practice to isolate that transformation to know exactly where the parttioning happens
+
+
+E.g.
+// Uee the first letter of the key as teh new key 
+rekeyed = stream.selectKey((key,value)) -> key.substring(0,1)))
+
+	- So for key,value pair ( alice, paris)  -> result will be ( a, paris)
+	- So for key,value pair ( bob, newyork)  -> result will be ( b, newyork)
+
+

@@ -1,0 +1,20 @@
+K Streams and KTables - Simple Operations
+------------------------------------------
+
+Refer : https://docs.confluent.io/home/overview.html#transform-a-stream
+https://docs.confluent.io/platform/current/streams/developer-guide/dsl-api.html
+
+Objectives:
+	 - Learn more about the theritical aspects:
+		- KStream, KTable, Duality
+		- Refresher on Log Compaction
+
+	- Learn about simple transformaitons and operations
+		- Map/MAp Values
+		- Filter/ FiletNot
+		- FlatMap/FlatMap Values
+		- Branch
+		- toStream()
+		- Reading from & Writing to /through Kafka
+	
+	

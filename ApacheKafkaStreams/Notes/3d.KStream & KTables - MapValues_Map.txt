@@ -1,0 +1,25 @@
+KStream & KTable
+MapValues /Map
+-----------------
+
+Refer : https://docs.confluent.io/platform/current/streams/developer-guide/dsl-api.html#transform-a-stream
+
+MapValues/Map
+------------
+Takes one record and produces one record
+
+MapValues
+----------
+	- Is only affecting values
+	- == does not change keys
+	- == does not trigger a repartition
+	- For KStreams and Ktables
+
+
+
+Map
+---
+	- Affects both keys and values
+	- Triggers a repartittion
+	- For KStreams only
+	

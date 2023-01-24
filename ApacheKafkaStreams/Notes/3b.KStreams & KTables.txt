@@ -1,0 +1,26 @@
+KStreams 
+---------------------
+- Refer Diagram : KStream.jpg
+- All inserts
+- Similar to a log
+- Infinite
+- Unbounded data Streams
+
+
+
+KTables
+-------
+- Refer Diagram : KTable.jpg
+- All upserts( update and inserts) on non null values
+- Deletes on null values
+- Similar to a table
+- Parallel with log compacted topics 
+
+
+KStream vs KTable
+---------------------
+- KStream reading from a topic that's not compacted
+- KTable reading from a topic tha's log-compacted(aggregations)
+
+- KStream if new data is partial information/transactional
+- KTable more if you need a structure that's like a "database table" , where every update is self sufficient( think - total bank balance) 

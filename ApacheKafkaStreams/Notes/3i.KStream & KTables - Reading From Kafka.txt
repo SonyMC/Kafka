@@ -1,0 +1,7 @@
+KStream & KTable
+Reading From Kafka
+------------------
+
+- You can read a topic as a kStream, KTable or GlobalKTable
+- Refer 'ReadingFromKafka.jpg'
+

@@ -1,0 +1,31 @@
+KStream
+FlatMapValues /FlatMap
+---------------------
+
+- Takes one record and produces zero,one or more record
+- Output will always be a list
+
+FlatMapValues
+--------------
+	- does not change kyes
+	- does not trigger reprttion
+	- for KStreams only
+	
+
+
+E.g: 
+//Split a sentence into words
+	- words = sentences.flatMapValues(value -> Arrays.asList(value.split("\\s+")));
+	- So the key.value pair (alice,alice is nice) will be split into 3 key.values as follows:
+		- (alice,alice) , (alice,is), (alice,nice)
+	- So essentially in thsi E.g, the FlatMapValue operator flattens the provided map into a list  
+
+
+FlatMap
+--------
+	- Changes keys
+	- triggers a reparttion
+	- For KStreams only
+
+
+
