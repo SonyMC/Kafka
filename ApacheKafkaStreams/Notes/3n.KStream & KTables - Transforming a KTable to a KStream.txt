@@ -1,0 +1,18 @@
+KStream & KTable
+
+Transforming a KTable to a KStream
+------------------------------------
+
+- It is sometimes helpful to transform a KTable to a KStream in order to keep a changelog of all the changes to the Ktable.
+- This can easily be achieved as follows:
+
+KTable<byte[], String> table = ....;
+
+// Also a variant of 'toStream' exists that allow you 
+// to select a new key for the resulting stream 
+KStream<byte[], String> stream = table.toStream();
+
+
+
+
+

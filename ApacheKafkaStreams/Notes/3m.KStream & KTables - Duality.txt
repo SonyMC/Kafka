@@ -1,0 +1,19 @@
+KStream & KTable
+
+Duality
+--------
+
+
+Stream as Table: 
+	- A stream can be considered a changelog of a table, where each data record in the stream captures a state change of the tale.
+
+	- Refer: StreamAsTable.jpg
+
+
+Table as a Stream:
+	- A table can be considered as a snapshot, at a point in time, of the latest value for each key in a stream( a stream's data records are key-value pairs)
+
+
+	- Refer : TableAsStream.jpg
+
+

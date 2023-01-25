@@ -3,6 +3,8 @@ Log Cleanup Policy: Compact
 
 Refer : https://www.conduktor.io/kafka/kafka-topic-configuration-log-compaction
 
+Refer E.g.: LogCompactionExample.jpg
+
 
 - Log compaction ensures that your log contains at least the last known value for a specific key within a partition 
 - Very useful if we just require a SNAPSHOT instead of full history(such as for a data table in a DB)

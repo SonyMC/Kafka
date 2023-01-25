@@ -1,0 +1,22 @@
+KStream & KTable
+
+Transforming a KStream to a KTable
+------------------------------------
+
+Two ways:
+	(1) Chain a groupByKey() and an aggregation step( E.g. count, aggegrate, reduce etc.)
+		KTable<String, Long> table = usersAndColours.groupByKey
+									 .count()
+															
+
+
+
+
+
+	(2) Write back to Kafka and read as KTable
+		
+		// write to Kafka
+		stream.to("intermediary-topic");
+		
+		// read from Kafka as a table
+		KTable<String, String> table = builder.table("intermediary-topic"); 
