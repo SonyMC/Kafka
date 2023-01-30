@@ -109,7 +109,7 @@ public class WordCountApp {
                     .toStream()
                     .to("word-count-output",   Produced.with(Serdes.String(), Serdes.Long()));
 
-            return builder.build();
+            return builder.build(); // Return the built topology
         }
 
 }

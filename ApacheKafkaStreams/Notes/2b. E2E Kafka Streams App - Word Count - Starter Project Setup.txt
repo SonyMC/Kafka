@@ -9,7 +9,7 @@ Starter Project Setup
 
 - Open IntelliJ:
 
-	- Note: I am using Eclipse, as IntelliJ seems to have soem problmes downloadign dold maven dependencies
+	- 
 	- File -> New -> Project
 		- New Project:
 			- Name= streams-starter-project-word-count

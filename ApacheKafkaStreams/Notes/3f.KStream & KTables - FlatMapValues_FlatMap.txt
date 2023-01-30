@@ -7,8 +7,8 @@ FlatMapValues /FlatMap
 
 FlatMapValues
 --------------
-	- does not change kyes
-	- does not trigger reprttion
+	- does not change keys
+	- does not trigger repartitioon
 	- for KStreams only
 	
 
