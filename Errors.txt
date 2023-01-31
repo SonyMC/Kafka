@@ -1,0 +1,31 @@
+(1) Windows:
+	
+			-  Error : 'The input line is too long. The syntax of the command is incorrect'
+
+-Start zookeeper 
+		- cmd: bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+
+
+	 - Open file 'kafka-run-class.bat' in editor
+			- Refer : https://narayanatutorial.com/jms/apache-kafka/the-input-line-is-too-long-the-syntax-of-the-command-is-incorrect
+			- Replace: 
+for %%i in ("%BASE_DIR%\libs\*") do (
+	call :concat "%%i"
+)	
+
+
+			- With:
+	call :concat "%BASE_DIR%\libs\*;"
+
+
+
+
+
+(2) Log full error:
+	- Go to the server.properties file:
+		- D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1\kafka_2.13-3.3.1\config\server.properties
+		- Change logs.dir location as follows:
+# A comma separated list of directories under which to store log files
+#log.dirs=\tmp\kafka-logs
+log.dirs=\logs
+
