@@ -1,0 +1,90 @@
+Objectives
+----------
+
+- Scala:
+	- Is a programmign language that also runs on the JVM and heavily relies on JAva
+	- Som epeople use Scala already beacuse it well suited for Big Data Analysis, and is used on popular frameworks like Spark or Scalding
+	- 
+
+- Take a cooma delimited topic of userid, colour
+	- Filter out bad data
+	- Keep only colour of "green", "red", "blue"
+- Get the running count of the favourite colurs overall and output this to a topic
+- Note : A user's favourite colour can change 
+	- E.g. 
+		- Stephane, Blue 
+		- John, Green
+		- Stephane, Red( update)
+		- Alicce , Red
+
+	- Colour count for the above E.g. should be:
+		- Blue = 0
+		- Green -= 1
+		- Red = 2
+
+- To do:
+	- Write topology
+	- Start finding the right transformations to apply
+	- Create input and output topics( and intermediary topics if you think on any)
+	- Feed the sample data as a producer:
+		- stephane, blue
+		- john, green
+		- stephane, red
+		- alice, red
+
+
+- Notes:
+	- The input data does not have keys but represents updates
+		- We should read it as a KStream and extract the key
+		- We should write the result to Kafka ( as a log compacted topic)
+	- The results can now be read as a KTable so that updates are correctly applied
+	- We can now perform an aggregation on the kTable(groupBy then count)
+	- And write the results back to Kafka
+
+
+- Topology and Operations:
+	(1) Read one topic from Kafka( KStream)
+	(2) Filter bad values
+	(3) SelectKey that will be the user id
+	(4) MapValues to extract the colour( a slowercase)
+	(5) Filter to remove bad colours
+	(6) Write to Kafka as an intermediary topic
+	(7) Read from Kafka as a KTable(Ktable)
+	(8) GroupBy Colours
+	(9) Count to count colours occurences(KTable)
+	(10)Write to Kfka as a final topic
+
+
+Starter Project Setup
+-----------------------
+- We will create a starter project with the required maven dependecies
+	- Kafka Stream Client
+	- Logging Libraries ( log 4j)
+	- Maven plugins
+
+
+
+
+
+
+
+Code reference:
+	- favourite-colour-scala
+		- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Refer\kafka-streams-course-2.0.0\favourite-colour-scala
+
+
+build.sbt:
+	- Is the maven POM file equivalnet for Scala
+	- After adding dependencies, click on icon for loading changes
+
+resources/log4
+
+
+- Setup log4j.properties
+	- src/main/resources
+
+-Main class:
+	-FavouriteColourAppScala.scala
+
+
+Note: Thsi does not work for me.

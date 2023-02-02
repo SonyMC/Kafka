@@ -1,0 +1,28 @@
+KGroupedStream/KGroupedTable Reduce
+---------------------------------------
+
+KGroupedStream Reduce
+-------------------------
+- Similar to Aggregate, but the result type has to be the same as an input
+	-(Int,Int) => Int(example: a * b) 
+	-(String,String) => String(example concat(a,b)) 
+ 
+
+//Reducing a KGroupedStream
+
+		
+		KTable<String, Long> aggregatedStream = 
+			groupedStream.reduce(
+				(aggValue, newValue) -> aggValue + newValue, /* adder */
+				"reduced-stream-store"); /* state store name */
+
+//Reducing a KGroupedTable
+
+		
+		KTable<String, Long> aggregatedTable = 
+			groupedTable.reduce(
+				(aggValue, newValue) -> aggValue + newValue, /* adder */
+				(aggValue, oldValue) -> aggValue - oldValue, /* subtractor */
+				"reduced-table-store"); /* state store name */
+
+

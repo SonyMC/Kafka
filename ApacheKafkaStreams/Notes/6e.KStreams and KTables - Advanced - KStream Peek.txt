@@ -1,0 +1,20 @@
+KStream Peek
+------------
+
+- Peek allows you to apply a side-effect operation to a kStream and get the same KStream as a result
+- A side effect could be:
+	- printing the stream to the console
+	- Statistics collection
+
+- Warning:
+	- It could be executed multiple times as it is a side effect in cas eof failures)
+	
+
+E.g:
+KStream<byte[], String> Stream = ...;
+
+// Java 8+ example, using lambda expressions
+KStream<byte[], String> unmodifiedStream = stream.peek(
+	(key,value) -> Stream.out.println("key" + key + ", value =' + value));
+
+

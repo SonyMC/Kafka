@@ -1,0 +1,12 @@
+KStream Transform/ Transfrom Values
+--------------------------------------
+
+- Applies a Transformer to each record
+- The Transformer leverages the low level Processor API
+- The processor API is really advanced, not in scope for this course.
+
+Refer: 
+	- https://kafka.apache.org/0110/documentation/streams/developer-guide#streams_processor
+	- https://docs.confluent.io/platform/current/streams/developer-guide/index.html
+
+- Does not trigger a repartition

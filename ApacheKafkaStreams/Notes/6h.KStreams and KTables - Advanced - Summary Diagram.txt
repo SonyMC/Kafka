@@ -1,0 +1,5 @@
+Summary Diagram
+------------------
+
+- Refer diagram : KStreams_KTables_Summary.jpg
+- Link : https://docs.confluent.io/platform/current/streams/developer-guide/write-streams.html

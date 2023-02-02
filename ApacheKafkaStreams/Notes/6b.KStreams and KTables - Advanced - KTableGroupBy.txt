@@ -1,0 +1,10 @@
+KTable Group By
+----------------
+	- GroupBy allows yo to perform more aggregations within a KTable
+	- We have used it in the previous section during our Favourite Colour Example
+	- It triggers a reparttion because the key changes
+	- E.g:
+		- KGroupedTable<String,Integer> groupedTable = table.groupBy(
+			(key,value) -> KeyValue.pair(value, value.length()),
+			Serdes.String(), /* key ( note: type was modified) */
+			Serdes.Integer() /* value (note: type was modified) */ ); 

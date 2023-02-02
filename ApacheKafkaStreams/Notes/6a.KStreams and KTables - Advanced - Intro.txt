@@ -1,0 +1,14 @@
+Refer : https://docs.confluent.io/platform/current/streams/developer-guide/dsl-api.html#stateful-transformations
+
+- Objectives:
+	- Learn about advanced trnasformations nad operations
+	- KTable Stateful Operations
+		- groupBy
+	- KGroupedStream/KGroupedTable Operations
+		- Count
+		- Reduce
+		- Aggregate
+		
+	- KStreams advanced operations
+		- Peek
+		- Transform/TransformValues	

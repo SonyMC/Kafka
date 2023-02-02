@@ -1,0 +1,58 @@
+Exactly Once Semantics
+------------------------
+- Refer :
+	- https://techcrunch.com/2017/06/30/confluent-achieves-holy-grail-of-exactly-once-delivery-on-kafka-messaging-service/
+	- https://www.confluent.io/blog/exactly-once-semantics-are-possible-heres-how-apache-kafka-does-it/
+	- https://medium.com/@jaykreps/exactly-once-support-in-apache-kafka-55e1fdd0a35f
+
+
+What is exactly once?
+	- Exactly once is the ability to guarantee that data processing on each message will happen only once , and that pushing the message back to Kafka will also happen effectively only once( Kafka will de-dup)
+	- Guaranteed when booth I?P and O/P system is Kafka( not for Kafka to external systems)
+	- You can only get Exactly Once Semantics if your Kafka brokers are of version >=0.11 and your Kafka Streams Client is of version >= 0.11
+	
+
+
+When does the problem arises?
+	- Refer picture 'AtLeastOnceProblem.jpg'
+	- Refer picture 'AtLeastOnceProblem_case2.jpg'
+
+
+
+How does Kafka 0.11 solve teh problem?
+	-Refer: https://www.youtube.com/watch?v=Wo9jlaz8h0k&t=1s
+	- Without getting into too much engineering details:
+		- The producers are now idempotent(if the same message is sent twice or more due to retries, Kafka wil lmake sure to only keep one copy of it).
+		- You can write multiple messages to different Kafka topics as part of one transaction(either all are written, or none are written), This is a new advanced API.
+		- To achieve this they had to change some logic and the internal message format in Kafka 0.11, therefore only thsi broker and client version can achieve it
+		- You will ony have to use libraries that implment the new API:
+			- Kafka Streams
+ 
+
+
+Problem with AtLeast Once Semantics:
+	- Cases where it is not acceptable to have atleast once
+		- Getting the exact count by key for a stream
+		- Summing up the bank transactions to compute a persion's bank balance
+		- Any operation that is not idempotent
+		- Any finacial computation
+
+	- Cases where it's acceptable to have atleast once:
+		- Operations on time windows(because the time itself can be vague)
+		- Approximate operations(countign the number of times an IP hits a webpage to detect attacks and webscraping)
+		- Idempotent operations( max, min, etc.)
+
+How to do exactly once in KAfka Streams:
+	- One additional line of code:
+		Properties prop = new Properties();
+		...
+		props.put(StreamsConfig.PROCESSING_GUARANTEE_CONFIG, StreamConfig.EXACTY_ONCE);
+		...
+		KafkaStreams streams = new KafkaStreams(builder, props);
+
+- Currently , Kafka Streams 	is the only library that has implmented this feature, but it is possible that Spark, Flink and othe rframeowrks implement it in the future too.
+
+
+Cons:
+	- Results are published in transactions, which might incur a small latency
+	- You fine tune that settign using commit.interval.ms

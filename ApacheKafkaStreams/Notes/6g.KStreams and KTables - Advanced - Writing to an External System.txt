@@ -1,0 +1,4 @@
+Writing to an External System
+-------------------------------
+- Although theritically doable using  a Kafka Streams Library, it is NOT recommended
+- The recommended way of doing so is Kafka Streams to transform the data and then using Kafka COnnect API

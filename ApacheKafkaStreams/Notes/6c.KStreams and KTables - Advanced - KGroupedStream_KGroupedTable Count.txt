@@ -1,0 +1,12 @@
+KGroupedStream/KGroupedTable Count
+------------------------------------
+- KGroupedStream are obtained after a groupBy/groupByKey() call on a KStream
+- 'Count' counts the no. of record by a grouped key.
+- If used on KGroupedStream:
+	- Null keys are ignored
+	- Null values are ignored
+
+- If used on KGroupedTable:
+	- Null keys are ignored
+	- Nul lvalues are treated as "delete"(=tombstones)
+ 

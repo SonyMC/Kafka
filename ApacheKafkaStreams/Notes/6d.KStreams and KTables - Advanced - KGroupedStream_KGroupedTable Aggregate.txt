@@ -1,0 +1,32 @@
+KGroupedStream/KGroupedTable Aggregate
+---------------------------------------
+
+KGroupedStream Aggregate
+-------------------------
+
+- You need an initiliazer(of any type), an adder, a Serde and a State Store name(name of your aggregation)
+- E.g:
+	- Count total string length by key:
+		// Aggregating a KGroupedStream( note how the value type changes from String to Long)
+		KTable<byte[], Long> aggregatedStream = 
+			groupedStream.aggregate(
+				() -> 0L, /* initializer */
+				(aggKey, newValue, aggValue) -> aggValue + newValue.length(), /* adder */
+				Serdes.Long(0, /* serde for aggregate value */
+				"aggregated-stream-store"); /* state store name */
+
+
+KGroupedTable Aggregate
+-------------------------
+
+- You need an initiliazer(of any type), an adder,a subtractor,  a Serde and a State Store name(name of your aggregation
+- E.g:
+	- Count total string length by key:
+		// Aggregating a KGroupedStream( note how the value type changes from String to Long)
+		KTable<byte[], Long> aggregatedStream = 
+			groupedStream.aggregate(
+				() -> 0L, /* initializer */
+				(aggKey, newValue, aggValue) -> aggValue + newValue.length(), /* adder */
+				(aggKey, oldValue, aggValue) -> aggValue - oldValue.length(), /* subtractor */
+				Serdes.Long(0, /* serde for aggregate value */
+				"aggregated-table-store"); /* state store name */
