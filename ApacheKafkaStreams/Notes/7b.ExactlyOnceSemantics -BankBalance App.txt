@@ -67,10 +67,10 @@ Code location:
 
 -Main class:
 	- BankBalanceExactlyOnceApp.java
-		- Read one topic from KAfka(KSream)
-		- GroupByKey, because your topic already has teh right key! - no repartition happens
+		- Read one topic from Kafka(KStream)
+		- GroupByKey, because your topic already has the right key! - no repartition happens
 		- Aggregate, to compute the "bank balance"
-		- To inorder to write to Kafka
+		
 	
 
 
@@ -103,8 +103,8 @@ Tip: In iIntellIj, to see return type of an expression, use ctrl+shift+P
 		- Right click on folder -> properties-> Security-> Users/Athelas -> Edit -> Allo = Full COntrol
 	
 	- Refer commands:
-			- favourite-colour.bat
-					- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Refer\code_v2\code\3-favourite-colour
+			- bank-balance.bat
+					- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Refer\code_v2\code\4-bank-balance
 
 	- Open cmd
 		- cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
@@ -150,7 +150,7 @@ for %%i in ("%BASE_DIR%\libs\*") do (
 
 
 			
-(2)Create the 3 topics(favourite-colour-input,user-keys-and-colours,favourite-colour-output) that we need:  
+(2)Create input and outtput topics:  
 
 
 - For older version of Kafka using Zookeeper:
@@ -158,13 +158,11 @@ for %%i in ("%BASE_DIR%\libs\*") do (
 Note: To know about 'cleanup.polcy=compact' parameter in below cmds , refer notes '3l.KStream & KTables - Refresher on Log Compaction.txt'
 -
 	(a) create input topic with one partition to get full ordering
-			- cmd: bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic favourite-colour-input
+			- cmd: bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic bank-transactions
 
-	(b) create intermediary log compacted topic:
-			- cmd: bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic user-keys-and-colours --config cleanup.policy=compact
+	(b) create output log compacted topic:
+			- bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic bank-balance-exactly-once --config cleanup.policy=compact
 
-	(c) create output log compacted topic
-			- cmd: bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic favourite-colour-output --config cleanup.policy=compact
 
 
 - For newer version of Kafka :
@@ -172,15 +170,10 @@ Note: To know about 'cleanup.polcy=compact' parameter in below cmds , refer note
 Note: To know about 'cleanup.polcy=compact' parameter in below cmds , refer notes '3l.KStream & KTables - Refresher on Log Compaction.txt'
 	
 	(a) create input topic with one partition to get full ordering
-			- cmd: bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic favourite-colour-input
+			- cmd: bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic bank-transactions
 
-	(b) create intermediary log compacted topic:
-			- cmd: bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic user-keys-and-colours --config cleanup.policy=compact
-
-	(c) create output log compacted topic
-			- cmd: bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic favourite-colour-output --config cleanup.policy=compact
-
-
+	(b) create output log compacted topic:
+			- cmd: bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 -replication-factor 1 --partitions 1 --topic bank-balance-exactly-once --config cleanup.policy=compact
 
 
 
@@ -192,10 +185,8 @@ Note: To know about 'cleanup.polcy=compact' parameter in below cmds , refer note
 		cmd: bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --list
 		- Note: We are following the newer version cmd( without zookeeper)
 		- Response:
-
-favourite-colour-input
-favourite-colour-output
-user-keys-and-colours
+bank-balance-exactly-once
+bank-transactions
 
 
 
@@ -206,58 +197,45 @@ user-keys-and-colours
 
 cmd: 
 bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 ^
-    --topic favourite-colour-output ^
+    --topic bank-balance-exactly-once ^
     --from-beginning ^
     --formatter kafka.tools.DefaultMessageFormatter ^
     --property print.key=true ^
     --property print.value=true ^
     --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer ^
-    --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
+    --property value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
 
 
 	- Response:
 		- You will see blinking cursor which means consumer is waiting for a producer to provide it with data
 
 
-(5) Launch the streams application:
-	- Click on FavouriteColourApp.java
+(5) Launch  the Producer Application:
+	- Click on BankTransactionsProducer.java
 		- Click on Play button
 		- The app wil start and you wil lsee log output in teh IntellIj console
+		- Intellij console:
+			- You will see batches being produced
 
 
+(6) Launch the Streams application:
+	- Click on BankBalanceExactlyOnceApp.java
+		- Click on Play button
+		- The app wil start 
 
 
-(6)Produce data to the topic 'favourite-colour-input':
-	- cmd: bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic favourite-colour-input
-	- Enter any data in the console:
-			- >
-stephane,blue
-john,green
-stephane,red
-alice,red
-alice,blue
-cicily,magenta
-
+(7) Go to consumer console :
+		- You will see the output (i.e real time bank balance transactions)
 
 
 
 
 
-(7)Go to your consumer console window and you can see the following:
-blue    1
-green   1
-blue    0
-red     1
-red     2
-red     1
-blue    1
 
-Note:
-	-  You might need to do atleast a couple of entries in the producer console to see the result in the consumer works in batches.
-	- The KTable automaticvally updates the colour count and filters out colurs that we did not pecify in the code(green,blue,red)
 
 (7) Graceful Shutodown of application :
 	- Do a ctrl+C ot push the stop button in IntelliJ
-	- Response:
-INFO stream-client [wordcount-application-90433819-2bc2-4e5a-9ca3-978ff7816e43] State transition from PENDING_SHUTDOWN to NOT_RUNNING (org.apache.kafka.streams.KafkaStreams:342) 
-INFO stream-client [wordcount-application-90433819-2bc2-4e5a-9ca3-978ff7816e43] Streams client stopped completely (org.apache.kafka.streams.KafkaStreams:1451) 
+
+
+(8) Restart apps:	
+	- Wil pick up exactly wher eit stopped

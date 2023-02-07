@@ -1,27 +1,20 @@
 package com.mailsonymathew.kafka.streams;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;;
+import java.time.Instant;
+import java.util.Properties;
+import java.util.concurrent.ThreadLocalRandom;
+
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringSerializer;
 
-import java.time.Instant;
-import java.util.Properties;
-import java.util.concurrent.ThreadLocalRandom;
-
-/*
-Functionality:
-		- Read one topic from Kafka(KSream)
-		- GroupByKey, because your topic already has teh right key! - no repartition happens
-		- Aggregate, to compute the "bank balance"
-		- To inorder to write to Kafka
- */
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class BankTransactionsProducer {
-    public static void main(String[] args) {
+	public static void main(String[] args) {
         Properties properties = new Properties();
 
         // kafka bootstrap server
@@ -37,7 +30,7 @@ public class BankTransactionsProducer {
 
         Producer<String, String> producer = new KafkaProducer<>(properties);
         /*
-        Sed some data in a loop
+        Send some data as JSON in a loop
          */
         int i = 0;
         while (true) {

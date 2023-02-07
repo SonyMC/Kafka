@@ -1,6 +1,9 @@
+package com.mailsonymathew.kafka.streams;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mailsonymathew.kafka.streams.BankTransactionsProducer;
+
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.Test;
 
@@ -30,4 +33,5 @@ public class BankTransactionsProducerTests {
         System.out.println(value);
 
     }
+
 }
