@@ -34,7 +34,7 @@ Starter Project Setup
  
 	- File -> New -> Project
 		- New Project:
-			- Name= BANK-BALANCE-EXACTLY-ONCE
+			- Name= bank-balance-exactly-once
 			- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project
 			- Create GIT repository : Do not enable
 			- Language : Java
@@ -43,7 +43,7 @@ Starter Project Setup
 			- Add sample code
 			- Advanced Settings : 
 				- Group id = com.mailsonymathew.kafka.streams
-				- Artifact id =  BANK-BALANCE-EXACTLY-ONCE
+				- Artifact id =  bank-balance-exactly-once
 			
 
 
@@ -65,8 +65,7 @@ Code location:
 - Producer class:
 	- BankTransactionsProducer.java
 
--Main class:
-	- BankBalanceExactlyOnceApp.java
+- BankBalanceExactlyOnceApp.java
 		- Read one topic from Kafka(KStream)
 		- GroupByKey, because your topic already has the right key! - no repartition happens
 		- Aggregate, to compute the "bank balance"
@@ -238,4 +237,4 @@ bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 ^
 
 
 (8) Restart apps:	
-	- Wil pick up exactly wher eit stopped
+	- Will pick up exactly where it stopped

@@ -1,0 +1,272 @@
+Joins
+------------------------
+UserEnrichApp:
+	- Joins KStream to GlobalKTable	
+
+
+
+
+1)Join User Purchases(KStream) to User Data(GlobalKTable)
+2)Write a producer to explain the different scenarios
+3) We will do Left Join and an Iner Join and write the results back to Kafka
+3)Oberve the outputs
+
+
+Topology:
+1) Read one topic from KAfka(KStream)
+2) Read teh other topic from Kafka(GlobalkTable)
+3) Do an Inner Join 
+4) Write to Kafka the result of the Inner Join
+5) Do a Left Join 
+6) Write to Kafka the result of the left join
+
+
+Starter Project Setup
+-----------------------
+- We will create a starter project with the required maven dependecies
+	- Kafka Stream Client
+	- Logging Libraries ( log 4j)
+	- Maven plugins
+
+
+- Open IntelliJ:
+
+ 
+	- File -> New -> Project
+		- New Project:
+			- Name= user-event-enricher
+			- Location = D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project
+			- Create GIT repository : Do not enable
+			- Language : Java
+			- Build System = Maven 
+			- JDK = temurin-17
+			- Add sample code
+			- Advanced Settings : 
+				- Group id = com.mailsonymathew.kafka.streams
+				- Artifact id =  user-event-enricher
+			
+
+
+Code location:
+	- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Project\user-event-enricher
+
+
+
+
+
+- Setup pom.xml
+	- Add required dependencies
+
+
+- Setup log4j.properties
+	- src/main/resources
+
+
+- Producer class:
+	- UserDataProducer.java
+
+-UserEventEnricherApp.java
+
+	
+
+
+
+
+
+
+
+********************
+
+
+
+
+Running the Application
+----------------------
+Tip: In iIntellIj, to see return type of an expression, use ctrl+shift+P
+
+
+- Running the Kafka Streams applicaiton can be done directly from IntelliJ
+- Use the green arrow button on the top RHS corner to run the app and the stop button to stop it.
+
+
+
+
+
+(1) Start Zookeeper and Kafka
+		- cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+
+	- Change permissions of folder to allow access to all users( Note: only for DEV ):
+		- Right click on folder -> properties-> Security-> Users/Athelas -> Edit -> Allo = Full COntrol
+	
+	- Refer commands:
+			- join-example.bat
+					- D:\OneDrive\Study\DevOps\Kafka\ApacheKafkaStreams\Refer\code_v2\code\5-join-example
+
+	- Open cmd
+		- cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+	
+	-Start zookeeper 
+		- cmd: bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+			-  Error : 'The input line is too long. The syntax of the command is incorrect'
+
+
+	 - Open file 'kafka-run-class.bat' in editor
+			- Refer : https://narayanatutorial.com/jms/apache-kafka/the-input-line-is-too-long-the-syntax-of-the-command-is-incorrect
+			- Replace: 
+for %%i in ("%BASE_DIR%\libs\*") do (
+	call :concat "%%i"
+)	
+
+
+			- With:
+	call :concat "%BASE_DIR%\libs\*;"
+
+
+	- Close cmd console and try command again
+
+	- Start Zookeeper:
+		- Note: Zookeeper is used in older versionsof Kafka and we will not be requiring it here.	
+		- - zookeeper is at localhost:2181		
+		- cmd: cd D:\OneDrive\Study\DevOps\Kafka\KafkaBinary\kafka_2.13-3.3.1
+		- cmd: bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+	
+	- You should be seeing the following msg towards teh en din your powershell console:
+		- INFO binding to port 0.0.0.0/0.0.0.0:2181 (org.apache.zookeeper.server.NIOServerCnxnFactory)
+
+	- Start Kafka:
+		- open another cmd console  shell 
+			-  kafka is at localhost:9092		
+			- cmd: bin\windows\kafka-server-start.bat config\server.properties	
+
+		- You should see something like teh following:
+[2023-01-16 14:23:05,887] INFO [KafkaServer id=0] started (kafka.server.KafkaServer)
+
+
+	- Leave the two consoles for Zookeepr and KAfka running 
+
+
+			
+(2)Create input and output topics:  
+
+
+- For older version of Kafka using Zookeeper:
+	
+Note: To know about 'cleanup.polcy=compact' parameter in below cmds , refer notes '3l.KStream & KTables - Refresher on Log Compaction.txt'
+-
+	(a) create input topic for user purchases
+			- cmd: bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 3 --topic user-purchases
+
+	(b) create topic for table of user information - log compacted for optimisation
+			- cmd: bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 2 --topic user-table --config cleanup.policy=compact
+
+	(c) create out topic for user purchases enriched with user data (left join)
+			- cmd:bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 3 --topic user-purchases-enriched-left-join
+
+	(d) create out topic for user purchases enriched with user data (inner join)
+			- cmd: bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 3 --topic user-purchases-enriched-inner-join
+
+
+
+- For newer version of Kafka :
+
+Note: To know about 'cleanup.polcy=compact' parameter in below cmds , refer notes '3l.KStream & KTables - Refresher on Log Compaction.txt'
+	
+	(a) create input topic for user purchases
+			- cmd: bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 3 --topic user-purchases
+
+	
+	(b) create topic for table of user information - log compacted for optimisation
+			- cmd: bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 2 --topic user-table --config cleanup.policy=compact
+
+	(c) create out topic for user purchases enriched with user data (left join)
+			- cmd:bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 3 --topic user-purchases-enriched-left-join
+
+	(d) create out topic for user purchases enriched with user data (inner join)
+			- cmd: bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 3 --topic user-purchases-enriched-inner-join
+
+
+
+(3)List topics:
+	- Old version using Zookeeper:
+		cmd: bin\windows\kafka-topics.bat --zookeeper localhost:2181 --list
+
+	- Newer Version of Kafka that does not have Zookeeper
+		cmd: bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --list
+		- Note: We are following the newer version cmd( without zookeeper)
+
+		- Response:
+user-purchases
+user-purchases-enriched-inner-join
+user-purchases-enriched-left-join
+user-table
+
+
+
+
+
+
+(4)Launch a Kafka consumer : start a consumer on the output topic (left join)
+
+cmd: 
+bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 ^
+    --topic user-purchases-enriched-left-join ^
+    --from-beginning ^
+    --formatter kafka.tools.DefaultMessageFormatter ^
+    --property print.key=true ^
+    --property print.value=true ^
+    --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer ^
+    --property value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+
+
+	- Response:
+		- You will see blinking cursor which means consumer is waiting for a producer to provide it with data
+
+
+(5)Launch a Kafka consumer : start a consumer on the output topic (inner join)
+
+cmd: 
+bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 ^
+    --topic user-purchases-enriched-inner-join ^
+    --from-beginning ^
+    --formatter kafka.tools.DefaultMessageFormatter ^
+    --property print.key=true ^
+    --property print.value=true ^
+    --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer ^
+    --property value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+
+	- Response:
+		- You will see blinking cursor which means consumer is waiting for a producer to provide it with data
+
+***
+
+
+(6) Launch  the User Enrich App:
+	- Click on UserEventEnricherApp.java
+		- Click on Play button
+		- The app wil start and you wil lsee log output in teh IntellIj console
+		- Intellij console:
+			- 
+
+
+(7) Launch the Producer :
+	- Click on UserDataProducer.java
+		- Click on Play button
+		- The app wil start 
+		- Will push out data every 10 secs
+
+(8) Go to consumer consoles :
+		- You will see the output 
+			- YOu will see ouptuts based on the cases coded in UserDataProducer.java
+
+
+
+
+
+
+
+(9) Graceful Shutodown of application :
+	- Do a ctrl+C ot push the stop button in IntelliJ
+
+
+(10) Restart apps:	
+	- Will pick up exactly where it stopped

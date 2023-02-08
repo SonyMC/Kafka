@@ -1,0 +1,23 @@
+Understanding the different types of Join:
+------------------------------------------
+
+
+Refer: https://www.confluent.io/blog/crossing-streams-joins-apache-kafka/
+
+
+Inner Join:
+	- Join the data only if it has matches ibn both streams of data
+	- E.g. "Show me the Students with a Locker"
+	- Refer picture : "InnerJoin.jpg"
+
+Left Join:
+	- Join all the data from the left whether or not it has a match on the right
+	- E.g.: "Show me the Students with and without a Locker"
+	- Refer picture "LeftJoin.jpg"
+
+		
+Outer Join:
+	- Only available for KStream/KStream joins
+	- It a left join combined with a right join	
+	- Refer picture "OuterJoin.jpg" 
+ 

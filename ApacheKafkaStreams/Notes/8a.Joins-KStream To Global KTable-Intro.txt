@@ -1,0 +1,14 @@
+Refer : https://docs.confluent.io/home/overview.html#streams-developer-guide-dsl-joins
+
+
+- Join:
+	- Joining means taking a KStream and/or KTable and creating a new KStream or KTable from it
+	- There are 4 kinds of joins(SQL like) and the most common one will be analyzed in a further section, including behaviour and usage
+	- Possible combinations:
+		- Refer picture: 'Joins-KStreams and KTables.jpg'
+				- Note: Type= Windowed means doing the join within a specific time window
+
+	- E.g. We will be demoing:
+		- kStream to GlobalKTable
+			- Type = Non-Windowed
+			- Supported OPerations = (inner) join, left join and outer join

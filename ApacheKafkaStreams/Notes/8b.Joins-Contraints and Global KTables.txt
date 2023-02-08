@@ -1,0 +1,22 @@
+Join Constraints - Co-parttioning of data:
+	- These 3 joins:
+		- KStream/KStTream
+		- KTable/KTable
+		- KStream/KTable
+
+	- Can only happen when the data is co-partitioned. Otherwise the join won't be doable and Kafka Streams will fail with a Runtime Error
+
+
+	- Co-parttioned: 
+		- That means that the same no. of partitions is there on the stream and/or the table.
+	  	- To co-partition data, if the no. of parttions is different, write back the topics through Kafka before the join.Thsi had a N/W cost
+
+
+	- GlobalKTable:
+		- If your KTable data is reasonably small, and you can fit in each of your Kafka Streams application, you can read it as a GlobalKTable.
+		- With GlobalKTables, you can join any sream to your table even if the data doen't have the same no. of partitions.
+
+		- That's because the table data lives on every Streams application instance
+		- The downside is size on dosk, but that's okfor a reasonably sized dataset.
+		- We will demonstrate a join using a global KTable
+	
