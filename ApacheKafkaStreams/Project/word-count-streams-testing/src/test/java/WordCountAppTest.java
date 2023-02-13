@@ -30,15 +30,24 @@ import static org.junit.Assert.assertEquals;
 
 public class WordCountAppTest {
 
+    /*
+    Simulates Kafka Environment
+     */
     TopologyTestDriver testDriver;
 
+    /*
+    String Serializer for Key, Value
+     */
     StringSerializer stringSerializer = new StringSerializer();
 
+    /*
+    Consumer Record Factory
+     */
     ConsumerRecordFactory<String, String> recordFactory =
-            new ConsumerRecordFactory<>(stringSerializer, stringSerializer);
+            new ConsumerRecordFactory<>(stringSerializer, stringSerializer);  // stringSerializer is used for key.value
 
 
-    @Before
+    @Before // Before every test run
     public void setUpTopologyTestDriver(){
         Properties config = new Properties();
         config.put(StreamsConfig.APPLICATION_ID_CONFIG, "test");
@@ -46,16 +55,21 @@ public class WordCountAppTest {
         config.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
         config.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 
+        // Create App Instance
         WordCountApp wordCountApp = new WordCountApp();
+        // Create topology
         Topology topology = wordCountApp.createTopology();
-        testDriver = new TopologyTestDriver(topology, config);
+        testDriver = new TopologyTestDriver(topology,config);
     }
 
-    @After
+    @After  // After the test
     public void closeTestDriver(){
         testDriver.close();
     }
 
+    /*
+    Push record into record Factory using the topic, key and value
+     */
     public void pushNewInputRecord(String value){
         testDriver.pipeInput(recordFactory.create("word-count-input", null, value));
     }
@@ -66,6 +80,9 @@ public class WordCountAppTest {
         assertEquals(dummy, "Dummy");
     }
 
+    /*
+    Read Output from Topic returning a ProducerRecord<String, Long>
+     */
     public ProducerRecord<String, Long> readOutput(){
         return testDriver.readOutput("word-count-output", new StringDeserializer(), new LongDeserializer());
     }
@@ -73,17 +90,18 @@ public class WordCountAppTest {
     @Test
     public void makeSureCountsAreCorrect(){
         String firstExample = "testing Kafka Streams";
+        // Push input Record
         pushNewInputRecord(firstExample);
-        OutputVerifier.compareKeyValue(readOutput(), "testing", 1L);
-        OutputVerifier.compareKeyValue(readOutput(), "kafka", 1L);
-        OutputVerifier.compareKeyValue(readOutput(), "streams", 1L);
+        OutputVerifier.compareKeyValue(readOutput(), "testing", 1L);  // 'testing' occurs once in Kafka Stream based on input
+        OutputVerifier.compareKeyValue(readOutput(), "kafka", 1L); // 'kafka' occurs once in Kafka Stream based on input
+        OutputVerifier.compareKeyValue(readOutput(), "streams", 1L); // 'streams' occurs once in Kafka Stream based on input
         assertEquals(readOutput(), null);
 
         String secondExample = "testing Kafka again";
         pushNewInputRecord(secondExample);
-        OutputVerifier.compareKeyValue(readOutput(), "testing", 2L);
-        OutputVerifier.compareKeyValue(readOutput(), "kafka", 2L);
-        OutputVerifier.compareKeyValue(readOutput(), "again", 1L);
+        OutputVerifier.compareKeyValue(readOutput(), "testing", 2L); // 'testing' occurs now twice in Kafka Stream based on input
+        OutputVerifier.compareKeyValue(readOutput(), "kafka", 2L);  // 'kafka' occurs now twice in Kafka Stream based on input
+        OutputVerifier.compareKeyValue(readOutput(), "again", 1L); // 'again' occurs once in Kafka Stream based on input
 
     }
 

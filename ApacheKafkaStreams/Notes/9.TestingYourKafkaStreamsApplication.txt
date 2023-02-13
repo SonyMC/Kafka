@@ -1,5 +1,7 @@
 Testing Kafka Streams:
 
+- Refer : https://kafka.apache.org/11/documentation/streams/developer-guide/testing.html
+
 
 	- New in Kafka v1.1 onwards
 	- Possible to test the topology of your Kafka Streams Application
@@ -43,7 +45,7 @@ POM.xml:
        <dependency>
            <groupId>org.apache.kafka</groupId>
            <artifactId>kafka-streams-test-utils</artifactId>
-           <version>3.4.0</version>
+           <<version>2.8.2</version>
            <scope>test</scope>
        </dependency>
 
@@ -52,10 +54,7 @@ POM.xml:
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <!--
-            <version>4.12</version>
-            -->
-            <version>4.13.2</version>
++            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
 
@@ -128,86 +127,81 @@ for %%i in ("%BASE_DIR%\libs\*") do (
 
 
 			
-(2)Create input topic with two partitions
- -  Older versions of Kafka using Zookeeper
-	cmd: bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 2 --topic word-count-input
- - Newer Version of Kafka
-	cmd: bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 2 --topic word-count-input
 
-(3)create output topic
- -  Older versions of Kafka using Zookeeper
-	- cmd:bin\windows\kafka-topics.bat --create --zookeeper localhost:2181 --replication-factor 1 --partitions 2 --topic word-count-output
-- Newer Version of Kafka 
-	cmd:bin\windows\kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 2 --topic word-count-output
+(3) Run test in WordCountTestApp.java
+		- Note : Am getting an error:
 
 
-(3)List topics:
-	- Old version using Zookeeper:
-		cmd: bin\windows\kafka-topics.bat --zookeeper localhost:2181 --list
-	- Newer Version of Kafka that does not have Zookeeper
-		cmd: bin\windows\kafka-topics.bat --bootstrap-server localhost:9092 --list
-		- Note: We are following the newer version cmd( without zookeeper)
-		- Response:
-streams-plaintext-input
-streams-wordcount-output
+
+java.lang.NoSuchMethodError: 'org.apache.kafka.streams.processor.internals.StreamThread$ProcessingMode org.apache.kafka.streams.processor.internals.StreamThread.processingMode(org.apache.kafka.streams.StreamsConfig)'
+
+	at org.apache.kafka.streams.TopologyTestDriver.<init>(TopologyTestDriver.java:339)
+	at org.apache.kafka.streams.TopologyTestDriver.<init>(TopologyTestDriver.java:313)
+	at org.apache.kafka.streams.TopologyTestDriver.<init>(TopologyTestDriver.java:272)
+	at WordCountAppTest.setUpTopologyTestDriver(WordCountAppTest.java:62)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.RunBefores.invokeMethod(RunBefores.java:33)
+	at org.junit.internal.runners.statements.RunBefores.evaluate(RunBefores.java:24)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:27)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at com.intellij.junit4.JUnit4IdeaTestRunner.startRunnerWithArgs(JUnit4IdeaTestRunner.java:69)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:235)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:54)
 
 
-(4)Launch a Kafka consumer
+java.lang.NullPointerException: Cannot invoke "org.apache.kafka.streams.TopologyTestDriver.close()" because "this.testDriver" is null
 
-cmd: 
-bin\windows\kafka-console-consumer.bat --bootstrap-server localhost:9092 ^
-    --topic word-count-output ^
-    --from-beginning ^
-    --formatter kafka.tools.DefaultMessageFormatter ^
-    --property print.key=true ^
-    --property print.value=true ^
-    --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer ^
-    --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
-
-
-	- Response:
-		- You will see blinking cursor which means consumer is waiting for a producer to provide it with data
-
-(5) Launch the streams application:
-	- Click on WordCountApp.java
-		- Click on Play button
-		- The app wil start and you wil lsee log output in teh IntellIj console
-		- YOu can verify teh Stream has started by seein the following info in the log:
-INFO stream-thread [wordcount-application-90433819-2bc2-4e5a-9ca3-978ff7816e43-StreamThread-1-consumer] Client 90433819-2bc2-4e5a-9ca3-978ff7816e43 per-consumer assignment:
-	prev owned active {}
-	prev owned standby {wordcount-application-90433819-2bc2-4e5a-9ca3-978ff7816e43-StreamThread-1-consumer-ae611e3c-a41e-48f6-9734-1d931461518f=[]}
-	assigned active {wordcount-application-90433819-2bc2-4e5a-9ca3-978ff7816e43-StreamThread-1-consumer-ae611e3c-a41e-48f6-9734-1d931461518f=[1_0, 0_1, 1_1, 0_0]}
-	revoking active {}
-	assigned standby {}
-
-
-(6)Produce data to the topic 'word-count-input':
-	- cmd: bin\windows\kafka-console-producer.bat --broker-list localhost:9092 --topic word-count-input
-	- Enter any data in the console:
-			- >
->KAfka Streams is working
->Hrray
->I am KAfka awesome
->Kafka ILU
->
+	at WordCountAppTest.closeTestDriver(WordCountAppTest.java:67)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.junit.runners.model.FrameworkMethod$1.runReflectiveCall(FrameworkMethod.java:59)
+	at org.junit.internal.runners.model.ReflectiveCallable.run(ReflectiveCallable.java:12)
+	at org.junit.runners.model.FrameworkMethod.invokeExplosively(FrameworkMethod.java:56)
+	at org.junit.internal.runners.statements.RunAfters.invokeMethod(RunAfters.java:46)
+	at org.junit.internal.runners.statements.RunAfters.evaluate(RunAfters.java:33)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.BlockJUnit4ClassRunner$1.evaluate(BlockJUnit4ClassRunner.java:100)
+	at org.junit.runners.ParentRunner.runLeaf(ParentRunner.java:366)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:103)
+	at org.junit.runners.BlockJUnit4ClassRunner.runChild(BlockJUnit4ClassRunner.java:63)
+	at org.junit.runners.ParentRunner$4.run(ParentRunner.java:331)
+	at org.junit.runners.ParentRunner$1.schedule(ParentRunner.java:79)
+	at org.junit.runners.ParentRunner.runChildren(ParentRunner.java:329)
+	at org.junit.runners.ParentRunner.access$100(ParentRunner.java:66)
+	at org.junit.runners.ParentRunner$2.evaluate(ParentRunner.java:293)
+	at org.junit.runners.ParentRunner$3.evaluate(ParentRunner.java:306)
+	at org.junit.runners.ParentRunner.run(ParentRunner.java:413)
+	at org.junit.runner.JUnitCore.run(JUnitCore.java:137)
+	at com.intellij.junit4.JUnit4IdeaTestRunner.startRunnerWithArgs(JUnit4IdeaTestRunner.java:69)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater$1.execute(IdeaTestRunner.java:38)
+	at com.intellij.rt.execution.junit.TestsRepeater.repeat(TestsRepeater.java:11)
+	at com.intellij.rt.junit.IdeaTestRunner$Repeater.startRunnerWithArgs(IdeaTestRunner.java:35)
+	at com.intellij.rt.junit.JUnitStarter.prepareStreamsAndStart(JUnitStarter.java:235)
+	at com.intellij.rt.junit.JUnitStarter.main(JUnitStarter.java:54)
 
 
-(7)Go to your consumer console window and you can see the following:
-streams 1
-is      1
-hrray   1
-i       1
-am      1
-awesome 1
-kafka   3
-ilu     1
-working 1
+Process finished with exit code -1
 
-Note; You wil lhave to do atelast a couple of entries in the producer console to see the result in the consumer works in batches.
-
-
-(7) Graceful Shutodown of application :
-	- Do a ctrl+C ot push the stop button in IntelliJ
-	- Response:
-INFO stream-client [wordcount-application-90433819-2bc2-4e5a-9ca3-978ff7816e43] State transition from PENDING_SHUTDOWN to NOT_RUNNING (org.apache.kafka.streams.KafkaStreams:342) 
-INFO stream-client [wordcount-application-90433819-2bc2-4e5a-9ca3-978ff7816e43] Streams client stopped completely (org.apache.kafka.streams.KafkaStreams:1451) 

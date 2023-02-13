@@ -827,3 +827,4 @@ SLF4J: Ignoring binding found at [jar:file:/C:/Users/DELL/AppData/Local/Coursier
 SLF4J: See https://www.slf4j.org/codes.html#ignoredBindings for an explanation.
 2023.02.10 17:57:13 INFO  time: initialize in 2.26s
 2023.02.10 17:57:15 WARN  Build server is not auto-connectable.
+2023.02.10 18:22:18 INFO  shutting down Metals
